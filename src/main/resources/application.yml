@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/petwif
+    url: jdbc:mysql://umcdb.cbc2u8q8u4en.ap-northeast-2.rds.amazonaws.com:3306/petwif
     username: root
-    password: 1216
+    password: petwif0722
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
