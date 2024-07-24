@@ -25,4 +25,6 @@ public class AlbumReport extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="album_id")
     private Album album;
+
+    private String content;
 }

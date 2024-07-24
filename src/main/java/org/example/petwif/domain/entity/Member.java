@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.Gender;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
@@ -21,8 +23,12 @@ public class Member extends BaseEntity {
 
     private String profile_url;
 
+    private String name;
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    private LocalDateTime dirthDate;
 
     private String phoneNumber;
 
