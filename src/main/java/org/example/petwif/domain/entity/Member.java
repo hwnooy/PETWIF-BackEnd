@@ -28,7 +28,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    private LocalDateTime dirthDate;
+    private LocalDateTime birthDate;
 
     private String phoneNumber;
 
