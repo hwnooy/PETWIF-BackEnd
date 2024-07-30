@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.common.BaseEntity;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -25,4 +27,7 @@ public class Album extends BaseEntity {
     private String title;
 
     private String content;
+
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 }
