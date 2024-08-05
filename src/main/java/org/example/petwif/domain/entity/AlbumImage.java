@@ -24,7 +24,7 @@ public class AlbumImage extends BaseEntity {
 
     private String imageURL;
 
-    private String imageContent;
+    private String imageContent; //꼭있어야하나요?
 }
 
 

@@ -1,3 +1,4 @@
+/*
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
@@ -26,3 +27,4 @@ public class AlbumView extends BaseEntity {
     @JoinColumn(name="album_id")
     private Album album;
 }
+*/
