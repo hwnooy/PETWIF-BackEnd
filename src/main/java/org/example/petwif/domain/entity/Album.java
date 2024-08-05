@@ -11,6 +11,8 @@ import org.example.petwif.domain.enums.Scope;
 import java.util.ArrayList;
 import java.util.List;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -50,4 +52,6 @@ public class Album extends BaseEntity {
 
     @Enumerated(EnumType.STRING) //공개 범위
     private Scope scope;
+    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
+    private List<Comment> commentList;
 }
