@@ -4,7 +4,7 @@ package org.example.petwif.apiPayload.code.status;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.example.petwif.apiPayload.code.BaseCode;
-import org.example.petwif.apiPayload.code.ReasonDto;
+import org.example.petwif.apiPayload.code.ReasonDTO;
 import org.springframework.http.HttpStatus;
 
 @Getter
@@ -20,23 +20,21 @@ public enum SuccessStatus implements BaseCode {
     private final String message;
 
     @Override
-    public ReasonDto getReason() {
-        return ReasonDto.builder()
-                .httpStatus(httpStatus)
-                .isSuccess(true)
-                .code(code)
+    public ReasonDTO getReason() {
+        return ReasonDTO.builder()
                 .message(message)
+                .code(code)
+                .isSuccess(true)
                 .build();
     }
 
     @Override
-    public ReasonDto getReasonHttpStatus() {
-        return ReasonDto.builder()
+    public ReasonDTO getReasonHttpStatus() {
+        return ReasonDTO.builder()
                 .message(message)
                 .code(code)
                 .isSuccess(true)
                 .httpStatus(httpStatus)
-                .build()
-                ;
+                .build();
     }
 }
