@@ -1,17 +1,17 @@
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.Gender;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,13 +32,24 @@ public class Member extends BaseEntity {
 
     private String phoneNumber;
 
+    // 통신사 속성 넣기 (enum으로)
+    // private 통신사 telecome;
     private String address;
 
     private String status;
 
+    private String email;
+    private String pw;
     //LocalDateTime 사용하면 될까요?
     //private LocalDateTime inactiveDate;
 
     private boolean autoLogin;
+
+    // 양방향 매핑을 해야 멤버가 탈퇴할때 pet도 없어지므로 이건 해야함! 그런 관계가 아니면 굳이 안 넣어도 됨 복잡해져서
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Pet> myPet = new ArrayList<>();
+
+
+
 
 }
