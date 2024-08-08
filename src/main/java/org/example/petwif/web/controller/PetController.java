@@ -22,9 +22,9 @@ public class PetController {
     public ApiResponse<Pet> NewPet(@RequestBody PetRequestDto dto){
         try{
             petService.addPet(dto);
-            return
+            return null;
         } catch (Exception e){
-            return
+            return null;
         }
     }
 
@@ -33,9 +33,9 @@ public class PetController {
 
         try{
             petService.editPet(dto);
-            return ;
+            return null;
         } catch (Exception e){
-            return ;
+            return null;
         }
     }
 

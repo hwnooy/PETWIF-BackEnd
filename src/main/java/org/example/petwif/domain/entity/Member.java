@@ -49,7 +49,7 @@ public class Member extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY)
     private List<Pet> myPet = new ArrayList<>();
 
-
-
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Block> blockList = new ArrayList<>();
 
 }

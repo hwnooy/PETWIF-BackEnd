@@ -3,13 +3,13 @@ package org.example.petwif.apiPayload.code.status;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.example.petwif.apiPayload.code.BaseCode;
-import org.example.petwif.apiPayload.code.ReasonDto;
+import org.example.petwif.apiPayload.code.BaseErrorCode;
+import org.example.petwif.apiPayload.code.ErrorReasonDTO;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum ErrorStatus implements BaseCode {
+public enum ErrorStatus implements BaseErrorCode {
 
     // 가장 일반적인 응답
     _INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
@@ -30,30 +30,30 @@ public enum ErrorStatus implements BaseCode {
 
     // Album Error
     ALBUM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALBUM4001", "앨범을 찾을 수 없습니다."),
-    ALBUM_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "ALBUM4011", "앨범에 대한 권한이 없습니다.");
+    ALBUM_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "ALBUM4011", "앨범에 대한 권한이 없습니다."),
+
+    BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4001", "차단한 내역을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
 
     @Override
-    public ReasonDto getReason() {
-        return ReasonDto.builder()
-                .httpStatus(httpStatus)
+    public ErrorReasonDTO getReason() {
+        return ErrorReasonDTO.builder()
+                .message(message)
+                .code(code)
                 .isSuccess(false)
-                .code(this.code)
-                .message(this.message)
                 .build();
     }
 
     @Override
-    public ReasonDto getReasonHttpStatus() {
-        return ReasonDto.builder()
+    public ErrorReasonDTO getReasonHttpStatus() {
+        return ErrorReasonDTO.builder()
                 .message(message)
                 .code(code)
                 .isSuccess(false)
                 .httpStatus(httpStatus)
-                .build()
-                ;
+                .build();
     }
 }

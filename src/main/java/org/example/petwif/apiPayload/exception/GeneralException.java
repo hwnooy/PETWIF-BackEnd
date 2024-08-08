@@ -3,31 +3,21 @@ package org.example.petwif.apiPayload.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.example.petwif.apiPayload.code.BaseCode;
-import org.example.petwif.apiPayload.code.ReasonDto;
-import org.example.petwif.apiPayload.code.status.ErrorStatus;
+import org.example.petwif.apiPayload.code.BaseErrorCode;
+import org.example.petwif.apiPayload.code.ErrorReasonDTO;
+
 
 @Getter
+@AllArgsConstructor
 public class GeneralException extends RuntimeException {
 
-    private final ErrorStatus errorStatus;
+    private BaseErrorCode code;
 
-    public GeneralException(ErrorStatus errorStatus) {
-        super(errorStatus.getMessage());
-        this.errorStatus = errorStatus;
-    }
-
-    public ReasonDto getErrorStatus() {
-        return this.errorStatus.getReason();
-    }
-    private BaseCode code;
-
-    public ReasonDto getErrorReason() {
+    public ErrorReasonDTO getErrorReason() {
         return this.code.getReason();
     }
 
-    public ReasonDto getErrorReasonHttpStatus(){
+    public ErrorReasonDTO getErrorReasonHttpStatus() {
         return this.code.getReasonHttpStatus();
     }
-
 }

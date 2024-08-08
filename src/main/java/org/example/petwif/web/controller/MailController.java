@@ -21,7 +21,7 @@ public class MailController {
             mailService.sendMail(email);
             return ApiResponse.onSuccess("Verification email sent.");//<>(true, "Verification email sent.", null);
         } catch (Exception e) {
-            return new ApiResponse.onFailure("Failed to send verification email.");
+            return null;//return new ApiResponse.onFailure("Failed to send verification email.");
         }
     }
 
@@ -29,9 +29,9 @@ public class MailController {
     public ApiResponse<String> verifyCode(@RequestParam String email, @RequestParam String code) {
         boolean isVerified = mailService.verifyCode(email, code);
         if (isVerified) {
-            return new ApiResponse<>(true, "Verification successful.", null);
+            return ApiResponse.onSuccess("Verification successful.");
         } else {
-            return new ApiResponse<>(false, "Verification failed.", null);
+            return null;//return ApiResponse.onFailure( "Verification fail");
         }
     }
 }
