@@ -43,12 +43,7 @@ public class Member extends BaseEntity {
 
     private boolean autoLogin;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<Album> albums = new ArrayList<>();; //사용자가 만든 앨범 목록
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<AlbumBookmark> albumBookmarks = new ArrayList<>();; //사용자 북마크한 앨범 목록
-
+    private List<Block> blockList = new ArrayList<>();
 }
