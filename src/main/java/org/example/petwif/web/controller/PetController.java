@@ -7,10 +7,10 @@ import org.example.petwif.domain.entity.Pet;
 import org.example.petwif.service.PetService.PetService;
 import org.example.petwif.web.dto.PetDto.PetRequestDto;
 import org.example.petwif.web.dto.PetDto.PetResponseDto;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
+import static org.example.petwif.apiPayload.code.status.SuccessStatus.OK;
 import java.util.List;
 
 @RestController
@@ -18,19 +18,29 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetController {
 
-    private static PetService petService;
+    private final PetService petService;
     // private static MemberService memberService;
+
     @PostMapping("/newPet")
-    public ApiResponse<List<PetResponseDto>> newPet(@RequestParam Integer petNum, @RequestBody List<PetRequestDto> dtoList) {
+    public ApiResponse<Void> newPet(@RequestBody PetRequestDto dto) {
         System.out.print("pet API 실행");
         try {
-            List<Pet> petList = petService.addPet(dtoList);
-            //petList.stream().
+            petService.addPet(dto);
             return ApiResponse.onSuccess(null);
         } catch (Exception e) {
             throw new GeneralException(_BAD_REQUEST);
         }
     }
+//    @PostMapping("/newPet")
+//    public ApiResponse<?> newPet(@RequestBody List<PetRequestDto> dtoList) {
+//        System.out.print("pet API 실행");
+//        try {
+//            List<PetResponseDto> dto = petService.addPet(dtoList);
+//            return ApiResponse.onSuccess(dto);
+//        } catch (Exception e) {
+//            throw new GeneralException(_BAD_REQUEST);
+//        }
+//    }
 
     @PatchMapping("/edit")
     public ApiResponse<Pet> editPet(@RequestBody PetRequestDto dto){

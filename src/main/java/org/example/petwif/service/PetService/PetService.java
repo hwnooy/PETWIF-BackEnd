@@ -8,34 +8,32 @@ import org.example.petwif.repository.PetRepository;
 import org.example.petwif.web.dto.PetDto.PetRequestDto;
 import org.example.petwif.web.dto.PetDto.PetResponseDto;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class PetService {
     private final PetRepository petRepository;
-    private final MemberRepository memberRepository;
+    //private final MemberRepository memberRepository;
     // id 매칭을 위한 accessToken -> member repository에서 id 가져오기
 
-    public List<Pet> addPet(List<PetRequestDto> dtoList){
-        // 고민 -> n마리를 넣고 n개를 넘겨야하는데 이걸 어케 넘기지...
-        // 해당 로그인한 사람의 id에 펫을 추가해야함
-        //Member member = memberRepository.findById();
-        List<Pet> savedPets = new ArrayList<>();
-
-        for (PetRequestDto dto : dtoList){
+    public void addPet(PetRequestDto dto){
+//        List<Pet> savedPets = new ArrayList<>();
             Pet pet = new Pet();
             pet.setPetAge(dto.getAge());
             pet.setPetGender(dto.getGender());
             pet.setPetName(dto.getPetName());
             pet.setPetKind(dto.getPetKind());
-            savedPets.add(petRepository.save(pet));
-        }
-        System.out.println("addPet called with dtoList: " + dtoList);
-        return savedPets;
+            System.out.println("pet : "+ pet.getPetKind()+" "+ pet.getPetName());
+            petRepository.save(pet);
     }
+
+
 
     public Pet editPet(PetRequestDto dto){
         //Member member = memberRepository.findById();
