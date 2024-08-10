@@ -25,5 +25,5 @@ public class Terms extends BaseEntity {
 
     private String body;
 
-    private boolean option;
+    private boolean isOptionChecked;
 }
