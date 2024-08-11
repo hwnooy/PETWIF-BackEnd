@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.Gender;
+import org.example.petwif.domain.enums.Telecom;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,18 +30,16 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @DateTimeFormat(pattern = "yyyy-mm-dd")
     private LocalDateTime birthDate;
 
     private String phoneNumber;
-
-    // 통신사 속성 넣기 (enum으로)
-    // private 통신사 telecome;
+    private Telecom telecom;
     private String address;
-
     private String status;
-
     private String email;
     private String pw;
+
     //LocalDateTime 사용하면 될까요?
     //private LocalDateTime inactiveDate;
 

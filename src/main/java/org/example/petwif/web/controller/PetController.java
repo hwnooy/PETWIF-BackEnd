@@ -14,23 +14,28 @@ import static org.example.petwif.apiPayload.code.status.SuccessStatus.OK;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/pet")
+@RequestMapping("/pet")
 @RequiredArgsConstructor
 public class PetController {
 
     private final PetService petService;
     // private static MemberService memberService;
 
-    @PostMapping("/newPet")
-    public ApiResponse<Void> newPet(@RequestBody PetRequestDto dto) {
+    @PostMapping("/add")
+    public ApiResponse<String> newPet(@RequestParam Integer petNum, @RequestBody List<PetRequestDto> dto) {
         System.out.print("pet API 실행");
         try {
             petService.addPet(dto);
-            return ApiResponse.onSuccess(null);
+            return ApiResponse.onSuccess(petNum+" 명의 pet 등록완료");
         } catch (Exception e) {
             throw new GeneralException(_BAD_REQUEST);
         }
     }
+
+//    @PatchMapping("/edit")
+//    public ApiResponse<List<PetResponseDto>> editPet(){
+//        return null;
+//    }
 //    @PostMapping("/newPet")
 //    public ApiResponse<?> newPet(@RequestBody List<PetRequestDto> dtoList) {
 //        System.out.print("pet API 실행");
