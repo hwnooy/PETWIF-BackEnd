@@ -34,6 +34,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4001", "차단한 내역을 찾을 수 없습니다.");
 
+
     private final HttpStatus httpStatus;
     private final String code;
     private final String message;
