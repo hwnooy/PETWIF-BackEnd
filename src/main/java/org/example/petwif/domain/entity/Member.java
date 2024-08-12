@@ -7,6 +7,7 @@ import org.example.petwif.domain.enums.Gender;
 import org.example.petwif.domain.enums.Telecom;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +27,19 @@ public class Member extends BaseEntity {
     private String profile_url;
 
     private String name;
+    private String nickname;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @DateTimeFormat(pattern = "yyyy-mm-dd")
-    private LocalDateTime birthDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate birthDate;
 
     private String phoneNumber;
+
+    @Enumerated(EnumType.STRING)
     private Telecom telecom;
+
     private String address;
     private String status;
     private String email;

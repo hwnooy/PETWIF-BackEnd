@@ -1,4 +1,4 @@
-package org.example.petwif.web.dto.LoginDto;
+package org.example.petwif.web.dto.MemberDto;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,8 +6,8 @@ import lombok.Getter;
 @Builder
 @Getter
 public class LoginRequestDto {
-    private String name;
     private String email;
+    private String pw;
 }
 
 

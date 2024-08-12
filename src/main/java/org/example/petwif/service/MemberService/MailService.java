@@ -1,9 +1,6 @@
 package org.example.petwif.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
-import org.example.petwif.domain.entity.Member;
-import org.example.petwif.repository.MemberRepository;
-import org.example.petwif.web.dto.LoginDto.PasswordChangeRequestDto;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;

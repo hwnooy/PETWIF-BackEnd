@@ -3,8 +3,9 @@ package org.example.petwif.web.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
+import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MailService;
-import org.example.petwif.web.dto.LoginDto.EmailRequestDto;
+import org.example.petwif.web.dto.MemberDto.EmailRequestDto;
 import org.springframework.web.bind.annotation.*;
 
 import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
@@ -13,11 +14,15 @@ import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST
 @RequiredArgsConstructor
 public class MailController {
     private final MailService emailVerificationService;
+    private final MemberRepository memberRepository;
 
     /* Send Email: 인증번호 전송 버튼 click */
     @PostMapping("/signup/email")
     public ApiResponse<String> sendVerificationEmail(@RequestBody EmailRequestDto mail) {
         try{
+//            Member member = memberRepository.findByMemberId(5L);
+//            System.out.println(member.getName());
+
             String email = mail.getEmail();
             emailVerificationService.sendVerificationEmail(email);
             return ApiResponse.onSuccess("Verification code sent to " + email);

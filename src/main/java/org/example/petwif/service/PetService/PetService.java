@@ -33,14 +33,10 @@ public class PetService {
             petRepository.save(pet);
         }
     }
-    public Pet editPet(PetRequestDto dto){
-        // Member member = memberRepository.findById(dto);
-        Pet pet = new Pet();
-        pet.setPetKind(dto.getPetKind());
-        pet.setPetAge(dto.getAge());
-        pet.setPetName(dto.getPetName());
-        pet.setPetGender(dto.getGender());
-        return pet;
+    public Pet editPet(Long id, List<PetRequestDto> dto){
+        Member member = memberRepository.findByMemberId(id);
+
+        return null;
         //pet.patch(pet);
     }
 
