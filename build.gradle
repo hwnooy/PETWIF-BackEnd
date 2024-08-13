@@ -41,13 +41,17 @@ dependencies {
 
 	// swaggerDoc
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
-	//implementation 'io.springfox:springfox-swagger2:2.9.2'
+	implementation 'io.springfox:springfox-swagger2:2.9.2'
 	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
 
 	// Spring Boot Starter Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	// email validation
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 
 	// validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
