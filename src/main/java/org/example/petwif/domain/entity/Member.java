@@ -43,7 +43,13 @@ public class Member extends BaseEntity {
 
     private boolean autoLogin;
 
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Block> blockList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<Chat> chatList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<ChatRoom> chatRoomList = new ArrayList<>();
+
 }

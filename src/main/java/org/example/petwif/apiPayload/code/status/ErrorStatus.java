@@ -32,7 +32,11 @@ public enum ErrorStatus implements BaseErrorCode {
     ALBUM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALBUM4001", "앨범을 찾을 수 없습니다."),
     ALBUM_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "ALBUM4011", "앨범에 대한 권한이 없습니다."),
 
-    BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4001", "차단한 내역을 찾을 수 없습니다.");
+    BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4001", "차단한 내역을 찾을 수 없습니다."),
+
+    // Chat Error
+    CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방을 찾을 수 없습니다.");
+
 
     private final HttpStatus httpStatus;
     private final String code;
@@ -41,9 +45,10 @@ public enum ErrorStatus implements BaseErrorCode {
     @Override
     public ErrorReasonDTO getReason() {
         return ErrorReasonDTO.builder()
-                .message(message)
-                .code(code)
+                .httpStatus(httpStatus)
                 .isSuccess(false)
+                .code(this.code)
+                .message(this.message)
                 .build();
     }
 
@@ -54,6 +59,7 @@ public enum ErrorStatus implements BaseErrorCode {
                 .code(code)
                 .isSuccess(false)
                 .httpStatus(httpStatus)
-                .build();
+                .build()
+                ;
     }
 }
