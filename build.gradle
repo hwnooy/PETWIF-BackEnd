@@ -23,16 +23,6 @@ repositories {
 	mavenCentral()
 }
 
-//Qclass가 생성될 곳을 정의한다.
-def querydslSrcDir = 'src/main/generated'
-sourceSets {
-	main {
-		java {
-			srcDirs += [ querydslSrcDir ]
-		}
-	}
-}
-
 dependencies {
 	// web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
