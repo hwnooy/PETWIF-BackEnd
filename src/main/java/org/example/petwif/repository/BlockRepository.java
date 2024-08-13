@@ -15,4 +15,7 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
     Slice<Block> findAllByMember(Member member, PageRequest pageRequest);
 
     List<Block> findByMemberId(Long memberId);
+    Slice<Block> findAllByMemberOrderByCreatedAt(Member member, PageRequest pageRequest);
+
+    boolean existsByMember_IdAndTarget_Id(Long memberId, Long targetId);
 }
