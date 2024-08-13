@@ -13,4 +13,5 @@ public class CommentRequestDto {
 
     private Long id;
     private String content;
+
 }

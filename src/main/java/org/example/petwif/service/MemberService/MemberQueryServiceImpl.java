@@ -16,5 +16,6 @@ public class MemberQueryServiceImpl implements MemberQueryService {
     private final MemberRepository memberRepository;
 
     @Override
-    public Optional<Member> findMember(Long id) { return memberRepository.findById(id); }
+    public Optional<Member> findMember(Long id) {
+        return memberRepository.findById(id); }
 }
