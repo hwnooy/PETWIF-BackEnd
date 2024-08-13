@@ -28,8 +28,6 @@ public class Comment extends BaseEntity {
 
     private String content;
 
-    private Integer likeCount;
-
     public void update(String content){
         this.content = content;
     }
