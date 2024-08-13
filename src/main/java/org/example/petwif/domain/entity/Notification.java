@@ -26,5 +26,5 @@ public class Notification extends BaseEntity {
 
     private String content;
 
-    private boolean check;
+    private boolean isCheck;
 }
