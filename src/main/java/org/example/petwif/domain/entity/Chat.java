@@ -34,7 +34,7 @@ public class Chat extends BaseEntity {
     private String content;
 
     @Column(nullable = false)
-    private boolean checked;
+    private boolean isCheck;
 
     private String imageUrl;
 
