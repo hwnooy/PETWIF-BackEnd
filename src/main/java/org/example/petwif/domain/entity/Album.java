@@ -20,15 +20,19 @@ import java.util.List;
 @AllArgsConstructor
 public class Album extends BaseEntity {
 
-    @Id
+    @Id //앨범 PK
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY) //FK
+    @ManyToOne(fetch = FetchType.LAZY) //사용자 FK
     @JoinColumn(name="member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL) // 일대일 연관관계, 표지 1개의 사진
+    @JoinColumn(name = "cover_image_id")
+    private AlbumImage coverImage;
+
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL) //양방향 연관관계, 표지 제외 나머지 앨범 내 사진 리스트
     @Builder.Default
     private List<AlbumImage> albumImages = new ArrayList<>();
 
@@ -40,18 +44,28 @@ public class Album extends BaseEntity {
     @Builder.Default
     private List<AlbumBookmark> albumBookmarks = new ArrayList<>();
 
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    private List<Comment> commentList;
 
-    @Column(nullable = false)
+   // @Column(nullable = false)
     private String title;
 
-    @Column(nullable = false)
+   // @Column(nullable = false)
     private String content;
 
-    @Column(columnDefinition = "integer default 0", nullable = false)
+   // @Column(columnDefinition = "integer default 0")
     private Integer view;
 
     @Enumerated(EnumType.STRING) //공개 범위
     private Scope scope;
-    @OneToMany(mappedBy = "album", cascade = CascadeType.REMOVE)
-    private List<Comment> commentList;
+
+    public void update(String title, String content, Scope scope){
+        this.title = title;
+        this.content = content;
+        this.scope = scope;
+    }
+
+    public void incrementViewCount() {
+        this.view++;
+    }
 }
