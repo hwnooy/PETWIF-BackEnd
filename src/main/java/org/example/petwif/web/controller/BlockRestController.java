@@ -25,9 +25,9 @@ public class BlockRestController {
     private final BlockQueryService blockQueryService;
 
     @PostMapping("/{memberId}/blocks/{targetId}")
-    @Operation(summary = "멤버 차단 API", description = "특정 멤버가 다른 멤버를 차단하는 API입니다.")
+    @Operation(summary = "멤버 차단 API", description = "사용자가 다른 멤버를 차단하는 API입니다.")
     @Parameters({
-            @Parameter(name = "memberId", description = "차단을 하는 멤버의 아이디, path variable 입니다!"),
+            @Parameter(name = "memberId", description = "차단을 하는 멤버의 아이디(사용자), path variable 입니다!"),
             @Parameter(name = "targetId", description = "차단을 당하는 멤버의 아이디, path variable 입니다!")
     })
     public ApiResponse<BlockResponseDTO.BlockResultDTO> blockMember(@ExistMember @PathVariable(name = "memberId") Long memberId,
@@ -36,10 +36,22 @@ public class BlockRestController {
         return ApiResponse.onSuccess(BlockConverter.toBlockResultDTO(block));
     }
 
-    @GetMapping("/{memberId}/blocks")
-    @Operation(summary = "특정 멤버의 차단 목록 조회 API", description = "특정 멤버의 차단 목록을 조회하는 API이며, 페이징을 포함합니다. query String으로 page 번호를 주세요.")
+    @GetMapping("/{memberId}/blocks/{targetId}")
+    @Operation(summary = "다른 멤버와의 차단 상태 조회 API", description = "사용자가 다른 멤버와의 차단 상태를 조회하는 API입니다.")
     @Parameters({
-            @Parameter(name = "memberId", description = "멤버의 아이디, path variable 입니다!"),
+            @Parameter(name = "memberId", description = "사용자의 아이디, path variable 입니다!"),
+            @Parameter(name = "targetId", description = "다른 멤버의 아이디, path variable 입니다!")
+    })
+    public ApiResponse<BlockResponseDTO.BlockStatusDTO> getBlockStatus(@ExistMember @PathVariable(name = "memberId") Long memberId,
+                                                                       @ExistMember @PathVariable(name = "targetId") Long targetId) {
+        boolean blockStatus = blockQueryService.getBlockStatus(memberId, targetId);
+        return ApiResponse.onSuccess(BlockConverter.toBlockStatusDTO(blockStatus));
+    }
+
+    @GetMapping("/{memberId}/blocks")
+    @Operation(summary = "사용자의 차단 목록 조회 API", description = "사용자의 차단 목록을 조회하는 API이며, 페이징을 포함합니다. query String으로 page 번호를 주세요.")
+    @Parameters({
+            @Parameter(name = "memberId", description = "사용자의 아이디, path variable 입니다!"),
             @Parameter(name = "page", description = "현재 페이지, query parameter 입니다!")
     })
     public ApiResponse<BlockResponseDTO.BlockListDTO> getBlockList(@ExistMember @PathVariable(name = "memberId") Long memberId,
@@ -49,9 +61,9 @@ public class BlockRestController {
     }
 
     @DeleteMapping("/{memberId}/blocks/{targetId}")
-    @Operation(summary = "멤버 차단 해제 API", description = "특정 멤버가 다른 멤버에 대한 차단을 해제하는 API입니다.")
+    @Operation(summary = "멤버 차단 해제 API", description = "사용자가 다른 멤버에 대한 차단을 해제하는 API입니다.")
     @Parameters({
-            @Parameter(name = "memberId", description = "차단 해제를 하는 멤버의 아이디, path variable 입니다!"),
+            @Parameter(name = "memberId", description = "차단 해제를 하는 멤버의 아이디(사용자), path variable 입니다!"),
             @Parameter(name = "targetId", description = "차단 해제를 당하는 멤버의 아이디, path variable 입니다!")
     })
     public ApiResponse<Void> unblockMember(@ExistMember @PathVariable(name = "memberId") Long memberId,
