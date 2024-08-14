@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.common.BaseEntity;
-import org.example.petwif.domain.enums.NotificationDType;
+import org.example.petwif.domain.enums.NotificationDtype;
 
 @Entity
 @Getter
@@ -27,14 +27,14 @@ public class Notification extends BaseEntity {
     @JoinColumn(name="relatedMember_id")
     private Member relatedMember;
 
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="album_id", nullable = true)
+    private Album album;
 
-    private String content;
-
-    private boolean isCheck;
+    private Boolean isConfirmed;
 
     @Enumerated(EnumType.STRING)
-    private NotificationDType dType;
+    private NotificationDtype dtype;
 
     public void setMember(Member member) {
         if (this.member != null)
@@ -47,7 +47,15 @@ public class Notification extends BaseEntity {
         this.relatedMember = relatedMember;
     }
 
-    public void setDType(NotificationDType dType) {
-        this.dType = dType;
+    public void setAlbum(Album album) {
+        this.album = album;
+    }
+
+    public void setDType(NotificationDtype dtype) {
+        this.dtype = dtype;
+    }
+
+    public void setIsConfirmed(Boolean isConfirmed) {
+        this.isConfirmed = isConfirmed;
     }
 }
