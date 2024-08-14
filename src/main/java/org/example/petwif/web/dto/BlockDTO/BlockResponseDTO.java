@@ -14,10 +14,20 @@ public class BlockResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class BlockStatusDTO {
+        boolean block;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class BlockResultDTO {
         Long id;
         Long memberId;
         Long targetId;
+        String profile_url;
+        String nickname;
         LocalDateTime createdAt;
     }
 
