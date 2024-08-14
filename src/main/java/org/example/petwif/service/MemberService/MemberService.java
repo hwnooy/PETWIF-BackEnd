@@ -1,11 +1,15 @@
 package org.example.petwif.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petwif.JWT.TokenDto;
+import org.example.petwif.JWT.TokenProvider;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.domain.enums.Gender;
 import org.example.petwif.domain.enums.Telecom;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.web.dto.MemberDto.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder encoder;
+    private final TokenProvider tokenProvider;
 
     @Transactional
     public Boolean EmailSignup(EmailSignupRequestDTO dto) {
@@ -40,22 +45,38 @@ public class MemberService {
 
         return true;
     }
-    public Boolean login(LoginRequestDto dto){
+    public TokenDto login(LoginRequestDto dto) {
         String clientEmail = dto.getEmail();
         String clientPw = dto.getPw();
-        if (memberRepository.checkEmail(clientEmail).isPresent()){
-            Member member = memberRepository.findByEmail(clientEmail);
-            String dbPw = member.getPw();
-            if (encoder.matches(clientPw,dbPw)){
-                return true;
-            }
-            else {
-               throw new IllegalArgumentException("비밀번호 불일치");
-            }
-        }
-        else return false;
 
+        Member member = memberRepository.checkEmail(clientEmail)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 아닙니다. 회원가입을 해주세요."));
+
+        if (!encoder.matches(clientPw, member.getPw())) {
+            throw new IllegalArgumentException("비밀번호 불일치");
+        }
+
+        // 사용자 인증에 성공하면 JWT 토큰 생성
+        Authentication authentication = new UsernamePasswordAuthenticationToken(clientEmail, null);
+        return tokenProvider.generateTokenDto(authentication);
     }
+
+//    public Boolean login(LoginRequestDto dto){
+//        String clientEmail = dto.getEmail();
+//        String clientPw = dto.getPw();
+//        if (memberRepository.checkEmail(clientEmail).isPresent()){
+//            Member member = memberRepository.findByEmail(clientEmail);
+//            String dbPw = member.getPw();
+//            if (encoder.matches(clientPw,dbPw)){
+//                return true;
+//            }
+//            else {
+//               throw new IllegalArgumentException("비밀번호 불일치");
+//            }
+//        }
+//        else return false;
+//
+//    }
 
 
     public Boolean checkNickName(Long mId, NicknameDto nickname){

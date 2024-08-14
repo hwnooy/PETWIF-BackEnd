@@ -1,10 +1,14 @@
 package org.example.petwif.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.apiPayload.ApiResponse;
+import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.web.bind.annotation.*;
+
+import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,17 +33,28 @@ public class MemberController {
     }
 
 
-    @PostMapping("/email/login")  // 이것도 성공, accessToken으로 해야하나.. 이것 처리
-    public ApiResponse<String> login(@RequestBody LoginRequestDto dto){
-        try{
-            if (memberService.login(dto)){
-                return ApiResponse.onSuccess("로그인 성공");
-            }
-            else return ApiResponse.onFailure("400", "회원이 아닙니다.", "회원이 아닙니다. 회원가입을 해주세요.");
-        } catch (IllegalArgumentException e){
-            return ApiResponse.onFailure("400", "로그인 실패", "비밀번호가 틀렸습니다.");
+    @PostMapping("/email/login")  // JWT 토큰을 생성하여 반환
+    public ApiResponse<TokenDto> login(@RequestBody LoginRequestDto dto) {
+        try {
+            TokenDto tokenDto = memberService.login(dto);
+            return ApiResponse.onSuccess(tokenDto);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.onFailure("400", e.getMessage(), null);
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "다시하세요",null);
         }
     }
+//    @PostMapping("/email/login")  // 이것도 성공, accessToken으로 해야하나.. 이것 처리
+//    public ApiResponse<String> login(@RequestBody LoginRequestDto dto){
+//        try{
+//            if (memberService.login(dto)){
+//                return ApiResponse.onSuccess("로그인 성공");
+//            }
+//            else return ApiResponse.onFailure("400", "회원이 아닙니다.", "회원이 아닙니다. 회원가입을 해주세요.");
+//        } catch (IllegalArgumentException e){
+//            return ApiResponse.onFailure("400", "로그인 실패", "비밀번호가 틀렸습니다.");
+//        }
+//    }
 
     @PatchMapping("/nickname")  // 닉네임 변경할 때 중복방지 및 변경 : 완료
     public ApiResponse<String> changeNickname(@RequestParam Long id, @RequestBody NicknameDto nickname){
