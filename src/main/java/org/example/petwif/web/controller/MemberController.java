@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
+import org.example.petwif.domain.entity.Member;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.web.bind.annotation.*;
@@ -44,20 +45,12 @@ public class MemberController {
             return ApiResponse.onFailure("500", "다시하세요",null);
         }
     }
-//    @PostMapping("/email/login")  // 이것도 성공, accessToken으로 해야하나.. 이것 처리
-//    public ApiResponse<String> login(@RequestBody LoginRequestDto dto){
-//        try{
-//            if (memberService.login(dto)){
-//                return ApiResponse.onSuccess("로그인 성공");
-//            }
-//            else return ApiResponse.onFailure("400", "회원이 아닙니다.", "회원이 아닙니다. 회원가입을 해주세요.");
-//        } catch (IllegalArgumentException e){
-//            return ApiResponse.onFailure("400", "로그인 실패", "비밀번호가 틀렸습니다.");
-//        }
-//    }
 
     @PatchMapping("/nickname")  // 닉네임 변경할 때 중복방지 및 변경 : 완료
-    public ApiResponse<String> changeNickname(@RequestParam Long id, @RequestBody NicknameDto nickname){
+    public ApiResponse<String> changeNickname(@RequestHeader("Authorization") String authorizationHeader,
+                                              @RequestBody NicknameDto nickname){
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
         try{
             if (memberService.checkNickName(id, nickname)){
                 return ApiResponse.onSuccess("닉네임 변경 성공");
@@ -69,9 +62,11 @@ public class MemberController {
         }
     }
 
-    @PatchMapping("/addEtc/{id}")  // 이것도 완료, 나중에 accessToken 처리하기
-    public ApiResponse<String> addEtcInfo(@PathVariable("id") Long memberId, @RequestBody MemberEtcInfoRequestDto dto) {
-        System.out.println("member addEtc api 호출");
+    @PatchMapping("/addEtc")  // 이것도 완료, 나중에 accessToken 처리하기
+    public ApiResponse<String> addEtcInfo(@RequestHeader("Authorization") String authorizationHeader,
+                                          @RequestBody MemberEtcInfoRequestDto dto) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
         try {
             boolean isUpdated = memberService.MemberInfoAdd(memberId, dto);
             if (isUpdated) {
@@ -86,13 +81,29 @@ public class MemberController {
 
 
     @PatchMapping("/change/pw")   // 이것도 완료
-    public ApiResponse<String> changePassword(@RequestParam Long id, @RequestBody PasswordChangeRequestDto dto){
+    public ApiResponse<String> changePassword(@RequestHeader("Authorization") String authorizationHeader,
+                                              @RequestBody PasswordChangeRequestDto dto){
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
         try {
             if (memberService.changePassword(id, dto)) return ApiResponse.onSuccess("비밀번호 바꾸기 완료");
             else return ApiResponse.onFailure("400", "비밀번호 틀림", "비밀번호 수정 실패");
 
         } catch (Exception e){
             return ApiResponse.onFailure("400", "비밀번호 틀림", "비밀번호 수정 실패");
+        }
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<Member> getMemberByToken(@RequestHeader("Authorization") String authorizationHeader) {
+        String token = authorizationHeader; // Bearer 제거하지 않음
+        try {
+            Member member = memberService.getMemberByToken(token);
+            return ApiResponse.onSuccess(member);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.onFailure("400", e.getMessage(), null);
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "회원 정보를 가져오는 중 오류가 발생했습니다.", null);
         }
     }
 }

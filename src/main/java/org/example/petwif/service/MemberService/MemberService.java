@@ -61,23 +61,21 @@ public class MemberService {
         return tokenProvider.generateTokenDto(authentication);
     }
 
-//    public Boolean login(LoginRequestDto dto){
-//        String clientEmail = dto.getEmail();
-//        String clientPw = dto.getPw();
-//        if (memberRepository.checkEmail(clientEmail).isPresent()){
-//            Member member = memberRepository.findByEmail(clientEmail);
-//            String dbPw = member.getPw();
-//            if (encoder.matches(clientPw,dbPw)){
-//                return true;
-//            }
-//            else {
-//               throw new IllegalArgumentException("비밀번호 불일치");
-//            }
-//        }
-//        else return false;
-//
-//    }
+    @Transactional(readOnly = true)
+    public Member getMemberByToken(String token) {
+        // 토큰이 유효한지 검증
+        if (!tokenProvider.validateToken(token)) {
+            throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+        }
 
+        // 토큰에서 인증 정보를 추출
+        Authentication authentication = tokenProvider.getAuthentication(token);
+
+        // 인증 정보에서 사용자 이메일을 가져와 회원 조회
+        String email = authentication.getName();
+        return memberRepository.checkEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
+    }
 
     public Boolean checkNickName(Long mId, NicknameDto nickname){
         if (memberRepository.checkNickname(nickname.getNickname()).isPresent()) {
