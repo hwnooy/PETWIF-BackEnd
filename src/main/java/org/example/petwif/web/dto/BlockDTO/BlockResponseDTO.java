@@ -26,6 +26,8 @@ public class BlockResponseDTO {
         Long id;
         Long memberId;
         Long targetId;
+        String profile_url;
+        String nickname;
         LocalDateTime createdAt;
     }
 

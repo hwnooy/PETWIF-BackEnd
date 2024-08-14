@@ -40,7 +40,7 @@ public class BlockRestController {
     @Operation(summary = "다른 멤버와의 차단 상태 조회 API", description = "사용자가 다른 멤버와의 차단 상태를 조회하는 API입니다.")
     @Parameters({
             @Parameter(name = "memberId", description = "사용자의 아이디, path variable 입니다!"),
-            @Parameter(name = "friendId", description = "다른 멤버의 아이디, path variable 입니다!")
+            @Parameter(name = "targetId", description = "다른 멤버의 아이디, path variable 입니다!")
     })
     public ApiResponse<BlockResponseDTO.BlockStatusDTO> getBlockStatus(@ExistMember @PathVariable(name = "memberId") Long memberId,
                                                                        @ExistMember @PathVariable(name = "targetId") Long targetId) {
