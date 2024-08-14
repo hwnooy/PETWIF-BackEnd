@@ -10,6 +10,12 @@ import java.util.stream.Collectors;
 
 public class BlockConverter {
 
+    public static BlockResponseDTO.BlockStatusDTO toBlockStatusDTO(boolean blockStatus) {
+        return BlockResponseDTO.BlockStatusDTO.builder()
+                .block(blockStatus)
+                .build();
+    }
+
     public static BlockResponseDTO.BlockResultDTO toBlockResultDTO(Block block) {
         return BlockResponseDTO.BlockResultDTO.builder()
                 .id(block.getId())

@@ -22,13 +22,21 @@ public class BlockQueryServiceImpl implements BlockQueryService {
     private final BlockRepository blockRepository;
 
     @Override
+    public boolean getBlockStatus(Long memberId, Long targetId) {
+
+        boolean blockStatus = false;
+
+        if (blockRepository.existsByMember_IdAndTarget_Id(memberId, targetId)) blockStatus = true;
+
+        return blockStatus;
+    }
+
+    @Override
     public Slice<Block> getBlockList(Long memberId, Integer page) {
 
-        Member member = memberRepository.findById(memberId).get();
+        Slice<Block> blockList = blockRepository.findByMember_IdOrderByCreatedAt(memberId, PageRequest.of(page, 5));
 
-        Slice<Block> blockList = blockRepository.findAllByMemberOrderByCreatedAt(member, PageRequest.of(page, 5));
-
-        if (blockList.isEmpty() || page < 0) {
+        if (blockList.isEmpty() && page != 0) {
             throw new BlockHandler(ErrorStatus.BLOCK_PAGE_NOT_FOUND);
         }
 
