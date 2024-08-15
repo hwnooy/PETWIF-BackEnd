@@ -28,6 +28,7 @@ public class ChatConverter {
     public static Chat toChat(ChatRequestDTO.SendChatDTO request) {
         return Chat.builder()
                 .content(request.getContent())
+                .imageUrl(request.getImageUrl())
                 .build();
     }
 
@@ -64,6 +65,7 @@ public class ChatConverter {
                 .listSize(chatList.getSize())
                 .isFirst(chatList.isFirst())
                 .isLast(chatList.isLast())
+                .hasNext(chatList.hasNext())
                 .build();
     }
 
@@ -86,6 +88,7 @@ public class ChatConverter {
                .listSize(chatRoomList.getSize())
                .isFirst(chatRoomList.isFirst())
                .isLast(chatRoomList.isLast())
+               .hasNext(chatRoomList.hasNext())
                .build();
     }
 

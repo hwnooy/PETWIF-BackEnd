@@ -18,5 +18,6 @@ public class ChatRequestDTO {
     public static class SendChatDTO { //채팅 보내기
         @NotBlank
         private String content;
+        private String imageUrl;
     }
 }

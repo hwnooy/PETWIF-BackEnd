@@ -49,6 +49,7 @@ public class ChatResponseDTO {
         private Integer listSize;
         private boolean isFirst;
         private boolean isLast;
+        private boolean hasNext;
     }
 
     @Builder
@@ -60,6 +61,7 @@ public class ChatResponseDTO {
         private Long otherId;
         private Long chatRoomId;
         private String roomName;
+        private String content;
         private LocalDateTime createdAt;
     }
 
@@ -73,6 +75,7 @@ public class ChatResponseDTO {
         private Integer listSize;
         private boolean isFirst;
         private boolean isLast;
+        private boolean hasNext;
     }
 
     @Builder

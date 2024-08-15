@@ -2,21 +2,23 @@ package org.example.petwif.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
-@EnableWebSocket
+@EnableWebSocketMessageBroker
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketConfigurer {
-
-    private final WebSocketHandler webSocketHandler;
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) { //웹소켓 연결 완료
-        // endpoint 설정 : /api/v1/chat/{postId}
-        // 이를 통해서 ws://localhost:9090/ws/chat 으로 요청이 들어오면 websocket 통신을 진행한다.
-        // setAllowedOrigins("*")는 모든 ip에서 접속 가능하도록 해줌
-        registry.addHandler(webSocketHandler, "/ws/chats").setAllowedOrigins("*");
+    public void registerStompEndpoints(StompEndpointRegistry registry){
+        registry.addEndpoint("/ws") //클라이언트가 연결할 WebSocket 엔드포인트
+                .setAllowedOrigins("*");
+    }
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry){
+        registry.enableSimpleBroker("/sub"); //서버에서 메시지를 전달할 때 사용하는 prefix
+        registry.setApplicationDestinationPrefixes("/pub"); //클라이언트가 메시지를 보낼 때 사용하는 prefix
     }
 }
