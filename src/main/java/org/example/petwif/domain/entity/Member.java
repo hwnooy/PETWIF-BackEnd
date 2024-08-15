@@ -49,6 +49,16 @@ public class Member extends BaseEntity {
 
     private boolean autoLogin;
 
+    private Boolean friendRequestNoti = true;
+
+    private Boolean friendAcceptNoti = true;
+
+    private Boolean likeNoti = true;
+
+    private Boolean bookmarkNoti = true;
+
+    private Boolean commentNoti = true;
+
     // 양방향 매핑을 해야 멤버가 탈퇴할때 pet도 없어지므로 이건 해야함! 그런 관계가 아니면 굳이 안 넣어도 됨 복잡해져서
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "member", cascade = CascadeType.ALL)
     private List<Pet> myPet = new ArrayList<>();
