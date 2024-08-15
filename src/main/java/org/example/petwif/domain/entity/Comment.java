@@ -39,10 +39,14 @@ public class Comment extends BaseEntity {
     @Builder.Default
     private List<CommentImage> commentImages = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentReport> commentReports = new ArrayList<>();
+
     private String content;
 
-    @Builder.Default
-    private Integer likeCount = 0;  // 초기 값을 0으로 설정
+    private Integer likeCount = 0;
+
+    private Integer reportCount = 0;
 
     public void update(String content){
         this.content = content;
@@ -73,5 +77,13 @@ public class Comment extends BaseEntity {
     public void addImage(CommentImage commentImage) {
         commentImages.add(commentImage);
         commentImage.setComment(this);
+    }
+
+    public void incrementReportCount() {
+        if (this.reportCount == null) {
+            this.reportCount = 1;
+        }else{
+            this.reportCount += 1;
+        }
     }
 }

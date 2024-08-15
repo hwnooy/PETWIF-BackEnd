@@ -1,10 +1,11 @@
 package org.example.petwif.web.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
+import org.example.petwif.service.CommentService.CommentReportService;
+import org.example.petwif.service.CommentService.CommentService;
 import org.example.petwif.service.CommentService.CommentServiceImpl;
+import org.example.petwif.web.dto.CommentDto.CommentReportRequestDto;
 import org.example.petwif.web.dto.CommentDto.CommentRequestDto;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private final CommentServiceImpl commentService;
+    private final CommentService commentService;
+    private final CommentReportService commentReportService;
 
     // 댓글 작성
     @PostMapping(value = "/albums/{albumId}/commment",consumes = "multipart/form-data")
@@ -104,4 +106,15 @@ public class CommentController {
             return ResponseEntity.status(e.getErrorReason().getHttpStatus()).build();
         }
     }
+
+    //댓글 신고
+    @PostMapping("/comment/{commentId}/report")
+    public ResponseEntity<Long> reportComment(@RequestBody CommentReportRequestDto commentReportRequestDto
+                                            ,@PathVariable Long commentId
+                                            ,@RequestParam Long memberId) {
+
+        Long reportId=commentReportService.ReportComment(commentReportRequestDto,commentId,memberId);
+        return ResponseEntity.ok(reportId);
+    }
+
 }
