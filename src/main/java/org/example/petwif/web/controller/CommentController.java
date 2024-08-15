@@ -1,6 +1,7 @@
 package org.example.petwif.web.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.service.CommentService.CommentServiceImpl;
@@ -8,6 +9,7 @@ import org.example.petwif.web.dto.CommentDto.CommentRequestDto;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,13 +21,18 @@ public class CommentController {
     private final CommentServiceImpl commentService;
 
     // 댓글 작성
-    @PostMapping("/albums/{albumId}/commment")
+    @PostMapping(value = "/albums/{albumId}/commment",consumes = "multipart/form-data")
     public ResponseEntity<Long> writeComment(
             @PathVariable Long albumId,
-            @RequestBody CommentRequestDto commentRequestDto,
             @RequestParam Long memberId,
-            @RequestParam(required = false) Long parentCommentId) {
+            @RequestParam(required = false) Long parentCommentId,
+            @RequestPart("content") String content,
+            @RequestPart(value = "commentPicture", required = false) MultipartFile commentPicture) {
         try {
+            CommentRequestDto commentRequestDto = new CommentRequestDto();
+            commentRequestDto.setContent(content);
+            commentRequestDto.setCommentPicture(commentPicture);
+
             Long commentId = commentService.writeComment(commentRequestDto, albumId, memberId, parentCommentId);
             return ResponseEntity.ok(commentId);
         } catch (GeneralException e) {

@@ -35,6 +35,10 @@ public class Comment extends BaseEntity {
     @Builder.Default
     private List<Comment> childComments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CommentImage> commentImages = new ArrayList<>();
+
     private String content;
 
     @Builder.Default
@@ -63,5 +67,11 @@ public class Comment extends BaseEntity {
     public void addChildComment(Comment comment) {
         childComments.add(comment);
         comment.setParentComment(this);
+    }
+
+
+    public void addImage(CommentImage commentImage) {
+        commentImages.add(commentImage);
+        commentImage.setComment(this);
     }
 }

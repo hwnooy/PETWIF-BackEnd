@@ -1,22 +1,21 @@
 package org.example.petwif.service.CommentService;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petwif.S3.AmazonS3Manager;
+import org.example.petwif.S3.Uuid;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
-import org.example.petwif.domain.entity.Album;
-import org.example.petwif.domain.entity.Comment;
-import org.example.petwif.domain.entity.CommentLike;
-import org.example.petwif.domain.entity.Member;
-import org.example.petwif.repository.AlbumRepository;
-import org.example.petwif.repository.CommentLikeRepository;
-import org.example.petwif.repository.CommentRepository;
-import org.example.petwif.repository.MemberRepository;
+import org.example.petwif.config.AmazonConfig;
+import org.example.petwif.domain.entity.*;
+import org.example.petwif.repository.*;
 import org.example.petwif.web.dto.CommentDto.CommentRequestDto;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,6 +26,10 @@ public class CommentServiceImpl implements CommentService {
     private final MemberRepository memberRepository;
     private final AlbumRepository albumRepository;
     private final CommentLikeRepository commentLikeRepository;
+    private final AmazonS3Manager s3Manager;
+    private final UuidRepository uuidRepository;
+    private final CommentImageRepository commentImageRepository;
+    private final AmazonConfig amazonConfig;
 
 
     @Override
@@ -63,7 +66,32 @@ public class CommentServiceImpl implements CommentService {
             parentComment.addChildComment(comment);
         }
 
+
         commentRepository.save(comment);
+
+        // 댓글 이미지 처리
+        if (commentRequestDto.getCommentPicture() != null && !commentRequestDto.getCommentPicture().isEmpty()) {
+            // UUID 생성 및 저장
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+
+            // S3에 이미지 업로드
+            String pictureUrl = s3Manager.uploadFile(
+                    s3Manager.generateReviewKeyName(savedUuid),
+                    commentRequestDto.getCommentPicture()
+            );
+
+            // CommentImage 엔티티 생성 및 저장
+            CommentImage commentImage = CommentImage.builder()
+                    .pictureUrl(pictureUrl)
+                    .comment(comment)
+                    .build();
+            commentImageRepository.save(commentImage);
+
+            // 댓글과 이미지 연결
+            comment.addImage(commentImage);
+        }
+
         return comment.getId();
     }
 
@@ -91,7 +119,20 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteComment(Long commentId){
-        commentRepository.deleteById(commentId);
+        // 댓글 조회
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+
+        // 댓글에 연결된 이미지들 삭제
+        for (CommentImage commentImage : comment.getCommentImages()) {
+            String fileUrl = commentImage.getPictureUrl();
+            String keyName = fileUrl.substring(fileUrl.indexOf(amazonConfig.getCommentPath())); // 전체 경로를 포함한 keyName 추출
+            s3Manager.deleteFile(keyName);
+            commentImageRepository.delete(commentImage);
+        }
+
+        // 댓글 삭제
+        commentRepository.delete(comment);
     }
 
     public CommentLike likeComment(Long commentId, Long memberId) {
