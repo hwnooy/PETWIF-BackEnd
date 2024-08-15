@@ -23,8 +23,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
-
-
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final AlbumRepository albumRepository;
@@ -32,20 +30,41 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public Long writeComment(CommentRequestDto commentRequestDto, Long albumId,Long nameId){
-        Member member = memberRepository.findById(nameId)
+    // 댓글 또는 대댓글 작성 메서드
+    public Long writeComment(CommentRequestDto commentRequestDto, Long albumId, Long memberId, Long parentCommentId) {
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
-        Comment toComment=Comment.builder()
-                .content(commentRequestDto.getContent())
-                .album(album)
-                .member(member)
-                .build();
 
-        commentRepository.save(toComment);
+        Comment comment;
 
-        return toComment.getId();
+        if (parentCommentId == null) {
+            // 일반 댓글 작성
+            comment = Comment.builder()
+                    .content(commentRequestDto.getContent())
+                    .album(album)
+                    .member(member)
+                    .likeCount(0)  // 초기 좋아요 수 0으로 설정
+                    .build();
+        } else {
+            // 대댓글 작성
+            Comment parentComment = commentRepository.findById(parentCommentId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+
+            comment = Comment.builder()
+                    .content(commentRequestDto.getContent())
+                    .album(album)
+                    .member(member)
+                    .parentComment(parentComment)
+                    .likeCount(0)  // 초기 좋아요 수 0으로 설정
+                    .build();
+
+            parentComment.addChildComment(comment);
+        }
+
+        commentRepository.save(comment);
+        return comment.getId();
     }
 
 
@@ -90,8 +109,10 @@ public class CommentServiceImpl implements CommentService {
             throw new IllegalArgumentException("You have already liked this comment.");
         }
 
-        // 좋아요 추가
+        // 좋아요 추가 및 좋아요 수 증가
         CommentLike commentLike = new CommentLike(comment, member);
+        comment.incrementLikeCount();  // 좋아요 수 증가
+        commentRepository.save(comment);  // 변경된 likeCount 저장
         return commentLikeRepository.save(commentLike);
     }
 
@@ -100,7 +121,10 @@ public class CommentServiceImpl implements CommentService {
         CommentLike commentLike = commentLikeRepository.findByCommentIdAndMemberId(commentId, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Like not found"));
 
-        // 좋아요 삭제
+        // 좋아요 삭제 및 좋아요 수 감소
+        Comment comment = commentLike.getComment();
+        comment.decrementLikeCount();  // 좋아요 수 감소
+        commentRepository.save(comment);  // 변경된 likeCount 저장
         commentLikeRepository.delete(commentLike);
     }
 }

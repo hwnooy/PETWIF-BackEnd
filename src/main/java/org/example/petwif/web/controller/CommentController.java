@@ -23,9 +23,10 @@ public class CommentController {
     public ResponseEntity<Long> writeComment(
             @PathVariable Long albumId,
             @RequestBody CommentRequestDto commentRequestDto,
-            @RequestParam Long nameId) {
+            @RequestParam Long memberId,
+            @RequestParam(required = false) Long parentCommentId) {
         try {
-            Long commentId = commentService.writeComment(commentRequestDto, albumId, nameId);
+            Long commentId = commentService.writeComment(commentRequestDto, albumId, memberId, parentCommentId);
             return ResponseEntity.ok(commentId);
         } catch (GeneralException e) {
             return ResponseEntity.status(e.getErrorReason().getHttpStatus()).build();
