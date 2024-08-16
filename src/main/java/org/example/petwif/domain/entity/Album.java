@@ -1,10 +1,7 @@
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.Scope;
 
@@ -15,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,7 +43,8 @@ public class Album extends BaseEntity {
     private List<AlbumBookmark> albumBookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
-    private List<Comment> commentList;
+    @Builder.Default
+    private List<Comment> commentList = new ArrayList<>();
 
    // @Column(nullable = false)
     private String title;
@@ -53,7 +52,7 @@ public class Album extends BaseEntity {
    // @Column(nullable = false)
     private String content;
 
-   // @Column(columnDefinition = "integer default 0")
+    @Column(columnDefinition = "integer default 0")
     private Integer view;
 
     @Enumerated(EnumType.STRING) //공개 범위

@@ -10,6 +10,6 @@ import java.util.List;
 public interface AlbumBookmarkService {
     public void addBookmark(Long albumId, Long memberId);
     public void deleteBookmark(Long albumId, Long memberId);
-    public List<AlbumResponseDto.BookmarkResultDto> getAlbumBookmarks(Long albumId);
+    public List<AlbumResponseDto.BookmarkResultDto> getAlbumBookmarks(Long albumId, Long memberId);
 }
 

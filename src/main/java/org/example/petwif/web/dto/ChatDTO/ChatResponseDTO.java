@@ -24,7 +24,7 @@ public class ChatResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SendChatResultDTO { //채팅 보내기
+    public static class SendChatResultDTO { //채팅 보내기 - 메시지 내용
         private Long chatId;
         private LocalDateTime createdAt;
     }
@@ -49,6 +49,7 @@ public class ChatResponseDTO {
         private Integer listSize;
         private boolean isFirst;
         private boolean isLast;
+        private boolean hasNext;
     }
 
     @Builder
@@ -73,6 +74,7 @@ public class ChatResponseDTO {
         private Integer listSize;
         private boolean isFirst;
         private boolean isLast;
+        private boolean hasNext;
     }
 
     @Builder

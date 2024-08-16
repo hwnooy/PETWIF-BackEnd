@@ -1,8 +1,8 @@
 package org.example.petwif.converter;
 
 import org.example.petwif.domain.entity.Chat;
+import org.example.petwif.domain.entity.ChatImage;
 import org.example.petwif.domain.entity.ChatRoom;
-import org.example.petwif.web.dto.ChatDTO.ChatMessageDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
 import org.springframework.data.domain.Slice;
@@ -38,11 +38,10 @@ public class ChatConverter {
                 .build();
     }
 
-    public static ChatMessageDTO toSendChatMessageDTO(Chat chat) {
-        return ChatMessageDTO.builder()
-                .memberId(chat.getMember().getId())
-                .chatRoomId(chat.getChatRoom().getId())
-                .content(chat.getContent())
+    public static ChatImage toChatImage(String imageUrl, Chat chat){ //채팅 사진
+        return ChatImage.builder()
+                .imageUrl(imageUrl)
+                .chat(chat)
                 .build();
     }
 
@@ -64,6 +63,7 @@ public class ChatConverter {
                 .listSize(chatList.getSize())
                 .isFirst(chatList.isFirst())
                 .isLast(chatList.isLast())
+                .hasNext(chatList.hasNext())
                 .build();
     }
 
@@ -86,6 +86,7 @@ public class ChatConverter {
                .listSize(chatRoomList.getSize())
                .isFirst(chatRoomList.isFirst())
                .isLast(chatRoomList.isLast())
+               .hasNext(chatRoomList.hasNext())
                .build();
     }
 

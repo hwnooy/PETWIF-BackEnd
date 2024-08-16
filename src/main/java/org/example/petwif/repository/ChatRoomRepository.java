@@ -12,6 +12,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     Optional<ChatRoom> findChatRoomById(Long id);
 
     Slice<ChatRoom> findAllByMember(Member member, PageRequest pageRequest); //채팅방 목록 조회
+    Slice<ChatRoom> findAllByOther(Member other, PageRequest pageRequest);
 
     Optional<ChatRoom> findAllByMemberIdAndId(Long memberId, Long chatRoomId);
 }

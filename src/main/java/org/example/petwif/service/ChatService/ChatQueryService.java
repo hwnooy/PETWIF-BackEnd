@@ -17,7 +17,7 @@ public interface ChatQueryService {
     //채팅방 목록 조회
     Optional<ChatRoom> findChatRoom(Long id);
 
-    Slice<ChatRoom> getChatRoomList(Long memberId, Integer page);
+    Slice<ChatRoom> getChatRoomList(Long memberId, Long otherId, Integer page);
 
     //가장 최근 채팅 조회
     Optional<Chat> getLastChat(Long id);

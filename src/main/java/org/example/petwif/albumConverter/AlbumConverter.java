@@ -18,9 +18,10 @@ import java.util.stream.Collectors;
 public class AlbumConverter {
 
 
-    public static AlbumResponseDto.SaveResultDto toAlbumResultDto(Album album){
+    public static AlbumResponseDto.SaveResultDto toAlbumResultDto(Album album, Member member){
         return AlbumResponseDto.SaveResultDto.builder()
-                .memberId(album.getMember().getId())
+                .albumId(album.getId())
+                .memberId(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -39,9 +40,9 @@ public class AlbumConverter {
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .scope(requestDto.getScope())
-                .view(0)
                 .coverImage(requestDto.getCoverImage())
                 .albumImages(requestDto.getAlbumImages())
+                .view(0)
                 .build();
     }
 

@@ -2,12 +2,15 @@ package org.example.petwif.service.albumService;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.example.petwif.S3.AmazonS3Controller;
 import org.example.petwif.albumConverter.AlbumConverter;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.apiPayload.exception.handler.AlbumHandler;
 import org.example.petwif.apiPayload.exception.handler.BlockHandler;
 import org.example.petwif.domain.entity.Album;
+import org.example.petwif.domain.entity.AlbumImage;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.AlbumRepository;
 import org.example.petwif.repository.MemberRepository;
@@ -27,11 +30,12 @@ public class AlbumServiceImpl implements AlbumService {
     //앨범 생성
     @Override
     @Transactional
-    public Album saveAlbum(AlbumRequestDto.SaveRequestDto requestDto){
-        Member member = memberRepository.findById(requestDto.getMemberId())
+    public Album saveAlbum(AlbumRequestDto.SaveRequestDto requestDto, Long memberId){
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
         Album album = AlbumConverter.toAlbumEntity(requestDto, member);
+
         album = albumRepository.save(album);
         return album;
     }
