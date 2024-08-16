@@ -33,7 +33,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
     @Override
     @Transactional
-    public ChatRoom createChatRoom(Long memberId, Long otherId) { //채팅 생성
+    public ChatRoom createChatRoom(Long memberId, Long otherId, ChatRequestDTO.CreateChatRoomDTO request) { //채팅 생성
         ChatRoom chatRoom = new ChatRoom();
 
         Member member = memberRepository.findById(memberId)

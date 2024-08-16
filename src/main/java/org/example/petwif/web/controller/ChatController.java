@@ -13,8 +13,6 @@ import org.example.petwif.converter.ChatConverter;
 import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.domain.entity.Member;
-import org.example.petwif.repository.ChatRepository;
-import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.ChatService.ChatCommandService;
 import org.example.petwif.service.ChatService.ChatQueryService;
 
@@ -25,7 +23,6 @@ import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Slice;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -55,14 +52,16 @@ public class ChatController {
     }
 
     //채팅 생성 - 완
-    @PostMapping("/{memberId}")
+    @PostMapping("/chatRoom")
     @Operation(summary = "채팅방 생성 API")
     public ApiResponse<ChatResponseDTO.CreateChatRoomResultDTO> createChatRoom(@RequestHeader("Authorization") String authorizationHeader,
-                                                                               @ExistMember @RequestParam(name = "otherId") Long otherId) {
+                                                                               @RequestBody ChatRequestDTO.CreateChatRoomDTO request) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        ChatRoom chatRoom = chatCommandService.createChatRoom(memberId, otherId);
+        Long otherId = request.getOtherId();
+
+        ChatRoom chatRoom = chatCommandService.createChatRoom(memberId, otherId, request);
         return ApiResponse.onSuccess(ChatConverter.createChatRoomResultDTO(chatRoom));
     }
 
@@ -124,9 +123,7 @@ public class ChatController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "acess 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "acess 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
     })
-    @Parameters({
-            @Parameter(name = "memberId")
-    })
+
     public ApiResponse<ChatResponseDTO.ChatRoomPreviewListDTO> getChatRoomList(@RequestHeader("Authorization") String authorizationHeader,
                                                                                @RequestParam(name = "page") Integer page) {
         Member member = memberService.getMemberByToken(authorizationHeader);
@@ -157,7 +154,10 @@ public class ChatController {
     //채팅방 나가기 - 완
     @DeleteMapping("/{chatRoomId}")
     @Operation(summary = "채팅방 나가기 API")
-    public ApiResponse<Void> deleteChatRoom(@RequestParam Long memberId, @PathVariable(name = "chatRoomId") Long chatRoomId) {
+    public ApiResponse<Void> deleteChatRoom(@RequestHeader("Authorization") String authorizationHeader, @PathVariable(name = "chatRoomId") Long chatRoomId) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
+
         chatCommandService.deleteChatRoom(memberId, chatRoomId);
         return ApiResponse.onSuccess(null);
     }

@@ -7,7 +7,7 @@ import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 public interface ChatCommandService {
 
     //채팅 생성
-    ChatRoom createChatRoom(Long memberId, Long otherId);
+    ChatRoom createChatRoom(Long memberId, Long otherId, ChatRequestDTO.CreateChatRoomDTO request);
 
     //채팅 보내기
     Chat sendChat(Long memberId, Long chatRoomId, ChatRequestDTO.SendChatDTO request);
