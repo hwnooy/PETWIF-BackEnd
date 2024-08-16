@@ -40,9 +40,9 @@ public class AlbumConverter {
                 .title(requestDto.getTitle())
                 .content(requestDto.getContent())
                 .scope(requestDto.getScope())
-                .view(0)
                 .coverImage(requestDto.getCoverImage())
                 .albumImages(requestDto.getAlbumImages())
+                .view(0)
                 .build();
     }
 

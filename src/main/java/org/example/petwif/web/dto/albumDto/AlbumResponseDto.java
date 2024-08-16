@@ -58,8 +58,8 @@ public class AlbumResponseDto {
         private int bookmarkCount;
         private List<CommentResponseDto> comments;
     }
-    //====================================================================//
 
+    //====================================================================//
     // 2-1. 메인 페이지 내에서 앨범 스토리 형식 조회
     @Builder
     @Getter
@@ -126,45 +126,6 @@ public class AlbumResponseDto {
         private StoryAlbumListDto storyAlbumListDto;
         private MainPageAlbumListDto mainpageAlbumListDto;
     }
-
-
-    //==앨범 좋아요==//
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class LikeResultDto{
-        private Long memberId;
-        private String memberNickname;
-        private String profileUrl;
-    }
-
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class LikeListDto{
-        private List<LikeResultDto> likes;
-    }
-
-    //==앨범 북마크==//
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BookmarkResultDto{
-        private Long memberId;
-        private String memberNickName;
-        private String profileUrl;
-    }
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BookmarkListDto{
-        private List<BookmarkResultDto> bookmarks;
-    }
-
     //====================================================================//
     // 3. 탐색 페이지에서 앨범 조회 dto
     @Builder
@@ -186,12 +147,85 @@ public class AlbumResponseDto {
         private List<SearchAlbumDto> albums;
     }
 
+    //====================================================================//
+    // 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserAlbumViewDto {
+        private Long albumId;
+        private String coverImageUrl;
+        private int likeCount;
+        private int bookmarkCount;
+        private int commentCount;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserAlbumViewListDto {
+        private List<UserAlbumViewDto> albums;
+        private int totalAlbumCount;
+    }
+    //====================================================================//
+    // 5. 북마크한 앨범에서 앨범 조회
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberBookmarkAlbumDto {
+        private Long albumId;
+        private String coverImageUrl;
+        private int likeCount;
+        private int bookmarkCount;
+        private int commentCount;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MemberBookmarkAlbumListDto{
+        private List<MemberBookmarkAlbumDto> albums;
+    }
 
 
+    //==앨범 좋아요==//
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LikeResultDto{
+        private Long memberId;
+        private String memberNickname;
+        private String profileUrl;
+    }
 
-    //==앨범 신고==//
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LikeListDto{
+        private List<LikeResultDto> likes;
+    }
 
-
-
-
+    //==앨범 북마크, 특정 앨범에 들어가서 북마크 확인할 때==//
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BookmarkResultDto{
+        private Long memberId;
+        private String memberNickName;
+        private String profileUrl;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BookmarkListDto{
+        private List<BookmarkResultDto> bookmarks;
+    }
 }

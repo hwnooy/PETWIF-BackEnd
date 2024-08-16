@@ -12,25 +12,17 @@ import org.example.petwif.domain.common.BaseEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Comment extends BaseEntity {
+public class ReplyLike extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="album_id")
-    private Album album;
+    @JoinColumn(name="reply_id")
+    private Reply reply;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
-
-    private String content;
-
-    private Integer likeCount;
-
-    public void update(String content){
-        this.content = content;
-    }
 }
