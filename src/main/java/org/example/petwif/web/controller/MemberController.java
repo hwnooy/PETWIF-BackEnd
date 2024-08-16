@@ -1,6 +1,8 @@
 package org.example.petwif.web.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
@@ -21,17 +23,17 @@ public class MemberController {
     private final MemberRepository memberRepository;
 
     @PostMapping("/register") // 동일한 이메일로 회원가입X, 비번 틀림 적용해서 회원가입 처리 완료
-    public ApiResponse<String> registerNewMember(@RequestBody EmailSignupRequestDTO dto) {
-        try {
-            if (memberService.EmailSignup(dto)) {
-                return ApiResponse.onSuccess(dto.getName() + "님 " + dto.getEmail() + "으로 회원가입 성공하였습니다.");
+    public ApiResponse<EmailLoginResponse> registerNewMember(@RequestBody @Valid EmailSignupRequestDTO dto) {
+
+        try{
+            EmailLoginResponse response = memberService.EmailSignup(dto);
+            if (response != null) {
+                return ApiResponse.onSuccess(response);
             } else {
-                return ApiResponse.onFailure("400", dto.getName() + ", 이미 회원입니다. 다른 이메일로 가입해주세요", "duplicated email");
+                return ApiResponse.onFailure("400", dto.getName() + ", 이미 회원입니다. 다른 이메일로 가입해주세요", null);
             }
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.onFailure("400", "비밀번호가 일치하지 않습니다.", "wrong password");
-        } catch (Exception e) {
-            return ApiResponse.onFailure("500", dto.getName() + "님 회원가입 오류입니다. 다시 시도해주세요", "internal error");
+        } catch (IllegalStateException e){
+            return ApiResponse.onFailure("400", "wrong password", null);
         }
     }
 
@@ -109,6 +111,7 @@ public class MemberController {
         }
     }
 
+    // db cascade 문제로 실패
     @DeleteMapping("/delete")
     public ApiResponse<String> deleteMember(@RequestParam("id") Long id){
         try {
@@ -118,6 +121,19 @@ public class MemberController {
             return ApiResponse.onSuccess(member.getEmail()+"님 삭제 완료");
         } catch (Exception e) {
             return ApiResponse.onFailure("500", "존재하지 않는 회원입니다. ", null);
+        }
+    }
+
+    @PatchMapping("/profile")
+    public ApiResponse<String> uploadImage(@RequestHeader("Authorization") String authorizationHeader,
+                                           @RequestParam String image){
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
+        try{
+            memberService.uploadProfile(id, image);
+            return ApiResponse.onSuccess("사진 업로드 완료");
+        } catch(Exception e){
+            return ApiResponse.onFailure("400", "error", e.getMessage());
         }
     }
 }

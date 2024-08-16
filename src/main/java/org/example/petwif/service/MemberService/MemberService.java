@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.JWT.TokenProvider;
 import org.example.petwif.domain.entity.Member;
+import org.example.petwif.domain.entity.Pet;
 import org.example.petwif.domain.enums.Gender;
 import org.example.petwif.domain.enums.Telecom;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.web.dto.MemberDto.*;
+import org.example.petwif.web.dto.PetDto.PetResponseDto;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,11 +24,11 @@ public class MemberService {
     private final TokenProvider tokenProvider;
 
     @Transactional
-    public Boolean EmailSignup(EmailSignupRequestDTO dto) {
+    public EmailLoginResponse EmailSignup(EmailSignupRequestDTO dto) {
         // 동일한 이메일로 회원가입 안 됨, Optional<Member>와 isPresent()로 존재여부 찾아내기
         if (memberRepository.checkEmail(dto.getEmail(), "PETWIF").isPresent()) {
             // 중복된 이메일 존재
-            return false;  // false 반환으로 중복된 이메일임을 알림
+            return null;
         }
 
         String pw1 = dto.getPw();
@@ -34,18 +36,20 @@ public class MemberService {
 
         if (!pw1.equals(pw2)) {
             // 비밀번호가 일치하지 않음
-            throw new IllegalArgumentException("Passwords do not match.");
+            throw new IllegalStateException("Passwords do not match.");
         }
 
-        Member member = new Member();
-        member.setName(dto.getName());
-        member.setEmail(dto.getEmail());
-        member.setPw(encoder.encode(pw1));
-        member.setOauthProvider("PETWIF");
-        memberRepository.save(member);
-
-        return true;
+        else {
+            Member member = new Member();
+            member.setName(dto.getName());
+            member.setEmail(dto.getEmail());
+            member.setPw(encoder.encode(pw1));
+            member.setOauthProvider("PETWIF");
+            memberRepository.save(member);
+            return mapMemberToResponse(member);
+        }
     }
+
     public TokenDto login(LoginRequestDto dto) {
         String clientEmail = dto.getEmail();
         String clientPw = dto.getPw();
@@ -140,6 +144,21 @@ public class MemberService {
         }
     }
 
+    public void uploadProfile(Long mId, String image) {
+        Member member = memberRepository.findByMemberId(mId);
+        member.setProfile_url(image);
+        memberRepository.save(member);
+    }
+
+    public EmailLoginResponse mapMemberToResponse(Member member) {
+        return EmailLoginResponse.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .build();
+    }
+
+
+    // 유일한 실패 코드
     public void deleteMember(Long id){
         memberRepository.deleteById(id);
     }
