@@ -27,8 +27,8 @@ public class AlbumServiceImpl implements AlbumService {
     //앨범 생성
     @Override
     @Transactional
-    public Album saveAlbum(AlbumRequestDto.SaveRequestDto requestDto){
-        Member member = memberRepository.findById(requestDto.getMemberId())
+    public Album saveAlbum(AlbumRequestDto.SaveRequestDto requestDto, Long memberId){
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
         Album album = AlbumConverter.toAlbumEntity(requestDto, member);

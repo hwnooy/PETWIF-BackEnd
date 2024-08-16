@@ -19,12 +19,18 @@ public class AlbumReportServiceImpl implements AlbumReportService{
     private final AlbumRepository albumRepository;
     private final AlbumReportRepository albumReportRepository;
     private final MemberRepository memberRepository;
+    private final AlbumCheckAccessService albumCheckAccessService;
 
     public void doReport(Long albumId, Long memberId, String reason){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
+        albumCheckAccessService.checkAccess(album, memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+        albumReportRepository.findByAlbumAndMember(album, member).ifPresent(report -> {
+            throw new GeneralException(ErrorStatus.ALBUM_REPORT_EXIST);
+        });
+
         AlbumReport albumReport = AlbumReport.builder()
                 .album(album)
                 .member(member)

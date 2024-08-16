@@ -16,7 +16,6 @@ public class AlbumRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SaveRequestDto{
-        private Long memberId;
         private String title;
         private String content;
         private Scope scope;

@@ -11,5 +11,5 @@ public interface AlbumLikeService {
 
     public void deleteAlbumLike(Long albumId, Long memberId);
 
-    public List<AlbumResponseDto.LikeResultDto> getAlbumLikes(Long albumId);
+    public List<AlbumResponseDto.LikeResultDto> getAlbumLikes(Long albumId, Long memberId);
 }
