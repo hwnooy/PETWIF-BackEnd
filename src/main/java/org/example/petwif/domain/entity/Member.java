@@ -78,5 +78,4 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<ChatRoom> chatRoomList = new ArrayList<>();
-
 }

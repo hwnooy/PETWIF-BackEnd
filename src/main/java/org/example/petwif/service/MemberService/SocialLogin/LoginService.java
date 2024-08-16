@@ -112,9 +112,13 @@ import io.jsonwebtoken.io.IOException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.petwif.JWT.TokenDto;
+import org.example.petwif.JWT.TokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import org.springframework.util.LinkedMultiValueMap;
@@ -130,6 +134,7 @@ import java.net.URI;
 public class LoginService {
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
+    private final TokenProvider tokenProvider;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -138,7 +143,7 @@ public class LoginService {
     @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
     private String googleRedirectUrl;
 
-    public String loginByGoogle(String authorizationCode) throws Exception {
+    public TokenDto loginByGoogle(String authorizationCode) throws Exception {
         // 1. Authorization Token과 Access Token 교환
         GoogleTokenResponse googleToken = getGoogleToken(authorizationCode);
 
@@ -148,7 +153,13 @@ public class LoginService {
         log.info("Google User Info: {}", googleUserInfo);
 
         // 실제로 여기서 유저 정보를 DB에서 확인하고 로그인 처리하거나, 새로운 사용자를 등록합니다.
-        return googleToken.getAccessToken();
+        String token = googleToken.getAccessToken();
+        GoogleUserInfo info = getGoogleUserInfo(token);
+        String email = info.getEmail();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
+        TokenDto tokenFinal = tokenProvider.generateTokenDto(authentication);
+        return tokenFinal;
+
     }
 
     /** Authorization Code를 이용하여 Google Access Token 발급 */
