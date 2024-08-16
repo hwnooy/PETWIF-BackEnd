@@ -1,19 +1,23 @@
 package org.example.petwif.service.ChatService;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petwif.S3.AmazonS3Manager;
+import org.example.petwif.S3.Uuid;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.converter.ChatConverter;
 import org.example.petwif.domain.entity.Chat;
+import org.example.petwif.domain.entity.ChatImage;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.domain.enums.ChatRoomStatus;
-import org.example.petwif.repository.ChatRepository;
-import org.example.petwif.repository.ChatRoomRepository;
-import org.example.petwif.repository.MemberRepository;
+import org.example.petwif.repository.*;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +27,9 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     private final ChatRepository chatRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
-    //private final AmazonS3Manager s3Manager; 사진 전송
+    private final AmazonS3Manager s3Manager;
+    private final UuidRepository uuidRepository;
+    private final ChatImageRepository chatImageRepository;
 
     @Override
     @Transactional
@@ -52,6 +58,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
+
         if (!chatRoom.getMember().equals(member) && !chatRoom.getOther().equals(member)) { //채팅방에 없는 사용자가 채팅 메시지를 보내려고 할 경우
             throw new IllegalArgumentException("Invalid chat room");
         }
@@ -66,12 +73,40 @@ public class ChatCommandServiceImpl implements ChatCommandService {
         chat.setChatRoom(chatRoom);
         chat.setMember(member);
 
+        //채팅 사진 전송
+        List<ChatImage> chatImages = Optional.ofNullable(request.getChatImages())
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(multipartFile -> {
+                    try {
+                        String uuid = UUID.randomUUID().toString() + ".jpg";
+                        System.out.println("Generated UUID: " + uuid);
+                        Uuid savedUuid = uuidRepository.save(
+                                Uuid.builder()
+                                        .uuid(uuid)
+                                        .build()
+                        );
+                        String pictureUrl = s3Manager.uploadFile(s3Manager.generateChatKeyName(savedUuid), multipartFile);
+                        return ChatConverter.toChatImage(pictureUrl, chat);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (!chatImages.isEmpty()) {
+            chatImageRepository.saveAll(chatImages);
+        }
+
         return chatRepository.save(chat);
     }
 
     @Override
     @Transactional
-    public void deleteChatRoom(Long memberId, Long chatRoomId) { //채팅방 나가기 오류 해결 시도 - memberChatRoom -> 실패
+    public void deleteChatRoom(Long memberId, Long chatRoomId) { //채팅방 나가기
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CHATROOM_NOT_FOUND));
 

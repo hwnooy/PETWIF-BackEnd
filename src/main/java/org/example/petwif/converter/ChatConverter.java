@@ -1,6 +1,7 @@
 package org.example.petwif.converter;
 
 import org.example.petwif.domain.entity.Chat;
+import org.example.petwif.domain.entity.ChatImage;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.web.dto.ChatDTO.ChatMessageDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
@@ -28,7 +29,6 @@ public class ChatConverter {
     public static Chat toChat(ChatRequestDTO.SendChatDTO request) {
         return Chat.builder()
                 .content(request.getContent())
-                .imageUrl(request.getImageUrl())
                 .build();
     }
 
@@ -36,6 +36,13 @@ public class ChatConverter {
         return ChatResponseDTO.SendChatResultDTO.builder()
                 .chatId(chat.getId())
                 .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static ChatImage toChatImage(String imageUrl, Chat chat){
+        return ChatImage.builder()
+                .imageUrl(imageUrl)
+                .chat(chat)
                 .build();
     }
 

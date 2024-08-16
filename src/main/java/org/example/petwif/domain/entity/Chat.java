@@ -7,6 +7,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -37,6 +38,9 @@ public class Chat extends BaseEntity {
     private boolean isCheck;
 
     private String imageUrl;
+
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
+    private List<ChatImage> chatImages = new ArrayList<>();
 
     //채팅 보내기
     public void setChatRoom(ChatRoom chatRoom) {

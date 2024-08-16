@@ -61,7 +61,6 @@ public class ChatResponseDTO {
         private Long otherId;
         private Long chatRoomId;
         private String roomName;
-        private String content;
         private LocalDateTime createdAt;
     }
 

@@ -2,8 +2,6 @@ package org.example.petwif.service.ChatService;
 
 import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatRoom;
-import org.example.petwif.domain.entity.Member;
-import org.example.petwif.web.dto.ChatDTO.ChatMessageDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 
 public interface ChatCommandService {

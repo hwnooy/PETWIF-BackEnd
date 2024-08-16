@@ -34,7 +34,8 @@ public class AmazonS3Manager{
 
         return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
     }
-
-
+    public String generateChatKeyName(Uuid uuid){
+        return amazonConfig.getChatPath() + '/' + uuid.getUuid();
+    }
 
 }
