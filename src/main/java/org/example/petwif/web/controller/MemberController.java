@@ -5,6 +5,7 @@ import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
+import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/register") // 동일한 이메일로 회원가입X, 비번 틀림 적용해서 회원가입 처리 완료
     public ApiResponse<String> registerNewMember(@RequestBody EmailSignupRequestDTO dto) {
@@ -104,6 +106,18 @@ public class MemberController {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         } catch (Exception e) {
             return ApiResponse.onFailure("500", "회원 정보를 가져오는 중 오류가 발생했습니다.", null);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ApiResponse<String> deleteMember(@RequestParam("id") Long id){
+        try {
+            Member member = memberRepository.findByMemberId(id);
+            System.out.println(member);
+            memberService.deleteMember(id);
+            return ApiResponse.onSuccess(member.getEmail()+"님 삭제 완료");
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "존재하지 않는 회원입니다. ", null);
         }
     }
 }

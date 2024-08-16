@@ -75,6 +75,7 @@ public class TokenProvider {
     }
 
 
+
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
@@ -119,3 +120,61 @@ public class TokenProvider {
 //
 //        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
 //    }
+
+/*
+public TokenDto generateTokenDto(Authentication authentication, String loginProvider) {
+        // 권한들 가져오기
+        String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+
+        // Test 추가
+        String oauthProvider = "";
+        if ("GOOGLE".equalsIgnoreCase(loginProvider)) {
+            oauthProvider = "GOOGLE";
+        } else if ("PETWIF".equalsIgnoreCase(loginProvider)){
+            oauthProvider = "GOOGLE";
+        }
+
+        // Access Token 생성
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+        String accessToken = Jwts.builder()
+                .setSubject(authentication.getName())       // payload "sub": "name"
+                .claim(AUTHORITIES_KEY, authorities)// payload "auth": "ROLE_USER"
+                // 임의 추가
+                .claim("oauthProvider", oauthProvider)
+                .claim("memberId", )
+                .setExpiration(accessTokenExpiresIn)        // payload "exp": 151621022 (ex)
+                .signWith(key, SignatureAlgorithm.HS512)    // header "alg": "HS512"
+                .compact();
+
+        // Refresh Token 생성
+        String refreshToken = Jwts.builder()
+                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME))
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact();
+
+        return TokenDto.builder()
+                //.grantType(BEARER_TYPE)
+                .accessToken(accessToken)
+                //.accessTokenExpiresIn(accessTokenExpiresIn.getTime())
+                .refreshToken(refreshToken)
+                .loginProvider(oauthProvider)
+                .build();
+    }
+    public Authentication getAuthentication(String accessToken) {
+        Claims claims = parseClaims(accessToken);
+        Long memberId = claims.get("memberId", Long.class);
+        // 권한 정보 없이 UserDetails 생성
+        //UserDetails principal = new User(claims.getSubject(), "", new ArrayList<>());
+        PetwifDetail principal = new PetwifDetail
+                (claims.getSubject(),
+                        claims.get("oauthProvider", String.class),
+                        memberId, new ArrayList<>());
+
+        return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
+    }
+
+ */

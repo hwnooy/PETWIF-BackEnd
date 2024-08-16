@@ -24,7 +24,7 @@ public class MemberService {
     @Transactional
     public Boolean EmailSignup(EmailSignupRequestDTO dto) {
         // 동일한 이메일로 회원가입 안 됨, Optional<Member>와 isPresent()로 존재여부 찾아내기
-        if (memberRepository.checkEmail(dto.getEmail()).isPresent()) {
+        if (memberRepository.checkEmail(dto.getEmail(), "PETWIF").isPresent()) {
             // 중복된 이메일 존재
             return false;  // false 반환으로 중복된 이메일임을 알림
         }
@@ -41,6 +41,7 @@ public class MemberService {
         member.setName(dto.getName());
         member.setEmail(dto.getEmail());
         member.setPw(encoder.encode(pw1));
+        member.setOauthProvider("PETWIF");
         memberRepository.save(member);
 
         return true;
@@ -49,7 +50,7 @@ public class MemberService {
         String clientEmail = dto.getEmail();
         String clientPw = dto.getPw();
 
-        Member member = memberRepository.checkEmail(clientEmail)
+        Member member = memberRepository.checkEmail(clientEmail, "PETWIF")
                 .orElseThrow(() -> new IllegalArgumentException("회원이 아닙니다. 회원가입을 해주세요."));
 
         if (!encoder.matches(clientPw, member.getPw())) {
@@ -73,9 +74,13 @@ public class MemberService {
 
         // 인증 정보에서 사용자 이메일을 가져와 회원 조회
         String email = authentication.getName();
-        return memberRepository.checkEmail(email)
+        System.out.println("회원조회 체크 "+email);
+
+        return memberRepository.findMemberByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
     }
+
+
 
     public Boolean checkNickName(Long mId, NicknameDto nickname){
         if (memberRepository.checkNickname(nickname.getNickname()).isPresent()) {
@@ -133,5 +138,9 @@ public class MemberService {
         }  else{
             return false;
         }
+    }
+
+    public void deleteMember(Long id){
+        memberRepository.deleteById(id);
     }
 }

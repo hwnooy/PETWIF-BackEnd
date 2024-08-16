@@ -31,6 +31,10 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    private String oauthProvider;
+
+    //private String accessToken;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthDate;
 

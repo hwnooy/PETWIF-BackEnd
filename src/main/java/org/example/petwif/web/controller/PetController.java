@@ -8,6 +8,7 @@ import org.example.petwif.domain.entity.Pet;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.PetService.PetService;
 import org.example.petwif.web.dto.PetDto.PetRequestDto;
+import org.example.petwif.web.dto.PetDto.PetResponseDto;
 import org.springframework.web.bind.annotation.*;
 import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
 import static org.example.petwif.apiPayload.code.status.SuccessStatus.OK;
@@ -21,53 +22,43 @@ public class PetController {
     private final PetService petService;
     private final MemberService memberService;
 
-    @PostMapping("/add")
-    public ApiResponse<String> newPet(@RequestHeader("Authorization")
-                                          String authorizationHeader,
-                                      @RequestParam Integer petNum, @RequestBody List<PetRequestDto> dto) {
-        System.out.println("pet api 호출");
+    @GetMapping("/view")
+    public ApiResponse<List<PetResponseDto>> viewAllMyPets(@RequestHeader("Authorization")
+                                          String authorizationHeader) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long id = member.getId();
         try {
-            petService.addPet(id, dto);
-            return ApiResponse.onSuccess(petNum+"명의 pet 등록완료");
+            return ApiResponse.onSuccess(petService.getAllPets(id));
         } catch (Exception e) {
             throw new GeneralException(_BAD_REQUEST);
         }
     }
 
-/*
-    @PatchMapping("/edit")
-    public ApiResponse<String> editPet(@RequestHeader("Authorization")
-                                        String authorizationHeader, @RequestBody List<PetRequestDto> dto){
+    @PostMapping("/add")
+    public ApiResponse<List<PetResponseDto>> newPet(@RequestHeader("Authorization")
+                                                    String authorizationHeader,
+                                                    @RequestBody List<PetRequestDto> dto) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long id = member.getId();
-        System.out.println("pet edit api 호출");
-
-        try{
-            petService.editPet(id, dto);
-        } catch (Exception e){
-
+        try {
+            return ApiResponse.onSuccess(petService.addPet(id, dto));
+        } catch (Exception e) {
+            throw new GeneralException(_BAD_REQUEST);
         }
     }
-*/
 
+    @PatchMapping("/edit")
+    public ApiResponse<PetResponseDto> editPet(@RequestHeader("Authorization")
+                                       String authorizationHeader, @RequestBody PetRequestDto dto,
+                                       @RequestParam("petId") Long petId){
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
 
-//    @PatchMapping("/edit")
-//    public ApiResponse<List<PetResponseDto>> editPet(){
-//        return null;
-//    }
-//    @PostMapping("/newPet")
-//    public ApiResponse<?> newPet(@RequestBody List<PetRequestDto> dtoList) {
-//        System.out.print("pet API 실행");
-//        try {
-//            List<PetResponseDto> dto = petService.addPet(dtoList);
-//            return ApiResponse.onSuccess(dto);
-//        } catch (Exception e) {
-//            throw new GeneralException(_BAD_REQUEST);
-//        }
-//    }
-
-
+        try{
+            return ApiResponse.onSuccess(petService.editPet(id, petId, dto));
+        } catch (Exception e){
+            throw new GeneralException(_BAD_REQUEST);
+        }
+    }
 
 }
