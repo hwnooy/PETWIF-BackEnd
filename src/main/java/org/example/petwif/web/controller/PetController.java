@@ -1,5 +1,6 @@
 package org.example.petwif.web.controller;
 
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
@@ -58,6 +59,16 @@ public class PetController {
             return ApiResponse.onSuccess(petService.editPet(id, petId, dto));
         } catch (Exception e){
             throw new GeneralException(_BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/delete")
+    public ApiResponse<String> deletePet(@RequestParam("id") Long id){
+        try{
+            petService.deletePet(id);
+            return ApiResponse.onSuccess("id가 "+id+"인 Pet 삭제 완료");
+        } catch (IllegalArgumentException e){
+            return ApiResponse.onFailure("400", "error", e.getMessage());
         }
     }
 

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,5 +76,11 @@ public class PetService {
         return pets.stream()
                 .map(this::mapPetToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public void deletePet(Long id){
+        Pet pet = petRepository.findById(id).orElseThrow(()
+                -> new IllegalArgumentException("Pet not found"));
+        petRepository.delete(pet);
     }
 }
