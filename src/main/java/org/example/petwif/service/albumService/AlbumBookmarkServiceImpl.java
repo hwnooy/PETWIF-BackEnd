@@ -23,6 +23,7 @@ public class AlbumBookmarkServiceImpl implements AlbumBookmarkService{
     private final AlbumRepository albumRepository;
     private final AlbumBookmarkRepository albumBookmarkRepository;
     private final MemberRepository memberRepository;
+    private final AlbumCheckAccessService albumCheckAccessService;
 
     //북마크 생성
     @Transactional
@@ -30,12 +31,12 @@ public class AlbumBookmarkServiceImpl implements AlbumBookmarkService{
     public void addBookmark(Long albumId, Long memberId){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
+        albumCheckAccessService.checkAccess(album, memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        albumBookmarkRepository.findByAlbumAndMember(album, member)
-                .ifPresent(like -> {
-                    throw new IllegalStateException("이미 북마크를 눌렀습니다.");
-                });
+        albumBookmarkRepository.findByAlbumAndMember(album, member).ifPresent(report -> {
+            throw new GeneralException(ErrorStatus.ALBUM_BOOKMARK_EXIST);
+        });
         AlbumBookmark albumBookmark = AlbumBookmark.builder()
                                 .album(album)
                                 .member(member)
@@ -50,20 +51,24 @@ public class AlbumBookmarkServiceImpl implements AlbumBookmarkService{
     public void deleteBookmark(Long albumId, Long memberId){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
+        albumCheckAccessService.checkAccess(album, memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         AlbumBookmark albumBookmark = albumBookmarkRepository.findByAlbumAndMember(album, member)
-                .orElseThrow(() -> new IllegalStateException("북마크를 하지 않았습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_BOOKMARK_NOT_FOUND));
        albumBookmarkRepository.delete(albumBookmark);
     }
 
+    // 북마크 리스트 조회
     @Override
-    public List<AlbumResponseDto.BookmarkResultDto> getAlbumBookmarks(Long albumId){
+    public List<AlbumResponseDto.BookmarkResultDto> getAlbumBookmarks(Long albumId, Long memberId){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
+        albumCheckAccessService.checkAccess(album, memberId);
         List<AlbumBookmark> bookmarks = albumBookmarkRepository.findByAlbum(album);
+        if(bookmarks.isEmpty())throw new GeneralException(ErrorStatus.ALBUM_BOOKMARK_PAGE_NOT_FOUND);
         return bookmarks.stream()
-                .map(bookmark ->new AlbumResponseDto.BookmarkResultDto(bookmark.getMember().getId(), bookmark.getMember().getName(), bookmark.getMember().getProfile_url()))
+                .map(bookmark ->new AlbumResponseDto.BookmarkResultDto(bookmark.getMember().getId(), bookmark.getMember().getNickname(), bookmark.getMember().getProfile_url()))
                 .collect(Collectors.toList());
     }
 }

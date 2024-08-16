@@ -18,9 +18,10 @@ import java.util.stream.Collectors;
 public class AlbumConverter {
 
 
-    public static AlbumResponseDto.SaveResultDto toAlbumResultDto(Album album){
+    public static AlbumResponseDto.SaveResultDto toAlbumResultDto(Album album, Member member){
         return AlbumResponseDto.SaveResultDto.builder()
-                .memberId(album.getMember().getId())
+                .albumId(album.getId())
+                .memberId(member.getId())
                 .createdAt(LocalDateTime.now())
                 .build();
     }
