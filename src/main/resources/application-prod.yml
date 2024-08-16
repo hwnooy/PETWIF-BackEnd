@@ -1,0 +1,21 @@
+spring:
+  profiles: prod
+
+  datasource:
+    url: jdbc:mysql://umcdb.cbc2u8q8u4en.ap-northeast-2.rds.amazonaws.com:3306/petwif
+    username: root
+    password: petwif0722
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+server:
+  port: 8080
