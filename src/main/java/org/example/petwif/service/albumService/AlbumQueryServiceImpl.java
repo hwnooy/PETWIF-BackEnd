@@ -4,20 +4,18 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
-import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.entity.*;
-import org.example.petwif.domain.enums.FriendStatus;
-import org.example.petwif.domain.enums.Scope;
+import org.example.petwif.domain.enums.AlbumSortType;
 import org.example.petwif.repository.*;
 import org.example.petwif.repository.albumRepository.AlbumBookmarkRepository;
 import org.example.petwif.repository.albumRepository.AlbumLikeRepository;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,8 +26,6 @@ import java.util.stream.Collectors;
 public class AlbumQueryServiceImpl implements AlbumQueryService{
 
     private final AlbumRepository albumRepository;
-    private final BlockRepository blockRepository;
-    private final FriendRepository friendRepository;
     private final CommentRepository commentRepository;
     private final AlbumLikeRepository albumLikeRepository;
     private final AlbumBookmarkRepository albumBookmarkRepository;
@@ -74,7 +70,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                .build();
        }
 
-    //===============================2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식)================================//
+    //=============================== 2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식)================================//
     // 2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식) 일단 해볼게요...어려웡
     /*@Override
     public AlbumResponseDto.MainPageContentDto getMainPageContent(Long memberId) {
@@ -90,12 +86,12 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .build();
     }*/
 
-    //===============================3. 탐색 페이지에서 앨범 조회 서비스================================//
+    //=============================== 3. 탐색 페이지에서 앨범 조회 서비스================================//
     @Override
     public AlbumResponseDto.SearchAlbumListDto getSearchableAlbums(Long memberId) {
-        List<Album> allAlbums = albumRepository.findAllByOrderByCreatedAtDesc();
+        List<Album> albums = albumRepository.findAllByOrderByCreatedAtDesc();
 
-        List<AlbumResponseDto.SearchAlbumDto> accessibleAlbums = allAlbums.stream()
+        List<AlbumResponseDto.SearchAlbumDto> accessibleAlbums = albums.stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
                 .map(this::convertToSearchAlbumDto)
                 .collect(Collectors.toList());
@@ -118,17 +114,59 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .build();
     }
 
-    //===========================4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함============================//
+
+
+    //=========================== 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함============================//
+    @Override
+    public AlbumResponseDto.UserAlbumViewListDto getMemberPageAlbums(Long memberId, Long pageOwnerId, AlbumSortType sortType) {
+        List<Album> albums = albumRepository.findAlbumsByMemberId(pageOwnerId);
+        List<AlbumResponseDto.UserAlbumViewDto> albumDtos = albums.stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
+                .map(this::convertToUserAlbumDto)
+                .sorted(getComparator(sortType))
+                .collect(Collectors.toList());
+
+        return AlbumResponseDto.UserAlbumViewListDto.builder()
+                .albums(albumDtos)
+                .totalAlbumCount(albumDtos.size())
+                .build();
+    }
+
+    private AlbumResponseDto.UserAlbumViewDto convertToUserAlbumDto(Album album) {
+        return AlbumResponseDto.UserAlbumViewDto.builder()
+                .albumId(album.getId())
+                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
+                .likeCount(album.getAlbumLikes().size())
+                .bookmarkCount(album.getAlbumBookmarks().size())
+                .commentCount(album.getCommentList().size())
+                .build();
+    }
+
+    private Comparator<AlbumResponseDto.UserAlbumViewDto> getComparator(AlbumSortType sortType) {
+        switch (sortType) {
+            case LIKES:
+                return Comparator.comparingInt(AlbumResponseDto.UserAlbumViewDto::getLikeCount).reversed();
+            case COMMENTS:
+                return Comparator.comparingInt(AlbumResponseDto.UserAlbumViewDto::getCommentCount).reversed();
+            case BOOKMARKS:
+                return Comparator.comparingInt(AlbumResponseDto.UserAlbumViewDto::getBookmarkCount).reversed();
+            case LATEST:
+            default:
+                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getAlbumId).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
+        }
+    }
+
 
     //=================================== 5. 북마크한 앨범 에서 앨범 조회====================================//
+    @Override
     public AlbumResponseDto.MemberBookmarkAlbumListDto getMemberBookmarkAlbums(Long memberId){
-        List<Album> accessibleAlbums = albumRepository.findAll().stream()
+        List<Album> albums = albumRepository.findAll().stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
                 .collect(Collectors.toList());
 
         // 접근 가능한 앨범 중에서 사용자가 북마크한 앨범만 필터링
         List<Long> bookmarkedAlbumIds = albumBookmarkRepository.findBookmarkedAlbumIdsByMemberId(memberId);
-        List<AlbumResponseDto.MemberBookmarkAlbumDto> bookmarkedAlbums = accessibleAlbums.stream()
+        List<AlbumResponseDto.MemberBookmarkAlbumDto> bookmarkedAlbums = albums.stream()
                 .filter(album -> bookmarkedAlbumIds.contains(album.getId()))
                 .map(this::convertToMemberBookmarkAlbumDto)
                 .collect(Collectors.toList());

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.entity.AlbumImage;
 import org.example.petwif.domain.enums.Scope;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

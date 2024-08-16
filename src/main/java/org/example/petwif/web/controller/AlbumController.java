@@ -16,6 +16,7 @@ import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Album;
 import org.example.petwif.domain.entity.AlbumLike;
 import org.example.petwif.domain.entity.Member;
+import org.example.petwif.domain.enums.AlbumSortType;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.albumService.*;
@@ -142,6 +143,22 @@ public class AlbumController {
 
 
     // 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함
+    @GetMapping("/users/{userId}/albums")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH003", description = "access 토큰을 주세요!", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Operation(summary = "사용자 앨범 조회 API", description = "사용자 페이지에서 앨범을 보는 API입니다. 정렬 방식은 최신(기본),좋아요,댓글,북마크 입니다.")
+    public ApiResponse<AlbumResponseDto.UserAlbumViewListDto> getUserAlbums(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @PathVariable("userId") Long pageOwnerId,
+            @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        AlbumResponseDto.UserAlbumViewListDto albumListDto = albumQueryService.getMemberPageAlbums(member.getId(), pageOwnerId, sortType);
+        return ApiResponse.onSuccess(albumListDto);
+    }
 
     // 5. 북마크한 앨범 에서 앨범 조회
     @GetMapping("/albums/memberBookmark")
@@ -163,7 +180,7 @@ public class AlbumController {
 
 
 
-    //==앨범 좋아요 생서==//
+    //==앨범 좋아요 생성==//
     @PostMapping("/albums/{albumId}/like")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
