@@ -4,6 +4,8 @@ import org.example.petwif.domain.entity.Album;
 import org.example.petwif.domain.entity.AlbumBookmark;
 import org.example.petwif.domain.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,4 +19,7 @@ public interface AlbumBookmarkRepository extends JpaRepository<AlbumBookmark, Lo
     Optional<AlbumBookmark> findByAlbumIdAndMemberId(Long albumId, Long memberId);
 
     Optional<AlbumBookmark> findByAlbumAndMember(Album album, Member member);
+
+    @Query("SELECT ab.album.id FROM AlbumBookmark ab WHERE ab.member.id = :memberId")
+    List<Long> findBookmarkedAlbumIdsByMemberId(@Param("memberId") Long memberId);
 }
