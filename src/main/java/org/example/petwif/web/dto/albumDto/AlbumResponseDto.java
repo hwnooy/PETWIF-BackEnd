@@ -148,6 +148,29 @@ public class AlbumResponseDto {
     }
 
     //====================================================================//
+    // 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserAlbumViewDto {
+        private Long albumId;
+        private String coverImageUrl;
+        private int likeCount;
+        private int bookmarkCount;
+        private int commentCount;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserAlbumViewListDto {
+        private List<UserAlbumViewDto> albums;
+        private int totalAlbumCount;
+    }
+    //====================================================================//
     // 5. 북마크한 앨범에서 앨범 조회
     @Builder
     @Getter
