@@ -1,13 +1,16 @@
 package org.example.petwif.web.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
+import org.example.petwif.service.CommentService.CommentReportService;
+import org.example.petwif.service.CommentService.CommentService;
 import org.example.petwif.service.CommentService.CommentServiceImpl;
+import org.example.petwif.web.dto.CommentDto.CommentReportRequestDto;
 import org.example.petwif.web.dto.CommentDto.CommentRequestDto;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,16 +19,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentController {
 
-    private final CommentServiceImpl commentService;
+    private final CommentService commentService;
+    private final CommentReportService commentReportService;
 
     // 댓글 작성
-    @PostMapping("/albums/{albumId}/commment")
+    @PostMapping(value = "/albums/{albumId}/commment",consumes = "multipart/form-data")
     public ResponseEntity<Long> writeComment(
             @PathVariable Long albumId,
-            @RequestBody CommentRequestDto commentRequestDto,
-            @RequestParam Long nameId) {
+            @RequestParam Long memberId,
+            @RequestParam(required = false) Long parentCommentId,
+            @RequestPart("content") String content,
+            @RequestPart(value = "commentPicture", required = false) MultipartFile commentPicture) {
         try {
-            Long commentId = commentService.writeComment(commentRequestDto, albumId, nameId);
+            CommentRequestDto commentRequestDto = new CommentRequestDto();
+            commentRequestDto.setContent(content);
+            commentRequestDto.setCommentPicture(commentPicture);
+
+            Long commentId = commentService.writeComment(commentRequestDto, albumId, memberId, parentCommentId);
             return ResponseEntity.ok(commentId);
         } catch (GeneralException e) {
             return ResponseEntity.status(e.getErrorReason().getHttpStatus()).build();
@@ -96,4 +106,15 @@ public class CommentController {
             return ResponseEntity.status(e.getErrorReason().getHttpStatus()).build();
         }
     }
+
+    //댓글 신고
+    @PostMapping("/comment/{commentId}/report")
+    public ResponseEntity<Long> reportComment(@RequestBody CommentReportRequestDto commentReportRequestDto
+            ,@PathVariable Long commentId
+            ,@RequestParam Long memberId) {
+
+        Long reportId=commentReportService.ReportComment(commentReportRequestDto,commentId,memberId);
+        return ResponseEntity.ok(reportId);
+    }
+
 }
