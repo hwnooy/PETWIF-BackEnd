@@ -12,11 +12,13 @@ import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.converter.ChatConverter;
 import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatRoom;
+import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.ChatRepository;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.ChatService.ChatCommandService;
 import org.example.petwif.service.ChatService.ChatQueryService;
 
+import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.validation.annotation.ExistChatRoom;
 import org.example.petwif.validation.annotation.ExistMember;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
@@ -45,6 +47,7 @@ public class ChatController {
     private final ChatCommandService chatCommandService;
     private final ChatQueryService chatQueryService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final MemberService memberService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -54,24 +57,29 @@ public class ChatController {
     //채팅 생성 - 완
     @PostMapping("/{memberId}")
     @Operation(summary = "채팅방 생성 API")
-    public ApiResponse<ChatResponseDTO.CreateChatRoomResultDTO> createChatRoom(@ExistMember @PathVariable(name = "memberId") Long memberId,
+    public ApiResponse<ChatResponseDTO.CreateChatRoomResultDTO> createChatRoom(@RequestHeader("Authorization") String authorizationHeader,
                                                                                @ExistMember @RequestParam(name = "otherId") Long otherId) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
+
         ChatRoom chatRoom = chatCommandService.createChatRoom(memberId, otherId);
         return ApiResponse.onSuccess(ChatConverter.createChatRoomResultDTO(chatRoom));
     }
 
     //채팅 보내기 - 완 (Rest API)
     @PostMapping(value = "/{chatRoomId}/send", consumes = "multipart/form-data")
-    @Operation(summary = "채팅 메시지 전송 API")
+    @Operation(summary = "채팅 메시지 전송 API - Rest API")
     public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendChat(@ModelAttribute ChatRequestDTO.SendChatDTO request,
-                                                                   @ExistMember @RequestParam(name = "memberId") Long memberId,
+                                                                   @RequestHeader("Authorization") String authorizationHeader,
                                                                    @ExistChatRoom @PathVariable(name = "chatRoomId") Long chatRoomId) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
 
         Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
         return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
     }
 
-    //채팅 전송 - WebSocket (WebSocket 연결 성공 / 클라이언트 -> 서버 메시지 전송, 저장 실패)
+    //채팅 전송 - 완 (WebSocket : 사진 아직 미완성)
     @MessageMapping(value = "/{chatRoomId}/sending")
     @Operation(summary = "채팅 메시지 전송 API - WebSocket")
     public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendingChat(Map<String, Object> payload,
@@ -119,8 +127,12 @@ public class ChatController {
     @Parameters({
             @Parameter(name = "memberId")
     })
-    public ApiResponse<ChatResponseDTO.ChatRoomPreviewListDTO> getChatRoomList(@ExistMember @RequestParam(name = "memberId") Long memberId,
+    public ApiResponse<ChatResponseDTO.ChatRoomPreviewListDTO> getChatRoomList(@RequestHeader("Authorization") String authorizationHeader,
                                                                                @RequestParam(name = "page") Integer page) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+
+        Long memberId = member.getId();
+
         Slice<ChatRoom> chatRoomList = chatQueryService.getChatRoomList(memberId, memberId, page);
         return ApiResponse.onSuccess(ChatConverter.toChatRoomPreviewListDTO(chatRoomList));
     }

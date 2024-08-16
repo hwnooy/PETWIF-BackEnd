@@ -24,7 +24,7 @@ public class ChatResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SendChatResultDTO { //채팅 보내기
+    public static class SendChatResultDTO { //채팅 보내기 - 메시지 내용
         private Long chatId;
         private LocalDateTime createdAt;
     }
