@@ -23,18 +23,35 @@ public class AmazonS3Manager{
 
     private final UuidRepository uuidRepository;
 
-    public String uploadFile(String keyName, MultipartFile file){
+    public String uploadFile(String keyName, MultipartFile file) {
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(file.getSize());
-        try {
-            amazonS3.putObject(new PutObjectRequest(amazonConfig.getBucket(), keyName, file.getInputStream(), metadata));
-        }catch (IOException e){
-            log.error("error at AmazonS3Manager uploadFile : {}", (Object) e.getStackTrace());
+
+        // 파일의 확장자를 추출
+        String originalFilename = file.getOriginalFilename();
+        String fileExtension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
         }
 
-        return amazonS3.getUrl(amazonConfig.getBucket(), keyName).toString();
+        // 확장자를 포함한 최종 keyName 생성
+        String finalKeyName = keyName + fileExtension;
+
+        try {
+            amazonS3.putObject(new PutObjectRequest(amazonConfig.getBucket(), finalKeyName, file.getInputStream(), metadata));
+        } catch (IOException e) {
+            log.error("Error at AmazonS3Manager uploadFile: {}", e.getMessage());
+        }
+
+        return amazonS3.getUrl(amazonConfig.getBucket(), finalKeyName).toString();
     }
 
+    public void deleteFile(String keyName) {
+        amazonS3.deleteObject(amazonConfig.getBucket(), keyName);
+    }
 
+    public String generateReviewKeyName(Uuid uuid){
+        return  amazonConfig.getCommentPath()+'/'+uuid.getUuid();
+    }
 
 }
