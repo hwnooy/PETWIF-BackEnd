@@ -6,26 +6,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.common.BaseEntity;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
 
 @Entity
 @Getter
-@DynamicUpdate
-@DynamicInsert
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberChatRoom extends BaseEntity {
+public class ChatImage extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_id")
-    private Member member;
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="chatRoom_id")
-    private ChatRoom chatRoom;
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
+
 }

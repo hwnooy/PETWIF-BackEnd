@@ -31,6 +31,13 @@ public class AmazonConfig {
     private String bucket;
 
 
+    @Value("${cloud.aws.s3.path.chat}")
+    private String chatPath;
+
+    @Value("${cloud.aws.s3.path.comment}")
+    private String commentPath;
+
+
     @PostConstruct
     public void init() {
         this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
