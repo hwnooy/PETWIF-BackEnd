@@ -45,7 +45,8 @@ public class Album extends BaseEntity {
     private List<AlbumBookmark> albumBookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
-    private List<Comment> commentList;
+    @Builder.Default
+    private List<Comment> commentList = new ArrayList<>();
 
    // @Column(nullable = false)
     private String title;
@@ -53,7 +54,7 @@ public class Album extends BaseEntity {
    // @Column(nullable = false)
     private String content;
 
-   // @Column(columnDefinition = "integer default 0")
+    @Column(columnDefinition = "integer default 0")
     private Integer view;
 
     @Enumerated(EnumType.STRING) //공개 범위

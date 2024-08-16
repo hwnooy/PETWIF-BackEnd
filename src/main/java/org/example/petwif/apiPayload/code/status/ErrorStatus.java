@@ -38,8 +38,31 @@ public enum ErrorStatus implements BaseErrorCode {
     FRIEND_PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "FRIEND4006", "친구 리스트를 확인할 수 없습니다. 유효하지 않은 페이지입니다."),
 
     // Album Error
-    ALBUM_NOT_FOUND(HttpStatus.BAD_REQUEST, "ALBUM4001", "앨범을 찾을 수 없습니다."),
-    ALBUM_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "ALBUM4011", "앨범에 대한 권한이 없습니다."),
+    ALBUM_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4001", "앨범을 찾을 수 없습니다."),
+    ALBUM_UNAUTHORIZED(HttpStatus.FORBIDDEN, "ALBUM4020", "앨범에 대한 권한이 없습니다."),
+    ALBUM_LIST_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4021", "앨범 리스트를 찾을 수 없습니다."),
+    ALBUM_ACCESS_RESTRICTED(HttpStatus.FORBIDDEN, "ALBUM4002", "앨범 보기(열람) 권한이 없습니다."),
+    ALBUM_SCOPE_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4003", "앨범 공개 범위를 확인할 수 없습니다."),
+
+    // Album Image Error
+    ALBUM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,"ALBUM4004", "앨범 내의 이미지를 찾을 수 없습니다."),
+    ALBUM_IMAGE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST,"ALBUM4005", "앨범의 이미지 업로드를 실패했습니다."),
+
+
+    // AlbumLike Error
+    ALBUM_LIKE_EXIST(HttpStatus.CONFLICT, "ALBUM4006", "이미 앨범 좋아요가 있습니다."),
+    ALBUM_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4007", "앨범 좋아요가 존재하지 않습니다."),
+    ALBUM_LIKE_PAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4008", "앨범 좋아요 리스트를 찾을 수 없습니다."),
+
+    // AlbumBookmark Error
+    ALBUM_BOOKMARK_EXIST(HttpStatus.CONFLICT, "ALBUM4009", "이미 앨범 북마크가 있습니다."),
+    ALBUM_BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4010", "앨범 북마크가 존재하지 않습니다."),
+    ALBUM_BOOKMARK_PAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4011", "앨범 북마크 리스트를 찾을 수 없습니다."),
+
+
+    // AlbumReport Error
+    ALBUM_REPORT_EXIST(HttpStatus.CONFLICT, "ALBUM4012", "이미 신고를 했습니다."),
+
 
     BLOCK_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "BLOCK4001", "이미 차단된 사용자입니다."),
     BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4002", "차단한 내역을 찾을 수 없습니다."),
