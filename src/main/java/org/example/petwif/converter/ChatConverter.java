@@ -50,7 +50,6 @@ public class ChatConverter {
         return ChatMessageDTO.builder()
                 .memberId(chat.getMember().getId())
                 .chatRoomId(chat.getChatRoom().getId())
-                .content(chat.getContent())
                 .build();
     }
 

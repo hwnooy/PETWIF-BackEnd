@@ -23,6 +23,7 @@ import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Slice;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -70,17 +72,19 @@ public class ChatController {
     }
 
     //채팅 전송 - WebSocket (WebSocket 연결 성공 / 클라이언트 -> 서버 메시지 전송, 저장 실패)
-    @MessageMapping("/{chatRoomId}/sending")
+    @MessageMapping(value = "/{chatRoomId}/sending")
     @Operation(summary = "채팅 메시지 전송 API - WebSocket")
-    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendingChat(@ExistMember @RequestParam(name = "memberId") Long memberId,
-                                                                      @ExistChatRoom @PathVariable(name = "chatRoomId") Long chatRoomId,
-                                                                      @RequestBody ChatRequestDTO.SendChatDTO request) {
+    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendingChat(Map<String, Object> payload,
+                                                                      @ModelAttribute ChatRequestDTO.SendChatDTO request) {
+
+        Long chatRoomId = ((Number) payload.get("chatRoomId")).longValue();
+        Long memberId = ((Number) payload.get("memberId")).longValue();
 
         //메시지 저장
         Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
 
         //메시지 전송
-        messagingTemplate.convertAndSend("sub/chats/" + chatRoomId , request);
+        messagingTemplate.convertAndSend("/sub" + chatRoomId , request);
 
         return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
     }
