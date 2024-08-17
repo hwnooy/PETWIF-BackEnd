@@ -157,7 +157,7 @@ public class AlbumController {
         return ApiResponse.onSuccess(posts);
     }
 
-    //== 3. 탐색 페이지에서 앨범 조회 ==//
+    //== 3. 탐색 페이지에서 앨범 조회 ==// //탐색 화면입니다.
     @GetMapping("/albums/search")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -169,6 +169,8 @@ public class AlbumController {
     public ApiResponse<AlbumResponseDto.SearchAlbumListDto> getSearchAlbums(@RequestHeader("Authorization") String authorizationHeader){
         Member member = memberService.getMemberByToken(authorizationHeader);
         AlbumResponseDto.SearchAlbumListDto albums = albumQueryService.getSearchableAlbums(member.getId());
+
+        //return
         return ApiResponse.onSuccess(albums);
     }
 
