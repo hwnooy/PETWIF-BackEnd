@@ -9,6 +9,7 @@ import org.example.petwif.domain.enums.Scope;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +33,6 @@ public class AlbumResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateResultDto{
-        LocalDateTime createdAt;
         LocalDateTime updatedAt;
     }
 

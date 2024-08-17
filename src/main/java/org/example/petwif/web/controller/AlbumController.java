@@ -1,6 +1,7 @@
 package org.example.petwif.web.controller;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -27,6 +28,7 @@ import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -53,16 +55,19 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    public ApiResponse<AlbumResponseDto.SaveResultDto> createAlbum(@RequestBody AlbumRequestDto.SaveRequestDto requestDto, @RequestHeader("Authorization") String authorizationHeader) {
+    public ApiResponse<AlbumResponseDto.SaveResultDto> createAlbum(  @RequestPart(value = "requestDto") AlbumRequestDto.SaveRequestDto requestDto,
+                                                                     @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
+                                                                     @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
+                                                                     @RequestHeader("Authorization") String authorizationHeader ) {
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Album album = albumService.saveAlbum(requestDto, member.getId());
+        Album album = albumService.saveAlbum(requestDto, member.getId(), coverImage, albumImages);
         AlbumResponseDto.SaveResultDto saveResultDto = AlbumConverter.toAlbumResultDto(album, member);
         return ApiResponse.onSuccess(saveResultDto);
     }
 
 
     //==앨범 수정==//
-    @PatchMapping("/albums/{albumId}")
+    @PatchMapping(value = "/albums/{albumId}", consumes = "multipart/form-data")
     @Operation(summary = "앨범 수정 API", description = "앨범을 생성 후 수정하는 API 입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -70,9 +75,14 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    public ApiResponse<AlbumResponseDto.UpdateResultDto> updateAlbum(@ExistAlbum @PathVariable Long albumId, @RequestHeader("Authorization") String authorizationHeader, @RequestBody AlbumRequestDto.UpdateRequestDto requestDto) {
+    public ApiResponse<AlbumResponseDto.UpdateResultDto> updateAlbum(@ExistAlbum @PathVariable("albumId") Long albumId,
+                                                                     @RequestPart(value = "requestDto") AlbumRequestDto.UpdateRequestDto requestDto,
+                                                                     @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
+                                                                     @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
+                                                                     @RequestHeader("Authorization") String authorizationHeader)
+                                                                      {
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Album updatedAlbum = albumService.updateAlbum(albumId, member.getId(), requestDto);
+        Album updatedAlbum = albumService.updateAlbum(albumId, member.getId(), requestDto, coverImage, albumImages);
         return ApiResponse.onSuccess(AlbumConverter.UpdatedAlbumResultDto(updatedAlbum));
     }
 
@@ -189,7 +199,8 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 좋아요 API", description = "앨범 좋아요를 누르는 API 입니다. 앨범에서 좋아요 리스트를 누르면 볼수 있습니다.")
-    public ApiResponse<Void> createAlbumLike(@ExistAlbum @PathVariable Long albumId, @RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<Void> createAlbumLike(@ExistAlbum @PathVariable("albumId") Long albumId,
+                                             @RequestHeader("Authorization") String authorizationHeader){
         Member member = memberService.getMemberByToken(authorizationHeader);
         albumLikeService.addAlbumLike(albumId, member.getId());
         return ApiResponse.onSuccess(null);
