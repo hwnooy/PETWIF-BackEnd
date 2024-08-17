@@ -30,7 +30,6 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-
     @Value("${cloud.aws.s3.path.chat}")
     private String chatPath;
 
