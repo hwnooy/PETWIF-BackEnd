@@ -20,8 +20,8 @@ public class AlbumRequestDto {
         private String title;
         private String content;
         private Scope scope;
-        private AlbumImage coverImage;
-        private List<AlbumImage> albumImages;  // 이미지 URL 목록
+   /*     private MultipartFile coverImage;  // 변경: String -> MultipartFile
+        private List<MultipartFile> albumImages;  // 변경: String -> MultipartFile*/
 
     }
 
@@ -32,8 +32,6 @@ public class AlbumRequestDto {
         private String title;
         private String content;
         private Scope scope;
-        private AlbumImage coverImage;
-        private List<AlbumImage> newAlbumImages; // 새 이미지
     }
 
 

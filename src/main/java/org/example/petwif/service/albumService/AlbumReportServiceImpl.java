@@ -21,6 +21,7 @@ public class AlbumReportServiceImpl implements AlbumReportService{
     private final MemberRepository memberRepository;
     private final AlbumCheckAccessService albumCheckAccessService;
 
+    @Override
     public void doReport(Long albumId, Long memberId, String reason){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));

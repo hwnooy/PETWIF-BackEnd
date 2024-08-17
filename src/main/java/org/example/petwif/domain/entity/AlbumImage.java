@@ -24,6 +24,18 @@ public class AlbumImage extends BaseEntity {
 
     private String imageURL;
 
+    public static class AlbumImageBuilder {
+        public AlbumImageBuilder album(Album album) {
+            this.album = album;
+            return this;
+        }
+
+        public AlbumImageBuilder imageUrl(String imageUrl) {
+            this.imageURL = imageUrl;
+            return this;
+        }
+    }
+
    //앨범 이미지 content 삭제
 }
 

@@ -1,4 +1,5 @@
 package org.example.petwif.web.controller;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -11,8 +12,6 @@ import org.example.petwif.converter.ChatConverter;
 import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.domain.entity.Member;
-import org.example.petwif.repository.ChatRepository;
-import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.ChatService.ChatCommandService;
 import org.example.petwif.service.ChatService.ChatQueryService;
 
@@ -22,7 +21,6 @@ import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Slice;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -32,15 +30,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
+
 @RestController
 @Controller
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/chats")
 public class ChatController {
+
     private final ChatCommandService chatCommandService;
     private final ChatQueryService chatQueryService;
     private final MemberService memberService;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor("",true));
@@ -51,7 +52,6 @@ public class ChatController {
     @Operation(summary = "채팅방 생성 API")
     public ApiResponse<ChatResponseDTO.CreateChatRoomResultDTO> createChatRoom(@RequestHeader("Authorization") String authorizationHeader,
                                                                                @RequestBody ChatRequestDTO.CreateChatRoomDTO request) {
-
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 

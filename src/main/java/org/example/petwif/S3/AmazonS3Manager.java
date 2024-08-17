@@ -52,4 +52,6 @@ public class AmazonS3Manager{
             return  amazonConfig.getCommentPath()+'/'+uuid.getUuid();
         }
 
+        public String generateAlbumKeyName(Uuid uuid) {return amazonConfig.getAlbumPath() + '/' + uuid.getUuid();}
+
     }
