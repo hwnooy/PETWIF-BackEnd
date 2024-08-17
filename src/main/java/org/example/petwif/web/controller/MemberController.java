@@ -4,13 +4,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.example.petwif.JWT.TokenDto;
+import org.example.petwif.S3.AmazonS3Manager;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.web.dto.MemberDto.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
 
@@ -21,6 +24,7 @@ public class MemberController {
 
     private final MemberService memberService;
     private final MemberRepository memberRepository;
+    private final AmazonS3Manager amazonS3Manager;
 
     @PostMapping("/register") // 동일한 이메일로 회원가입X, 비번 틀림 적용해서 회원가입 처리 완료
     public ApiResponse<EmailLoginResponse> registerNewMember(@RequestBody @Valid EmailSignupRequestDTO dto) {
@@ -124,16 +128,25 @@ public class MemberController {
         }
     }
 
-    @PatchMapping("/profile")
-    public ApiResponse<String> uploadImage(@RequestHeader("Authorization") String authorizationHeader,
-                                           @RequestParam String image){
-        Member member = memberService.getMemberByToken(authorizationHeader);
-        Long id = member.getId();
-        try{
-            memberService.uploadProfile(id, image);
-            return ApiResponse.onSuccess("사진 업로드 완료");
-        } catch(Exception e){
-            return ApiResponse.onFailure("400", "error", e.getMessage());
-        }
+@PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+public ApiResponse<String> uploadImage(
+        @RequestHeader("Authorization") String authorizationHeader,
+        @RequestParam("file") MultipartFile file) {
+
+    Member member = memberService.getMemberByToken(authorizationHeader);
+    Long memberId = member.getId();
+
+    try {
+        // S3에 파일 업로드 및 URL 반환
+        String keyName =  file.getOriginalFilename()+ "/"+ memberId;
+        String fileUrl = amazonS3Manager.uploadFile(keyName, file);
+
+        memberService.uploadProfile(memberId, fileUrl);
+
+        return ApiResponse.onSuccess("사진 업로드 완료");
+    } catch (Exception e) {
+        return ApiResponse.onFailure("400", "error", e.getMessage());
     }
+}
+
 }
