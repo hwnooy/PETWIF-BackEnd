@@ -2,21 +2,28 @@ package org.example.petwif.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
-@EnableWebSocket
+@EnableWebSocketMessageBroker
 @RequiredArgsConstructor
-public class WebSocketConfig implements WebSocketConfigurer {
-
-    private final WebSocketHandler webSocketHandler;
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
-    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) { //웹소켓 연결 완료
-        // endpoint 설정 : /api/v1/chat/{postId}
-        // 이를 통해서 ws://localhost:9090/ws/chat 으로 요청이 들어오면 websocket 통신을 진행한다.
-        // setAllowedOrigins("*")는 모든 ip에서 접속 가능하도록 해줌
-        registry.addHandler(webSocketHandler, "/ws/chats").setAllowedOrigins("*");
+    public void registerStompEndpoints(StompEndpointRegistry registry){
+        registry.addEndpoint("/ws/chats") //클라이언트가 연결할 WebSocket 엔드포인트
+                .setAllowedOrigins("*");
+    }
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry registry){
+        registry.enableSimpleBroker("/sub"); //메시지 구독 요청 = 메시지 송신
+        registry.setApplicationDestinationPrefixes("/pub"); //메시지 발행 요청 = 메시지 수신
+    }
+
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+        registration.setMessageSizeLimit(50 * 1024 * 1024); // 메세지 크기 제한 오류 방지(이 코드가 없으면 byte code를 보낼때 소켓 연결이 끊길 수 있음)
     }
 }

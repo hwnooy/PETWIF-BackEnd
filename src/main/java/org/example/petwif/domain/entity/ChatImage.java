@@ -12,19 +12,16 @@ import org.example.petwif.domain.common.BaseEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Reply extends BaseEntity {
+public class ChatImage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="comment_id")
-    private Comment comment;
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="member_id")
-    private Member member;
+    @JoinColumn(name = "chat_id")
+    private Chat chat;
 
-    private String content;
 }
