@@ -28,7 +28,7 @@ public class CommentController {
     private final MemberService memberService;
 
     // 댓글 작성
-    @PostMapping(value = "/albums/{albumId}/commment",consumes = "multipart/form-data")
+    @PostMapping(value = "/albums/{albumId}/comment",consumes = "multipart/form-data")
     @Operation(summary = "댓글 작성 API")
     public ApiResponse<Long> writeComment(
             @PathVariable Long albumId,
@@ -53,7 +53,7 @@ public class CommentController {
     }
 
     // 특정 앨범에 대한 댓글 목록 조회
-    @GetMapping("/albums/{albumId}/commment")
+    @GetMapping("/albums/{albumId}/comment")
     @Operation(summary = "특정 앨범에 대한 댓글 목록 조회 API")
     public ApiResponse<List<CommentResponseDto>> getCommentsByAlbum(@PathVariable Long albumId) {
         try {
