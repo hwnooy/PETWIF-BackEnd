@@ -10,6 +10,8 @@ public interface CommentService {
     public List<CommentResponseDto> commentList(Long id);
     public void updateComment(CommentRequestDto commentRequestDto, Long CommentId);
     public void deleteComment(Long commentId);
+    public CommentLike likeComment(Long commentId, Long memberId);
+    public void unlikeComment(Long commentId, Long memberId);
 
     public CommentLike likeComment(Long commentId, Long memberId);
     public void unlikeComment(Long commentId, Long memberId);

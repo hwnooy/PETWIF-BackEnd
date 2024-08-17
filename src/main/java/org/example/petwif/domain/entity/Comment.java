@@ -4,6 +4,7 @@ import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import java.util.ArrayList;
 import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -33,6 +34,22 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentReport> commentReports = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="parent_comment_id")
+    private Comment parentComment;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> childComments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CommentImage> commentImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<CommentReport> commentReports = new ArrayList<>();
+
     private String content;
 
     private Integer likeCount = 0;
@@ -42,6 +59,7 @@ public class Comment extends BaseEntity {
     public void update(String content){
         this.content = content;
     }
+
     public void incrementLikeCount() {
         if (this.likeCount == null) {
             this.likeCount = 1;
@@ -49,6 +67,7 @@ public class Comment extends BaseEntity {
             this.likeCount += 1;
         }
     }
+
     public void decrementLikeCount() {
         if (this.likeCount == null || this.likeCount <= 0) {
             this.likeCount = 0;  // 음수 값이 되지 않도록 방지
@@ -56,10 +75,12 @@ public class Comment extends BaseEntity {
             this.likeCount -= 1;
         }
     }
+
     public void addChildComment(Comment comment) {
         childComments.add(comment);
         comment.setParentComment(this);
     }
+
     public void addImage(CommentImage commentImage) {
         commentImages.add(commentImage);
         commentImage.setComment(this);

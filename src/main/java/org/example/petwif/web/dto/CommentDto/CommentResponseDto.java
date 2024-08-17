@@ -16,7 +16,7 @@ public class CommentResponseDto {
     private Long id;
     private String content;
     private String name;
-
+  
     private List<CommentResponseDto> childComments; // 대댓글 목록
 
     @Builder

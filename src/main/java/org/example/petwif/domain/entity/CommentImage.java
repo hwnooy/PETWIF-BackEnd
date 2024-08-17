@@ -24,3 +24,4 @@ public class CommentImage {
     private Comment comment;
 
 }
+

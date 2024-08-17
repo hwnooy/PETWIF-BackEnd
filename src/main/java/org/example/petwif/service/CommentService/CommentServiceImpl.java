@@ -5,14 +5,6 @@ import org.example.petwif.S3.AmazonS3Manager;
 import org.example.petwif.S3.Uuid;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
-import org.example.petwif.domain.entity.Album;
-import org.example.petwif.domain.entity.Comment;
-import org.example.petwif.domain.entity.CommentLike;
-import org.example.petwif.domain.entity.Member;
-import org.example.petwif.repository.AlbumRepository;
-import org.example.petwif.repository.CommentLikeRepository;
-import org.example.petwif.repository.CommentRepository;
-import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.config.AmazonConfig;
 import org.example.petwif.domain.entity.*;
 import org.example.petwif.repository.*;
@@ -29,6 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
+  
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final AlbumRepository albumRepository;
@@ -46,7 +39,9 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
+
         Comment comment;
+
         if (parentCommentId == null) {
             // 일반 댓글 작성
             comment = Comment.builder()
@@ -59,6 +54,12 @@ public class CommentServiceImpl implements CommentService {
             // 대댓글 작성
             Comment parentComment = commentRepository.findById(parentCommentId)
                     .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
+
+            // 이미 대댓글인지 확인
+            if (parentComment.getParentComment() != null) {
+                throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            }
+
             comment = Comment.builder()
                     .content(commentRequestDto.getContent())
                     .album(album)
@@ -66,6 +67,7 @@ public class CommentServiceImpl implements CommentService {
                     .parentComment(parentComment)
                     .likeCount(0)  // 초기 좋아요 수 0으로 설정
                     .build();
+
             parentComment.addChildComment(comment);
         }
 
@@ -80,7 +82,7 @@ public class CommentServiceImpl implements CommentService {
 
             // S3에 이미지 업로드
             String pictureUrl = s3Manager.uploadFile(
-                    s3Manager.generateReviewKeyName(savedUuid),
+                    s3Manager.generateCommentKeyName(savedUuid),
                     commentRequestDto.getCommentPicture()
             );
 
@@ -97,6 +99,7 @@ public class CommentServiceImpl implements CommentService {
 
         return comment.getId();
     }
+
 
     @Override
     public List<CommentResponseDto> commentList(Long id){
@@ -147,6 +150,7 @@ public class CommentServiceImpl implements CommentService {
         if (existingLike.isPresent()) {
             throw new IllegalArgumentException("You have already liked this comment.");
         }
+
         // 좋아요 추가 및 좋아요 수 증가
         CommentLike commentLike = new CommentLike(comment, member);
         comment.incrementLikeCount();  // 좋아요 수 증가

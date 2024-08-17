@@ -29,6 +29,7 @@ public enum ErrorStatus implements BaseErrorCode {
     NOTIFICATION_DTYPE_NOT_FOUND(HttpStatus.BAD_REQUEST, "Notification4002", "유효하지 않은 데이터 타입입니다."),
     NOTIFICATION_PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "Notification4002", "알람 리스트를 확인할 수 없습니다. 유효하지 않은 페이지입니다."),
 
+    // Comment Error
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "COMMENT4001", "댓글이 없습니다."),
 
     // Follow Error

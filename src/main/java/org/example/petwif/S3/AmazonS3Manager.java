@@ -18,40 +18,41 @@ public class AmazonS3Manager{
 
     private final UuidRepository uuidRepository;
 
-        public String uploadFile(String keyName, MultipartFile file) {
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(file.getSize());
+    public String uploadFile(String keyName, MultipartFile file) {
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
 
-            // 파일의 확장자를 추출
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = "";
-            if (originalFilename != null && originalFilename.contains(".")) {
-                fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
-            }
-
-            // 확장자를 포함한 최종 keyName 생성
-            String finalKeyName = keyName + fileExtension;
-
-            try {
-                amazonS3.putObject(new PutObjectRequest(amazonConfig.getBucket(), finalKeyName, file.getInputStream(), metadata));
-            } catch (IOException e) {
-                log.error("Error at AmazonS3Manager uploadFile: {}", e.getMessage());
-            }
-
-            return amazonS3.getUrl(amazonConfig.getBucket(), finalKeyName).toString();
-        }
-        public String generateChatKeyName(Uuid uuid){
-            return amazonConfig.getChatPath() + '/' + uuid.getUuid();
+        // 파일의 확장자를 추출
+        String originalFilename = file.getOriginalFilename();
+        String fileExtension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf('.'));
         }
 
-        public void deleteFile(String keyName) {
-            amazonS3.deleteObject(amazonConfig.getBucket(), keyName);
+        // 확장자를 포함한 최종 keyName 생성
+        String finalKeyName = keyName + fileExtension;
+
+        try {
+            amazonS3.putObject(new PutObjectRequest(amazonConfig.getBucket(), finalKeyName, file.getInputStream(), metadata));
+        } catch (IOException e) {
+            log.error("Error at AmazonS3Manager uploadFile: {}", e.getMessage());
         }
 
-        public String generateReviewKeyName(Uuid uuid){
-            return  amazonConfig.getCommentPath()+'/'+uuid.getUuid();
-        }
+        return amazonS3.getUrl(amazonConfig.getBucket(), finalKeyName).toString();
+    }
 
-        public String generateAlbumKeyName(Uuid uuid) {return amazonConfig.getAlbumPath() + '/' + uuid.getUuid();}
+    public void deleteFile(String keyName) {
+        amazonS3.deleteObject(amazonConfig.getBucket(), keyName);
+    }
+
+    public String generateCommentKeyName(Uuid uuid){
+        return  amazonConfig.getCommentPath()+'/'+uuid.getUuid();
+    }
+
+    public String generateChatKeyName(Uuid uuid){
+        return amazonConfig.getChatPath() + '/' + uuid.getUuid();
+    }
+
+    public String generateAlbumKeyName(Uuid uuid) {return amazonConfig.getAlbumPath() + '/' + uuid.getUuid();}
 
     }
