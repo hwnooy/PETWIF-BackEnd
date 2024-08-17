@@ -1,6 +1,8 @@
 package org.example.petwif.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petwif.apiPayload.code.status.ErrorStatus;
+import org.example.petwif.apiPayload.exception.handler.NotificationHandler;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.domain.entity.Notification;
 import org.example.petwif.domain.enums.NotificationDtype;
@@ -110,11 +112,22 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
         Notification notification = new Notification();
 
-        if (request.getDtype().equals("FRIEND_REQUEST") && !member.getFriendRequestNoti()) return null;
-        if (request.getDtype().equals("FRIEND_ACCEPT") && !member.getFriendAcceptNoti()) return null;
-        if (request.getDtype().equals("LIKE") && !member.getLikeNoti()) return null;
-        if (request.getDtype().equals("BOOKMARK") && !member.getBookmarkNoti()) return null;
-        if (request.getDtype().equals("COMMENT") && !member.getCommentNoti()) return null;
+        String dtype = request.getDtype();
+        if (!dtype.equals("FRIEND_REQUEST") && !dtype.equals("FRIEND_ACCEPT") &&
+                !dtype.equals("LIKE") && !dtype.equals("BOOKMARK") && !dtype.equals("COMMENT")) {
+            throw new NotificationHandler(ErrorStatus.NOTIFICATION_DTYPE_NOT_FOUND);
+        }
+
+        if ((dtype.equals("LIKE") || dtype.equals("BOOKMARK") || dtype.equals("COMMENT"))
+                && (request.getAlbumId() == 0 || request.getAlbumId() == null)) {
+            throw new NotificationHandler(ErrorStatus.ALBUM_NOT_FOUND);
+        }
+
+        if (dtype.equals("FRIEND_REQUEST") && !member.getFriendRequestNoti()) return null;
+        if (dtype.equals("FRIEND_ACCEPT") && !member.getFriendAcceptNoti()) return null;
+        if (dtype.equals("LIKE") && !member.getLikeNoti()) return null;
+        if (dtype.equals("BOOKMARK") && !member.getBookmarkNoti()) return null;
+        if (dtype.equals("COMMENT") && !member.getCommentNoti()) return null;
 
         notification.setMember(memberRepository.findById(memberId).get());
         notification.setRelatedMember(memberRepository.findById(relatedMemberId).get());
