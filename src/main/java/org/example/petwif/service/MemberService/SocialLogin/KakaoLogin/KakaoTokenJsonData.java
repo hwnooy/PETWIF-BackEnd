@@ -1,6 +1,7 @@
 package org.example.petwif.service.MemberService.SocialLogin.KakaoLogin;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -11,11 +12,23 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class KakaoTokenJsonData {
     private final WebClient webClient;
-    private static final String TOKEN_URI = "https://kauth.kakao.com/oauth/token";
-    private static final String REDIRECT_URI = "http://localhost:8080/kakaoLogin";
-    private static final String GRANT_TYPE = "authorization_code";
-    private static final String CLIENT_ID = "290e9622e67ae7945bf3ba677f42dc48"; // Replace with your client ID
-    private static final String CLIENT_SECRET = "LW0baB7Koy6ILrW1OyygT6VtS1tyWzI9"; // Replace with your client secret
+
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    private String TOKEN_URI;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}")
+    private String REDIRECT_URI;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
+    private String GRANT_TYPE;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String CLIENT_ID;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String CLIENT_SECRET;
+
+
 
     public KakaoTokenResponse getToken(String code) {
         return webClient.post()
