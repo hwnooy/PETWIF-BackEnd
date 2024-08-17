@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/members")
+@RequestMapping("/notifications")
 public class NotificationRestController {
 
     private final NotificationCommandService notificationCommandService;
@@ -48,7 +48,7 @@ public class NotificationRestController {
 
     }
 
-    @PutMapping("/notifications/setting/friend-requests")
+    @PutMapping("/setting/friend-requests")
     @Operation(summary = "사용자의 친구 요청 알람 활성화/비활성화 API", description = "사용자의 친구 요청 알람 활성화/비활성화하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -61,7 +61,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("/notifications/setting/friend-accepts")
+    @PutMapping("/setting/friend-accepts")
     @Operation(summary = "사용자의 친구 요청 수락 알람 활성화/비활성화 API", description = "사용자의 친구 요청 수락 알람 활성화/비활성화하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -74,7 +74,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("/notifications/setting/likes")
+    @PutMapping("/setting/likes")
     @Operation(summary = "사용자의 좋아요 알람 활성화/비활성화 API", description = "사용자의 좋아요 알람 활성화/비활성화하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -87,7 +87,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("/notifications/setting/bookmarks")
+    @PutMapping("/setting/bookmarks")
     @Operation(summary = "사용자의 북마크 알람 활성화/비활성화 API", description = "사용자의 북마크 알람 활성화/비활성화하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -100,7 +100,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("/notifications/setting/comments")
+    @PutMapping("/setting/comments")
     @Operation(summary = "사용자의 댓글 알람 활성화/비활성화 API", description = "사용자의 댓글 알람 활성화/비활성화하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -113,7 +113,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("/notifications")
+    @PutMapping("")
     @Operation(summary = "사용자의 알람 확인 API", description = "사용자의 알람을 확인하는 API입니다. ResponseBody의 null이 아닌 Id를 이용해서 해당 페이지로 이동하시면 됩니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!"),
@@ -128,7 +128,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationOpenDTO(notification));
     }
 
-    @GetMapping("/notifications")
+    @GetMapping("")
     @Operation(summary = "사용자의 알람 목록 조회 API", description = "사용자의 알람 목록을 조회하는 API이며, 페이징을 포함합니다. query String으로 page 번호를 주세요.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")

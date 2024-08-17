@@ -21,14 +21,14 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@RequestMapping("/members")
+@RequestMapping("/blocks")
 public class BlockRestController {
 
     private final BlockCommandService blockCommandService;;
     private final BlockQueryService blockQueryService;
     private final MemberService memberService;
 
-    @PostMapping("/blocks")
+    @PostMapping("")
     @Operation(summary = "멤버 차단 API", description = "사용자가 다른 멤버를 차단하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -45,7 +45,7 @@ public class BlockRestController {
         return ApiResponse.onSuccess(BlockConverter.toBlockResultDTO(block));
     }
 
-    @GetMapping("/blocks/status")
+    @GetMapping("/status")
     @Operation(summary = "다른 멤버와의 차단 상태 조회 API", description = "사용자가 다른 멤버와의 차단 상태를 조회하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
@@ -62,7 +62,7 @@ public class BlockRestController {
         return ApiResponse.onSuccess(BlockConverter.toBlockStatusDTO(blockStatus));
     }
 
-    @GetMapping("/blocks")
+    @GetMapping("")
     @Operation(summary = "사용자의 차단 목록 조회 API", description = "사용자의 차단 목록을 조회하는 API이며, 페이징을 포함합니다. query String으로 page 번호를 주세요.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!"),
@@ -77,7 +77,7 @@ public class BlockRestController {
         return ApiResponse.onSuccess(BlockConverter.blockListDTO(blockList));
     }
 
-    @DeleteMapping("/blocks")
+    @DeleteMapping("")
     @Operation(summary = "멤버 차단 해제 API", description = "사용자가 다른 멤버에 대한 차단을 해제하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 차단 해제를 하는 멤버의 아이디(사용자), request header 입니다!")
