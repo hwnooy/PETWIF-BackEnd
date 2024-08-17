@@ -37,6 +37,8 @@ public class ChatResponseDTO {
         private Long chatId;
         private Long memberId;
         private String content;
+        private String imageUrl;
+        private String nickName;
         private LocalDateTime createdAt;
     }
 
@@ -61,6 +63,7 @@ public class ChatResponseDTO {
         private Long otherId;
         private Long chatRoomId;
         private String roomName;
+        private String imageUrl;
         private LocalDateTime createdAt;
     }
 
