@@ -13,8 +13,9 @@ public interface AlbumQueryService {
 
     public AlbumResponseDto.DetailResultDto getAlbumDetails(Long albumId, Long memberId);
 
-    //public List<AlbumResponseDto.StoryResponseDto> getFriendAlbumStories(Long memberId);
-    //public AlbumResponseDto.MainPageContentDto getMainPageContent(Long memberId);
+    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId);
+
+    public AlbumResponseDto.MainPageAlbumListDto getMainpageAlbum(Long memberId);
 
     //탐색 페이지에서 앨범 조회
     public AlbumResponseDto.SearchAlbumListDto getSearchableAlbums(Long memberId);

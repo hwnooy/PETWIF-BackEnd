@@ -13,4 +13,5 @@ public class CommentRequestDto {
     private String content;
 
     private MultipartFile commentPicture;
+
 }

@@ -1,5 +1,4 @@
 package org.example.petwif.web.dto.CommentDto;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,12 +11,12 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 public class CommentResponseDto {
-
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private Long id;
     private String content;
     private String name;
+  
     private List<CommentResponseDto> childComments; // 대댓글 목록
 
     @Builder

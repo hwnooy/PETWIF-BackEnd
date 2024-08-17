@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CommentServiceImpl implements CommentService {
-
+  
     private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
     private final AlbumRepository albumRepository;
@@ -106,14 +106,12 @@ public class CommentServiceImpl implements CommentService {
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
         List<Comment> commentList=commentRepository.findByAlbum(album);
-
         return commentList.stream()
                 .map(comment-> CommentResponseDto.builder()
                         .comment(comment)
                         .build())
                 .collect(Collectors.toList());
     }
-
     @Override
     public void updateComment(CommentRequestDto commentRequestDto, Long CommentId){
         Comment comment = commentRepository.findById(CommentId)
@@ -144,11 +142,9 @@ public class CommentServiceImpl implements CommentService {
         // 댓글이 존재하는지 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("Comment not found"));
-
         // 멤버가 존재하는지 확인
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
-
         // 이미 좋아요를 누른 경우 예외 처리
         Optional<CommentLike> existingLike = commentLikeRepository.findByCommentIdAndMemberId(commentId, memberId);
         if (existingLike.isPresent()) {
@@ -161,12 +157,10 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment);  // 변경된 likeCount 저장
         return commentLikeRepository.save(commentLike);
     }
-
     public void unlikeComment(Long commentId, Long memberId) {
         // 좋아요 찾기
         CommentLike commentLike = commentLikeRepository.findByCommentIdAndMemberId(commentId, memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Like not found"));
-
         // 좋아요 삭제 및 좋아요 수 감소
         Comment comment = commentLike.getComment();
         comment.decrementLikeCount();  // 좋아요 수 감소

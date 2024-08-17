@@ -1,16 +1,12 @@
 package org.example.petwif.web.dto.ChatDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.entity.Member;
-
 import java.time.LocalDateTime;
 import java.util.List;
-
 public class ChatResponseDTO {
-
     @Builder
     @Getter
     @NoArgsConstructor
@@ -19,7 +15,6 @@ public class ChatResponseDTO {
         private Long chatRoomId;
         private LocalDateTime createdAt;
     }
-
     @Builder
     @Getter
     @NoArgsConstructor
@@ -28,7 +23,6 @@ public class ChatResponseDTO {
         private Long chatId;
         private LocalDateTime createdAt;
     }
-
     @Builder
     @Getter
     @NoArgsConstructor
@@ -37,9 +31,10 @@ public class ChatResponseDTO {
         private Long chatId;
         private Long memberId;
         private String content;
+        private String imageUrl;
+        private String nickName;
         private LocalDateTime createdAt;
     }
-
     @Builder
     @Getter
     @NoArgsConstructor
@@ -51,7 +46,6 @@ public class ChatResponseDTO {
         private boolean isLast;
         private boolean hasNext;
     }
-
     @Builder
     @Getter
     @NoArgsConstructor
@@ -61,9 +55,9 @@ public class ChatResponseDTO {
         private Long otherId;
         private Long chatRoomId;
         private String roomName;
+        private String imageUrl;
         private LocalDateTime createdAt;
     }
-
 
     @Builder
     @Getter
@@ -76,7 +70,6 @@ public class ChatResponseDTO {
         private boolean isLast;
         private boolean hasNext;
     }
-
     @Builder
     @Getter
     @NoArgsConstructor

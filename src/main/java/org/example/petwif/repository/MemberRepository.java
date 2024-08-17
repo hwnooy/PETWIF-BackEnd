@@ -10,16 +10,35 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByName(String name);
-    Member findByEmail(String email);
+    //Member findByEmail(String email);
+    Member findByNickname(String nickname);
+    boolean existsByNickname(String nickname);
     @Query("select m from Member m where m.id = :mId")
     Member findByMemberId(@Param("mId")Long id);
 
     @Query("select m from Member m where m.email = :mail")
-    Optional<Member> checkEmail(@Param("mail") String mail);
+    Optional<Member> findMemberByEmail(@Param("mail") String mail);
+    @Query("select m from Member m where m.email = :mail and m.oauthProvider = :oauth")
+    Optional<Member> checkEmail(@Param("mail") String mail, @Param("oauth") String oauth);
 
 
     @Query("select m from Member m where m.nickname = :nickname")
     Optional<Member> checkNickname(@Param("nickname") String name);
 
-    boolean existsByEmail(String email);
+//    @Query("select m from Member m where m.oauthProvider = :oauth and m.email=:email")
+//    Optional<Member> checkGoogleEmail(@Param("oauth") String oauth, @Param("email") String email);
+
+    //@Query("delete from Member m where m.id=:id")
+
+    @Override
+    void deleteById(Long id);
+
+    // 메인페이지에서 친구의 앨범을 스토리 형태로 조회하기 위해 추가한 메서드 입니다. - 현일
+    @Query("SELECT f.friend FROM Friend f WHERE f.member.id = :memberId AND f.status = 'ACCEPTED'")
+    List<Member> findFriendsByMemberId(@Param("memberId") Long memberId);
+
+    // 메인페이지에서 친구가 아닌 사용자(pm님은 추천앨범이라고 하셨습니다)의 앨범을 게시글 형태로 조회하기 위해 추가한 메서드 입니다. - 현일
+    @Query("SELECT m FROM Member m WHERE m.id NOT IN " +
+            "(SELECT f.friend.id FROM Friend f WHERE f.member.id = :memberId AND f.status = 'ACCEPTED')")
+    List<Member> findNonFriendsByMemberId(@Param("memberId") Long memberId);
 }

@@ -31,6 +31,7 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
 
     //좋아요 누르기
     @Transactional
+    @Override
     public void addAlbumLike(Long albumId, Long memberId){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
@@ -53,6 +54,7 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
 
     //좋아요 삭제
     @Transactional
+    @Override
     public void deleteAlbumLike(Long albumId, Long memberId){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
@@ -66,6 +68,7 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
     }
 
     //좋아요 목록 보이기
+    @Override
     public List<AlbumResponseDto.LikeResultDto> getAlbumLikes(Long albumId, Long memberId) {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));

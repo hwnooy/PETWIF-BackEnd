@@ -16,13 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AlbumBookmarkServiceImpl implements AlbumBookmarkService{
     private final AlbumRepository albumRepository;
     private final AlbumBookmarkRepository albumBookmarkRepository;
     private final MemberRepository memberRepository;
+
+
     private final AlbumCheckAccessService albumCheckAccessService;
 
     //북마크 생성

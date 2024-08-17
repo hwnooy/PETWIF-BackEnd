@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.Scope;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,5 +67,13 @@ public class Album extends BaseEntity {
 
     public void incrementViewCount() {
         this.view++;
+    }
+
+    public void addCoverImageToAlbum(AlbumImage newCoverImage) {
+        this.coverImage = newCoverImage;
+    }
+
+    public void addAlbumImageToAlbum(AlbumImage newAlbumImages) {
+        this.albumImages.add(newAlbumImages);
     }
 }

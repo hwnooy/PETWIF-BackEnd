@@ -1,5 +1,4 @@
 package org.example.petwif.S3;
-
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -9,16 +8,12 @@ import org.example.petwif.config.AmazonConfig;
 import org.example.petwif.repository.UuidRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AmazonS3Manager{
-
     private final AmazonS3 amazonS3;
-
     private final AmazonConfig amazonConfig;
 
     private final UuidRepository uuidRepository;
@@ -58,6 +53,6 @@ public class AmazonS3Manager{
         return amazonConfig.getChatPath() + '/' + uuid.getUuid();
     }
 
+    public String generateAlbumKeyName(Uuid uuid) {return amazonConfig.getAlbumPath() + '/' + uuid.getUuid();}
 
-
-}
+    }

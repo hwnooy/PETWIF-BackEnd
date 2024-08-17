@@ -6,6 +6,7 @@ import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.*;
 import org.example.petwif.domain.enums.AlbumSortType;
+import org.example.petwif.domain.enums.Scope;
 import org.example.petwif.repository.*;
 import org.example.petwif.repository.albumRepository.AlbumBookmarkRepository;
 import org.example.petwif.repository.albumRepository.AlbumLikeRepository;
@@ -29,7 +30,8 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     private final CommentRepository commentRepository;
     private final AlbumLikeRepository albumLikeRepository;
     private final AlbumBookmarkRepository albumBookmarkRepository;
-
+    private final FriendRepository friendRepository;
+    private final MemberRepository memberRepository;
 
     //열람 조회 가능한지 메서드
     private final AlbumCheckAccessService albumCheckAccessService;
@@ -71,20 +73,76 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
        }
 
     //=============================== 2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식)================================//
-    // 2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식) 일단 해볼게요...어려웡
-    /*@Override
-    public AlbumResponseDto.MainPageContentDto getMainPageContent(Long memberId) {
-        List<Album> friendAlbums = albumMainPageService.getFriendAlbums(memberId);
-        List<Album> publicAlbums = albumMainPageService.getPublicAlbums();
+    // 2-1. 앨범 조회 -> 스토리형식 조회
+    @Override
+    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId) {
 
-        AlbumResponseDto.StoryAlbumListDto stories = albumMainPageService.convertToStoryAlbumListDto(friendAlbums);
-        AlbumResponseDto.MainPageAlbumListDto mainpageAlbums = albumMainPageService.convertToMainPageAlbumListDto(publicAlbums);
+        List<Member> friends = memberRepository.findFriendsByMemberId(memberId);
+        List<AlbumResponseDto.StoryAlbumResultDto> stories = new ArrayList<>();
 
-        return AlbumResponseDto.MainPageContentDto.builder()
-                .storyAlbumListDto(stories)
-                .mainpageAlbumListDto(mainpageAlbums)
+       for(Member friend : friends){
+        List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(friend.getId());
+        for (Album album : albums){
+           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findFrindAndAllAlbum(album))
+                stories.add(convertToStoryAlbumResultDto(album));
+
+        }
+       }
+        return new AlbumResponseDto.StoryAlbumListDto(stories);
+    }
+
+    private boolean findFrindAndAllAlbum(Album album){
+        if(album.getScope().equals(Scope.FRIEND) || album.getScope().equals(Scope.ALL)){
+            return true;
+        }
+        else return false;
+    }
+
+
+    private AlbumResponseDto.StoryAlbumResultDto convertToStoryAlbumResultDto(Album album){
+        return AlbumResponseDto.StoryAlbumResultDto.builder()
+                .albumId(album.getId())
+                .nickName(album.getMember().getNickname())
+                .profileImageUrl(album.getMember().getProfile_url())
+                .createdAt(album.getCreatedAt())
                 .build();
-    }*/
+    }
+
+    // 2-2. 앨범 조회 -> 게시글 형식 조회
+    @Override
+    public AlbumResponseDto.MainPageAlbumListDto getMainpageAlbum(Long memberId){
+        List<Member> notFriends = memberRepository.findNonFriendsByMemberId(memberId);
+        List<AlbumResponseDto.MainPageAlbumResultDto> posts = new ArrayList<>();
+
+        for(Member notFriend : notFriends){
+            List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(notFriend.getId());
+            for (Album album : albums){
+                List<Comment> comments = commentRepository.findByAlbum(album);
+                if(albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope().equals(Scope.ALL))
+                    posts.add(convertToPostAlbumResultDto(album, comments));
+
+            }
+        }
+        return new AlbumResponseDto.MainPageAlbumListDto(posts);
+         //댓글 리스트
+    }
+
+    private AlbumResponseDto.MainPageAlbumResultDto convertToPostAlbumResultDto(Album album, List<Comment> comments){
+        return AlbumResponseDto.MainPageAlbumResultDto.builder()
+                .albumId(album.getId())
+                .content(album.getContent())
+                .createdAt(album.getCreatedAt())
+                .coverImage(album.getCoverImage())
+                .likeCount(album.getAlbumLikes().size())
+                .nickName(album.getMember().getNickname())
+                .profileImageUrl(album.getMember().getProfile_url())
+                .memberId(album.getMember().getId())
+                .comments(comments.stream()
+                        .map(c -> new CommentResponseDto(c))
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
 
     //=============================== 3. 탐색 페이지에서 앨범 조회 서비스================================//
     @Override
