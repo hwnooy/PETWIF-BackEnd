@@ -36,6 +36,9 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.path.comment}")
     private String commentPath;
 
+    @Value("album")
+    private String albumPath;
+
 
     @PostConstruct
     public void init() {

@@ -36,4 +36,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // 메인페이지에서 친구의 앨범을 스토리 형태로 조회하기 위해 추가한 메서드 입니다. - 현일
     @Query("SELECT f.friend FROM Friend f WHERE f.member.id = :memberId AND f.status = 'ACCEPTED'")
     List<Member> findFriendsByMemberId(@Param("memberId") Long memberId);
+
+    // 메인페이지에서 친구가 아닌 사용자(pm님은 추천앨범이라고 하셨습니다)의 앨범을 게시글 형태로 조회하기 위해 추가한 메서드 입니다. - 현일
+    @Query("SELECT m FROM Member m WHERE m.id NOT IN " +
+            "(SELECT f.friend.id FROM Friend f WHERE f.member.id = :memberId AND f.status = 'ACCEPTED')")
+    List<Member> findNonFriendsByMemberId(@Param("memberId") Long memberId);
 }

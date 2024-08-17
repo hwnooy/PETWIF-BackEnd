@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
     private final BlockRepository blockRepository;
     private final FriendRepository friendRepository;
+
+
     @Override
     public void checkAccess(Album album, Long currentUserId) {
         // 차단 여부 확인

@@ -83,7 +83,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
        for(Member friend : friends){
         List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(friend.getId());
         for (Album album : albums){
-           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findScope(album))
+           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findFrindAndAllAlbum(album))
                 stories.add(convertToStoryAlbumResultDto(album));
 
         }
@@ -91,7 +91,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         return new AlbumResponseDto.StoryAlbumListDto(stories);
     }
 
-    private boolean findScope(Album album){
+    private boolean findFrindAndAllAlbum(Album album){
         if(album.getScope().equals(Scope.FRIEND) || album.getScope().equals(Scope.ALL)){
             return true;
         }
@@ -111,16 +111,16 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     // 2-2. 앨범 조회 -> 게시글 형식 조회
     @Override
     public AlbumResponseDto.MainPageAlbumListDto getMainpageAlbum(Long memberId){
-        List<Member> notFriends = memberRepository.findAll();
+        List<Member> notFriends = memberRepository.findNonFriendsByMemberId(memberId);
         List<AlbumResponseDto.MainPageAlbumResultDto> posts = new ArrayList<>();
 
         for(Member notFriend : notFriends){
             List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(notFriend.getId());
             for (Album album : albums){
                 List<Comment> comments = commentRepository.findByAlbum(album);
+                if(albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope().equals(Scope.ALL))
+                    posts.add(convertToPostAlbumResultDto(album, comments));
 
-                albumCheckAccessService.checkAccess(album, memberId);
-                posts.add(convertToPostAlbumResultDto(album, comments));
             }
         }
         return new AlbumResponseDto.MainPageAlbumListDto(posts);
