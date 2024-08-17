@@ -5,7 +5,7 @@ import lombok.Getter;
 public class FriendRequestDTO {
 
     @Getter
-    public class FriendDTO {
+    public static class FriendDTO {
         String nickname;
     }
 }

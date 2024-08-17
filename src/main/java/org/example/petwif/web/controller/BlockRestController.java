@@ -49,13 +49,15 @@ public class BlockRestController {
     @Operation(summary = "다른 멤버와의 차단 상태 조회 API", description = "사용자가 다른 멤버와의 차단 상태를 조회하는 API입니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
+            //@Parameter(name = "nickname", description = "다른 사용자의 닉네임, query parameter 입니다!")
+            //@RequestParam String nickname
     })
     public ApiResponse<BlockResponseDTO.BlockStatusDTO> getBlockStatus(@RequestHeader("Authorization") String authorizationHeader,
-                                                                       @RequestBody @Valid BlockRequestDTO.BlockDTO request) {
+                                                                       @RequestParam String nickname) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Member target = memberService.getMemberByNickname(request.getNickname());
+        Member target = memberService.getMemberByNickname(nickname);
         Long targetId = target.getId();
 
         boolean blockStatus = blockQueryService.getBlockStatus(memberId, targetId);

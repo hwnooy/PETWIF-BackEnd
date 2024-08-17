@@ -5,7 +5,7 @@ import lombok.Getter;
 public class BlockRequestDTO {
 
     @Getter
-    public class BlockDTO {
+    public static class BlockDTO {
         String nickname;
     }
 }

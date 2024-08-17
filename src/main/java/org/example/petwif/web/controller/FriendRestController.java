@@ -83,8 +83,7 @@ public class FriendRestController {
     @PutMapping("/rejections")
     @Operation(summary = "친구 요청 거절 API", description = "사용자에게 온 친구 요청에 대해 거절하는 API입니다. 'REJECT'는 친구 요청을 거절한 상태로 친구 요청을 걸기 전과 같은 아무것도 아닌 상태가 되었음을 의미하며, 두 유저 모두에게 적용됩니다.")
     @Parameters({
-            @Parameter(name = "Authorization", description = "JWT 토큰으로, 친구 요청을 거절하는 멤버의 아이디(사용자), request header 입니다!"),
-            @Parameter(name = "friendId", description = "친구 요청을 했던 멤버의 아이디, path variable 입니다!")
+            @Parameter(name = "Authorization", description = "JWT 토큰으로, 친구 요청을 거절하는 멤버의 아이디(사용자), request header 입니다!")
     })
     public ApiResponse<FriendResponseDTO.FriendResultDTO> friendReject(@RequestHeader("Authorization") String authorizationHeader,
                                                                        @RequestBody @Valid FriendRequestDTO.FriendDTO request) {
@@ -104,11 +103,11 @@ public class FriendRestController {
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
     })
     public ApiResponse<FriendResponseDTO.FriendStatusDTO> getFriendStatus(@RequestHeader("Authorization") String authorizationHeader,
-                                                                          @RequestBody @Valid FriendRequestDTO.FriendDTO request) {
+                                                                          @RequestParam String nickname) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Member target = memberService.getMemberByNickname(request.getNickname());
+        Member target = memberService.getMemberByNickname(nickname);
         Long friendId = target.getId();
 
         FriendStatus friendStatus = friendQueryService.getFriendStatus(memberId, friendId);
