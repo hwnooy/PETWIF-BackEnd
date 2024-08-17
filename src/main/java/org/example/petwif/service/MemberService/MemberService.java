@@ -82,7 +82,15 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 회원이 존재하지 않습니다."));
     }
 
+    @Transactional(readOnly = true)
+    public Member getMemberByNickname(String nickname) {
 
+        if (!memberRepository.existsByNickname(nickname)) {
+            throw new IllegalArgumentException("해당 회원이 존재하지 않습니다.");
+        }
+
+        return memberRepository.findByNickname(nickname);
+    }
 
     public Boolean checkNickName(Long mId, NicknameDto nickname){
         if (memberRepository.checkNickname(nickname.getNickname()).isPresent()) {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,5 +45,10 @@ public class NotificationQueryServiceImpl implements NotificationQueryService {
         }
 
         return notificationList;
+    }
+
+    @Override
+    public Optional<Notification> findNotification(Long Id) {
+        return notificationRepository.findById(Id);
     }
 }

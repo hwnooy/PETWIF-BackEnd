@@ -8,6 +8,7 @@ public class NotificationRequestDTO {
 
     @Getter
     public static class NotificationDTO {
+        String nickname;
         Long albumId;
         @Enumerated(EnumType.STRING)
         String dtype;

@@ -22,8 +22,6 @@ public class BlockConverter {
 
         return BlockResponseDTO.BlockResultDTO.builder()
                 .id(block.getId())
-                .memberId(block.getMember().getId())
-                .targetId(block.getTarget().getId())
                 .profile_url(member.getProfile_url())
                 .nickname(member.getNickname())
                 .createdAt(LocalDateTime.now())
