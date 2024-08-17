@@ -1,13 +1,11 @@
 package org.example.petwif.web.controller;
 
-import io.jsonwebtoken.io.IOException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.converter.ChatConverter;
@@ -17,25 +15,19 @@ import org.example.petwif.domain.entity.Member;
 import org.example.petwif.service.ChatService.ChatCommandService;
 import org.example.petwif.service.ChatService.ChatQueryService;
 
-import org.example.petwif.service.ChatService.ImageUploadService;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.validation.annotation.ExistChatRoom;
-import org.example.petwif.validation.annotation.ExistMember;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,7 +42,6 @@ public class ChatController {
     private final ChatQueryService chatQueryService;
     private final SimpMessagingTemplate messagingTemplate;
     private final MemberService memberService;
-    private final ImageUploadService imageUploadService;
 
     @InitBinder
     public void initBinder(WebDataBinder binder) {
@@ -82,23 +73,6 @@ public class ChatController {
 
         Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
         return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
-    }
-
-    //채팅 이미지 업로드 (WebSocket에서 이미지 보낼 수 있도록 함)
-    @PostMapping("/upload")
-    @Operation(summary = "채팅 이미지 업로드 API - WebSocket에서 활용")
-    public ResponseEntity<List<String>> imageUpload(@ModelAttribute ChatRequestDTO.imageUploadDTO request){
-        List<String> files = new ArrayList<>();
-
-        for (MultipartFile file : request.getChatImages()){
-            try {
-                String fileUrl = imageUploadService.uploadImage(file);
-            } catch (IOException e){
-                e.printStackTrace();
-                return ResponseEntity.status(500).body(null);
-            }
-        }
-        return ResponseEntity.ok(files);
     }
 
     //채팅 전송 - 미완료 (WebSocket - JWT와 연동이 안됨)
