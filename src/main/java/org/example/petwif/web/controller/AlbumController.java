@@ -45,7 +45,7 @@ public class AlbumController {
 
 
     //==앨범 생성==//
-    @PostMapping("/albums")
+    @PostMapping(value = "/albums", consumes = "multipart/form-data")
     @Operation(summary = "앨범 생성 API", description = "앨범을 생성하는 API 입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),

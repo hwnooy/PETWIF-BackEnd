@@ -67,4 +67,12 @@ public class Album extends BaseEntity {
     public void incrementViewCount() {
         this.view++;
     }
+
+    public void addCoverImageToAlbum(AlbumImage newCoverImage) {
+        this.coverImage = newCoverImage;
+    }
+
+    public void addAlbumImagesToAlbum(List<AlbumImage> newAlbumImages) {
+        this.albumImages = newAlbumImages;
+    }
 }

@@ -28,6 +28,9 @@ public class AmazonConfig {
     @Value("${cloud.aws.s3.path.comment}")
     private String commentPath;
 
+    @Value("${cloud.aws.s3.path.album}")
+    private String albumPath;
+
     @PostConstruct
     public void init() {
         this.awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
