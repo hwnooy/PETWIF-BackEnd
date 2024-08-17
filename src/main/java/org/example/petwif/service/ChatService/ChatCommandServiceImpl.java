@@ -81,11 +81,8 @@ public class ChatCommandServiceImpl implements ChatCommandService {
                     try {
                         String uuid = UUID.randomUUID().toString() + ".jpg";
                         System.out.println("Generated UUID: " + uuid);
-                        Uuid savedUuid = uuidRepository.save(
-                                Uuid.builder()
-                                        .uuid(uuid)
-                                        .build()
-                        );
+                        Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+
                         String pictureUrl = s3Manager.uploadFile(s3Manager.generateChatKeyName(savedUuid), multipartFile);
                         return ChatConverter.toChatImage(pictureUrl, chat);
                     } catch (Exception e) {
