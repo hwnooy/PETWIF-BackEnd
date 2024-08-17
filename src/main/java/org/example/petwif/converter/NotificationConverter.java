@@ -18,8 +18,11 @@ public class NotificationConverter {
     }
 
     public static NotificationResponseDTO.NotificationOpenDTO toNotificationOpenDTO(Notification notification) {
+        Member member = notification.getRelatedMember();
+
         return NotificationResponseDTO.NotificationOpenDTO.builder()
-                .relatedMemberId(notification.getRelatedMember() != null ? notification.getRelatedMember().getId() : null)
+                .id(notification.getId())
+                .nickname(member != null ? member.getNickname() : null)
                 .albumId(notification.getAlbum() != null ? notification.getAlbum().getId() : null)
                 .isConfirmed(notification.getIsConfirmed())
                 .build();
@@ -37,8 +40,8 @@ public class NotificationConverter {
 
         return NotificationResponseDTO.NotificationResultDTO.builder()
                 .id(notification.getId())
-                .memberId(notification.getMember().getId())
-                .relatedMemberId(notification.getRelatedMember().getId())
+                .profile_url(member.getProfile_url())
+                .nickname(member.getNickname())
                 .albumId(notification.getAlbum() != null ? notification.getAlbum().getId() : null)
                 .isConfirmed(notification.getIsConfirmed())
                 .content(content)
