@@ -163,6 +163,7 @@ public class MemberService {
         Member user = Member.builder()
                 .email(email)
                 .oauthProvider("KAKAO")
+                .name(email+"님")
                 .build();
         if (memberRepository.findMemberByEmail(email).isEmpty()){
             memberRepository.save(user);
