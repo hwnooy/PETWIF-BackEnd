@@ -76,29 +76,29 @@ public class ChatController {
     }
 
     //채팅 전송 - 미완료 (WebSocket - JWT와 연동이 안됨)
-    @MessageMapping(value = "/chatRoom/{chatRoomId}/sending")
-    @Operation(summary = "채팅 메시지 전송 API - WebSocket")
-    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendingChat(Map<String, Object> payload,
-                                                                      @RequestHeader("Authorization") String authorizationHeader,
-                                                                      @ModelAttribute ChatRequestDTO.SendChatDTO request) {
-
-        Member member = memberService.getMemberByToken(authorizationHeader);
-        Long memberId = member.getId();
-
-        if (payload.containsKey("memberId")) {
-            memberId = ((Number) payload.get("memberId")).longValue();
-        }
-
-        Long chatRoomId = ((Number) payload.get("chatRoomId")).longValue();
-
-        //메시지 저장
-        Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
-
-        //메시지 전송
-        messagingTemplate.convertAndSend("/sub" + chatRoomId , request);
-
-        return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
-    }
+//    @MessageMapping(value = "/chatRoom/{chatRoomId}/sending")
+//    @Operation(summary = "채팅 메시지 전송 API - WebSocket")
+//    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendingChat(Map<String, Object> payload,
+//                                                                      @RequestHeader("Authorization") String authorizationHeader,
+//                                                                      @ModelAttribute ChatRequestDTO.SendChatDTO request) {
+//
+//        Member member = memberService.getMemberByToken(authorizationHeader);
+//        Long memberId = member.getId();
+//
+//        if (payload.containsKey("memberId")) {
+//            memberId = ((Number) payload.get("memberId")).longValue();
+//        }
+//
+//        Long chatRoomId = ((Number) payload.get("chatRoomId")).longValue();
+//
+//        //메시지 저장
+//        Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
+//
+//        //메시지 전송
+//        messagingTemplate.convertAndSend("/sub" + chatRoomId , request);
+//
+//        return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
+//    }
 
     //채팅창 화면 조회 - 완
     @GetMapping("/chatRoom/{chatRoomId}")
