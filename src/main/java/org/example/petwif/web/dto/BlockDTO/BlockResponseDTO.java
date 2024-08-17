@@ -24,8 +24,6 @@ public class BlockResponseDTO {
     @AllArgsConstructor
     public static class BlockResultDTO {
         Long id;
-        Long memberId;
-        Long targetId;
         String profile_url;
         String nickname;
         LocalDateTime createdAt;

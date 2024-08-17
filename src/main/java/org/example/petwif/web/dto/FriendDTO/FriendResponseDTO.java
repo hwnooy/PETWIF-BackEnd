@@ -25,8 +25,6 @@ public class FriendResponseDTO {
     @AllArgsConstructor
     public static class FriendResultDTO {
         Long id;
-        Long memberId;
-        Long friendId;
         String profile_url;
         String nickname;
         FriendStatus status;
@@ -50,8 +48,6 @@ public class FriendResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RecFriendResultDTO {
-        Long memberId;
-        Long recFriendId;
         String profile_url;
         String nickname;
         LocalDateTime createdAt;

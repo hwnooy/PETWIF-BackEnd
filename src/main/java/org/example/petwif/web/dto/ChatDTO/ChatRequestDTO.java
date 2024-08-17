@@ -27,4 +27,9 @@ public class ChatRequestDTO {
         @Nullable
         private List<MultipartFile> chatImages = new ArrayList<>();
     }
+
+    @Getter
+    public static class imageUploadDTO{
+        private List<MultipartFile> chatImages;
+    }
 }

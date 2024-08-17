@@ -31,13 +31,55 @@ public class ChatConverter {
                 .build();
     }
 
-        public static ChatImage toChatImage(String imageUrl, Chat chat){ //채팅 사진
-            return ChatImage.builder()
-                    .imageUrl(imageUrl)
-                    .chat(chat)
-                    .build();
-        }
 
+    public static ChatImage toChatImage(String imageUrl, Chat chat){ //채팅 사진
+        return ChatImage.builder()
+                .imageUrl(imageUrl)
+                .chat(chat)
+                .build();
+    }
+
+    public static ChatResponseDTO.ChatPreviewDTO toChatPreviewDTO(Chat chat) { //채팅창 화면 조회
+        return ChatResponseDTO.ChatPreviewDTO.builder()
+                .chatId(chat.getId())
+                .memberId(chat.getMember().getId())
+                .content(chat.getContent())
+                .imageUrl(chat.getMember().getProfile_url())
+                .nickName(chat.getMember().getNickname())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static ChatResponseDTO.ChatPreviewListDTO toChatPreviewListDTO(Slice<Chat> chatList) {
+        List<ChatResponseDTO.ChatPreviewDTO> chatPreviewDTOList = chatList.stream()
+                .map(ChatConverter::toChatPreviewDTO).collect(Collectors.toList());
+
+
+
+
+    public static ChatResponseDTO.ChatRoomPreviewDTO toChatRoomPreviewDTO(ChatRoom chatRoom) { //채팅방 목록 조회
+        return ChatResponseDTO.ChatRoomPreviewDTO.builder()
+                .memberId(chatRoom.getMember().getId())
+                .otherId(chatRoom.getOther().getId())
+                .chatRoomId(chatRoom.getId())
+                .roomName(chatRoom.getMember().getNickname())
+                .imageUrl(chatRoom.getMember().getProfile_url())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static ChatResponseDTO.ChatRoomPreviewListDTO toChatRoomPreviewListDTO(Slice<ChatRoom> chatRoomList) {
+        List<ChatResponseDTO.ChatRoomPreviewDTO> chatRoomPreviewDTOList = chatRoomList.stream()
+                .map(ChatConverter::toChatRoomPreviewDTO).collect(Collectors.toList());
+
+       return ChatResponseDTO.ChatRoomPreviewListDTO.builder()
+               .chatRoomList(chatRoomPreviewDTOList)
+               .listSize(chatRoomList.getSize())
+               .isFirst(chatRoomList.isFirst())
+               .isLast(chatRoomList.isLast())
+               .hasNext(chatRoomList.hasNext())
+               .build();
+    }
 
 
         public static ChatResponseDTO.ChatPreviewDTO toChatPreviewDTO(Chat chat) { //채팅창 화면 조회
