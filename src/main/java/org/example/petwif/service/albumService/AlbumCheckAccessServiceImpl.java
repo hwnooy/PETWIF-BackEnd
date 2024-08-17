@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
     private final BlockRepository blockRepository;
     private final FriendRepository friendRepository;
+    @Override
     public void checkAccess(Album album, Long currentUserId) {
         // 차단 여부 확인
         if (blockRepository.existsByMember_IdAndTarget_Id(album.getMember().getId(), currentUserId)) {
@@ -45,6 +46,7 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
         }
     }
 
+    @Override
     public boolean checkAccessInBool(Album album, Long currentUserId) {
         // 차단 여부 확인
         if (blockRepository.existsByMember_IdAndTarget_Id(album.getMember().getId(), currentUserId)) {

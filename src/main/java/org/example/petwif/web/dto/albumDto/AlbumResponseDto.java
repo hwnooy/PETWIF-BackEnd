@@ -67,8 +67,9 @@ public class AlbumResponseDto {
     @AllArgsConstructor
     public static class StoryAlbumResultDto{
         private Long albumId;
-        private String Nickname;
+        private String nickName;
         private String profileImageUrl;
+        private LocalDateTime createdAt;
     }
 
     //2-2 메인 페이지 내의 앨범 스토리들을 리스트로 합치는 dto
@@ -90,24 +91,16 @@ public class AlbumResponseDto {
     public static class MainPageAlbumResultDto {
         private Long albumId;
         private String content;
-        private Scope scope;
-        private LocalDateTime createdAt;// 언제 업데이트 했는지만 보이게 할거니까, 나중에 지워야함
-        private LocalDateTime updatedAt;
+        private LocalDateTime createdAt;
         private AlbumImage coverImage;
         private int likeCount;
-        // private List<AlbumImage> albumImages; 메인페이지는 표지만 보인다. 이건 안보인다.
-
-        // private String title; 메인페이지는 제목 안보인다
-        // private int viewCount; 메인페이지는 조회수 안보인다
-
-        //private int everyCommentCount; 메인페이지는 댓글수 안보인다
-      //  private int bookmarkCount; 메인페이지는 북마크수 안보인다
-       // private List<CommentResponseDto> comments;
-
+        private String nickName;
+        private String profileImageUrl;
+        private Long memberId;
+        private List<CommentResponseDto> comments;
     }
 
     // 메인 페이지의 앨범 들을 리스트로 변환 해주는 dto
-
     @Builder
     @Getter
     @NoArgsConstructor

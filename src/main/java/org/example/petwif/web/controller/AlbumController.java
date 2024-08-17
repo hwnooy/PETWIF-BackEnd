@@ -2,6 +2,7 @@ package org.example.petwif.web.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.core.util.ApiResponsesDeserializer;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -125,16 +126,36 @@ public class AlbumController {
     }
 
 
-    //== 2. 메인 페이지에서 앨범 조회 ==//
+    //== 2-1. 메인 페이지에서 앨범 조회, 스토리형식 ==//
 
-//    @GetMapping("/")
-//    @ApiResponses({
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH003", description = "access 토큰을 주세요!", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
-//            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
-//    })
-//    @Operation(summary = "메인 페이지에서 앨범 조회 API", description = "메인페이지에서 앨범 조회, 스토리 형식과 게시글 형식 두개 다있는 API입니다.")
+    @GetMapping("/stories")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH003", description = "access 토큰을 주세요!", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Operation(summary = "메인 페이지에서 스토리 형식으로 앨범 조회 API", description = "메인페이지에서 앨범 조회, 스토리 형식으로 조회하는 API입니다.")
+    public ApiResponse<AlbumResponseDto.StoryAlbumListDto> getStoryAlbums(@RequestHeader("Authorization") String authorizationHeader){
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        AlbumResponseDto.StoryAlbumListDto stories = albumQueryService.getStoryAlbum(member.getId());
+        return ApiResponse.onSuccess(stories);
+    }
+
+    //== 2-2, 메인 페이지에서 앨범 조회, 게시글 형식 ==//
+    @GetMapping("/posts")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH003", description = "access 토큰을 주세요!", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Operation(summary = "메인 페이지에서 게시글 형식으로 앨범 조회 API", description = "메인페이지에서 앨범 조회, 게시글 형식으로 조회하는 API입니다.")
+    public ApiResponse<AlbumResponseDto.MainPageAlbumListDto> getMainpageAlbums(@RequestHeader("Authorization") String authorizationHeader){
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        AlbumResponseDto.MainPageAlbumListDto posts = albumQueryService.getMainpageAlbum(member.getId());
+        return ApiResponse.onSuccess(posts);
+    }
 
     //== 3. 탐색 페이지에서 앨범 조회 ==//
     @GetMapping("/albums/search")

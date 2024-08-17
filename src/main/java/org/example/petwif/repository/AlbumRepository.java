@@ -18,4 +18,6 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     List<Album> findAllByOrderByCreatedAtDesc();
 
     List<Album> findAlbumsByMemberId(Long pageOwnerId);
+
+    List<Album> findByMemberIdOrderByCreatedAtDesc(Long memberId);
 }
