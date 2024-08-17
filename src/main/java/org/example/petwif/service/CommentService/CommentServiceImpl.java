@@ -55,6 +55,11 @@ public class CommentServiceImpl implements CommentService {
             Comment parentComment = commentRepository.findById(parentCommentId)
                     .orElseThrow(() -> new GeneralException(ErrorStatus.COMMENT_NOT_FOUND));
 
+            // 이미 대댓글인지 확인
+            if (parentComment.getParentComment() != null) {
+                throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            }
+
             comment = Comment.builder()
                     .content(commentRequestDto.getContent())
                     .album(album)
