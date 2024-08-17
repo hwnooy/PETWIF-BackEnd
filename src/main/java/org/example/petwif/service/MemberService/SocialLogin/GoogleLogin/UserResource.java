@@ -1,4 +1,4 @@
-package org.example.petwif.service.MemberService.SocialLogin;
+package org.example.petwif.service.MemberService.SocialLogin.GoogleLogin;
 
 import lombok.Getter;
 import lombok.Setter;

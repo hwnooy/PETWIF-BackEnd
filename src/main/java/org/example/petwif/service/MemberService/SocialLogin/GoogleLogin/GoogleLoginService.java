@@ -104,7 +104,7 @@
 //    }
 //}
 //
-package org.example.petwif.service.MemberService.SocialLogin;
+package org.example.petwif.service.MemberService.SocialLogin.GoogleLogin;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.JWT.TokenProvider;
 import org.example.petwif.domain.entity.Member;
-import org.example.petwif.domain.entity.Pet;
 import org.example.petwif.domain.enums.Gender;
 import org.example.petwif.domain.enums.Telecom;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.web.dto.MemberDto.*;
-import org.example.petwif.web.dto.PetDto.PetResponseDto;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -161,5 +159,17 @@ public class MemberService {
     // 유일한 실패 코드
     public void deleteMember(Long id){
         memberRepository.deleteById(id);
+    }
+
+    @Transactional
+    public Long createUser(String email) {
+        Member user = Member.builder()
+                .email(email)
+                .oauthProvider("KAKAO")
+
+                .build();
+
+        memberRepository.save(user);
+        return user.getId();
     }
 }
