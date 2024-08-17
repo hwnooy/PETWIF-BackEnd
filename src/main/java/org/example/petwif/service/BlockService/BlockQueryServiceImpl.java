@@ -12,6 +12,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -41,5 +43,10 @@ public class BlockQueryServiceImpl implements BlockQueryService {
         }
 
         return blockList;
+    }
+
+    @Override
+    public Optional<Block> findBlock(Long Id) {
+        return blockRepository.findById(Id);
     }
 }

@@ -23,8 +23,6 @@ public class FriendConverter {
 
         return FriendResponseDTO.FriendResultDTO.builder()
                 .id(friend.getId())
-                .memberId(friend.getMember().getId())
-                .friendId(friend.getFriend().getId())
                 .status(friend.getStatus())
                 .profile_url(member.getProfile_url())
                 .nickname(member.getNickname())
@@ -50,8 +48,6 @@ public class FriendConverter {
         Member member = friend.getFriend();
 
         return FriendResponseDTO.RecFriendResultDTO.builder()
-                .memberId(memberId)
-                .recFriendId(friend.getFriend().getId())
                 .profile_url(member.getProfile_url())
                 .nickname(member.getNickname())
                 .createdAt(LocalDateTime.now())
