@@ -113,7 +113,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("")
+    @PutMapping("/{notificationId}")
     @Operation(summary = "사용자의 알람 확인 API", description = "사용자의 알람을 확인하는 API입니다. ResponseBody의 null이 아닌 Id를 이용해서 해당 페이지로 이동하시면 됩니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!"),
