@@ -33,7 +33,7 @@ jobs:
     # 운영환경에 대한 설정 파일 정보 생성
     - name: create application.yml file
       run: |
-        mkdir -p ./src/main/resources
+        mkdir -p ./src/main/resources/application.yml
         cd ./src/main/resources
         touch application.yml
         echo "${{ secrets.APPLICATION_YML}}" | base64 --decode > src/main/resources/application.yml
