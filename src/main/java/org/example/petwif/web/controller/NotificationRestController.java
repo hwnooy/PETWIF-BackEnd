@@ -12,7 +12,6 @@ import org.example.petwif.domain.entity.Notification;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.NotificationService.NotificationCommandService;
 import org.example.petwif.service.NotificationService.NotificationQueryService;
-import org.example.petwif.validation.annotation.ExistMember;
 import org.example.petwif.validation.annotation.ExistNotification;
 import org.example.petwif.web.dto.NotificationDTO.NotificationRequestDTO;
 import org.example.petwif.web.dto.NotificationDTO.NotificationResponseDTO;
@@ -30,17 +29,18 @@ public class NotificationRestController {
     private final NotificationQueryService notificationQueryService;
     private final MemberService memberService;
 
-    @PostMapping("/send-notifications/{receive-memberId}")
+    @PostMapping("/send-notifications")
     @Operation(summary = "사용자의 알람 생성 API", description = "사용자가 어떠한 행위를 하여 다른 멤버에게 알람을 보내는 API입니다. 친구 관련 알람일 때는 RequestBody의 albumId을 입력하실 필요가 없지만, 앨범 관련 알람일 때는 RequestBody의 albumId를 필수로 입력하셔야 합니다.")
     @Parameters({
-            @Parameter(name = "Authorization", description = "JWT 토큰으로, 알람을 보내는 사람(사용자), request header 입니다!"),
-            @Parameter(name = "receive-memberId", description = "알람을 받는 사람, path variable 입니다!")
+            @Parameter(name = "Authorization", description = "JWT 토큰으로, 알람을 보내는 사람(사용자), request header 입니다!")
     })
-    public ApiResponse<NotificationResponseDTO.NotificationResultDTO> createdNotification(@RequestBody @Valid NotificationRequestDTO.NotificationDTO request,
-                                                                                          @RequestHeader("Authorization") String authorizationHeader,
-                                                                                          @ExistMember @PathVariable(name = "receive-memberId") Long receiveMemberId) {
+    public ApiResponse<NotificationResponseDTO.NotificationResultDTO> createdNotification(@RequestHeader("Authorization") String authorizationHeader,
+                                                                                          @RequestBody @Valid NotificationRequestDTO.NotificationDTO request) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
+
+        Member receiveMember = memberService.getMemberByNickname(request.getNickname());
+        Long receiveMemberId = receiveMember.getId();
 
         Notification notification = notificationCommandService.createNotification(memberId, receiveMemberId, request);
         if (notification != null) return ApiResponse.onSuccess(NotificationConverter.toNotificationResultDTO(notification));
@@ -113,7 +113,7 @@ public class NotificationRestController {
         return ApiResponse.onSuccess(NotificationConverter.toNotificationSettingDTO(setting));
     }
 
-    @PutMapping("/notifications/{notificationId}")
+    @PutMapping("/notifications")
     @Operation(summary = "사용자의 알람 확인 API", description = "사용자의 알람을 확인하는 API입니다. ResponseBody의 null이 아닌 Id를 이용해서 해당 페이지로 이동하시면 됩니다.")
     @Parameters({
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!"),

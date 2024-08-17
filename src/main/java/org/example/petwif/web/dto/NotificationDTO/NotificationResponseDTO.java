@@ -23,7 +23,8 @@ public class NotificationResponseDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class NotificationOpenDTO {
-        Long relatedMemberId;
+        Long id;
+        String nickname;
         Long albumId;
         Boolean isConfirmed;
     }
@@ -34,8 +35,8 @@ public class NotificationResponseDTO {
     @AllArgsConstructor
     public static class NotificationResultDTO {
         Long id;
-        Long memberId;
-        Long relatedMemberId;
+        String profile_url;
+        String nickname;
         Long albumId;
         Boolean isConfirmed;
         String content;
