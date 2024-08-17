@@ -22,6 +22,7 @@ public class AlbumRequestDto {
         private Scope scope;
         private AlbumImage coverImage;
         private List<AlbumImage> albumImages;  // 이미지 URL 목록
+
     }
 
     @Getter
