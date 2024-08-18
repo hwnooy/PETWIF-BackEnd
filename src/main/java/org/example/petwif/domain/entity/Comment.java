@@ -1,7 +1,9 @@
 package org.example.petwif.domain.entity;
+
 import jakarta.persistence.*;
 import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,27 +14,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="album_id")
     private Album album;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="member_id")
     private Member member;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="parent_comment_id")
-    private Comment parentComment;
-    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Comment> childComments = new ArrayList<>();
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<CommentImage> commentImages = new ArrayList<>();
-
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CommentReport> commentReports = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="parent_comment_id")
@@ -80,6 +73,7 @@ public class Comment extends BaseEntity {
         childComments.add(comment);
         comment.setParentComment(this);
     }
+
 
     public void addImage(CommentImage commentImage) {
         commentImages.add(commentImage);

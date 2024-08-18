@@ -13,6 +13,4 @@ public interface CommentService {
     public CommentLike likeComment(Long commentId, Long memberId);
     public void unlikeComment(Long commentId, Long memberId);
 
-    public CommentLike likeComment(Long commentId, Long memberId);
-    public void unlikeComment(Long commentId, Long memberId);
 }
