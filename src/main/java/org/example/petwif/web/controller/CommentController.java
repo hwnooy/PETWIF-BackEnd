@@ -70,12 +70,12 @@ public class CommentController {
     public ApiResponse<String> updateComment(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable Long commentId,
-            @RequestBody CommentRequestDto commentRequestDto) {
+            @RequestBody CommentRequestDto.UpdateDto commentUpdateRequestDto) {
         try {
             Member member = memberService.getMemberByToken(authorizationHeader);
             Long memberId = member.getId();
 
-            commentService.updateComment(commentRequestDto, commentId);
+            commentService.updateComment(commentUpdateRequestDto, commentId);
             return ApiResponse.onSuccess("ok");
         } catch (GeneralException e) {
             return ApiResponse.onFailure(e.getErrorReason().getHttpStatus().toString(), e.getErrorReason().getMessage(), null);

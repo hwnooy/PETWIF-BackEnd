@@ -113,10 +113,10 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toList());
     }
     @Override
-    public void updateComment(CommentRequestDto commentRequestDto, Long CommentId){
+    public void updateComment(CommentRequestDto.UpdateDto commentUpdateRequestDto, Long CommentId){
         Comment comment = commentRepository.findById(CommentId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
-        comment.update(commentRequestDto.getContent());
+        comment.update(commentUpdateRequestDto.getContent());
         commentRepository.save(comment);
     }
 
