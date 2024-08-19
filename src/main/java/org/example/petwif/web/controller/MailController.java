@@ -13,6 +13,7 @@ import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST
 
 @RestController
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MailController {
     private final MailService emailVerificationService;
     private final MemberRepository memberRepository;
