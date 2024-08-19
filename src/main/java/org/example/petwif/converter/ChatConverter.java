@@ -9,6 +9,7 @@ import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ChatConverter {
@@ -64,7 +65,7 @@ public class ChatConverter {
                 .chatId(chat.getId())
                 .memberId(chat.getMember().getId())
                 .content(chat.getContent())
-                .imageUrl(chat.getChatImage().getImageUrl())
+                .imageUrl(Optional.ofNullable(chat.getChatImage()).map(ChatImage::getImageUrl).orElse(null))
                 .profileUrl(chat.getMember().getProfile_url())
                 .nickName(chat.getMember().getNickname())
                 .createdAt(LocalDateTime.now())

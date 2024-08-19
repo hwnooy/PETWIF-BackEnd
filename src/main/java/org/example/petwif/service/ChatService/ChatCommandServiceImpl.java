@@ -133,7 +133,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CHATROOM_NOT_FOUND));
 
         if (!chatRoom.getMember().equals(member) && !chatRoom.getOther().equals(member)) { //채팅방에 없는 사용자가 채팅 메시지를 신고하려고 할 경우
-            throw new IllegalArgumentException("Invalid chat room");
+            throw new GeneralException(ErrorStatus.CHAT_ACCESS_RESTRICTED);
         }
 
         chatRoom.setMember(member);
