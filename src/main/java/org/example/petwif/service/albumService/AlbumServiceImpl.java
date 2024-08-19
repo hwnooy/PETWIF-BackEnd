@@ -110,7 +110,7 @@ public class AlbumServiceImpl implements AlbumService {
             throw new GeneralException(ErrorStatus.ALBUM_UNAUTHORIZED);
         }
 
-       /* //앨범 수정의 경우, 덮어 쓰는건지, 새로 저장해도 되는건지 잘 몰라서 프론트분들꼐서 앨범 제작을 어떻게 구현했는지 보고 짜게습니다.
+       /* //앨범 수정의 경우, 덮어 쓰는건지, 새로 저장해도 되는건지 잘 몰라서 프론트분들꼐서 앨범 제작을 어떻게 구현했는지 보고 짜겠습니다.
        // 현재는 앨범 제목, 내용, 범위만 수정 가능한 상태입니다.
         //1. 먼저 기존의 모든 앨범들을 삭제하고 다시 생성하는 메서드 입니다. 일단 주석 처리 하겠습니다.
         //기존 앨범 표지 삭제

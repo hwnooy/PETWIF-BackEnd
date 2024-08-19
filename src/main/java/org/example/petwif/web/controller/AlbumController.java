@@ -26,6 +26,7 @@ import org.example.petwif.validation.annotation.ExistAlbum;
 import org.example.petwif.validation.annotation.ExistMember;
 import org.example.petwif.web.dto.albumDto.AlbumRequestDto;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -135,9 +136,9 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "메인 페이지에서 스토리 형식으로 앨범 조회 API", description = "메인페이지에서 앨범 조회, 스토리 형식으로 조회하는 API입니다.")
-    public ApiResponse<AlbumResponseDto.StoryAlbumListDto> getStoryAlbums(@RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.StoryAlbumListDto> getStoryAlbums(@RequestHeader("Authorization") String authorizationHeader, @RequestParam(name = "page") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.StoryAlbumListDto stories = albumQueryService.getStoryAlbum(member.getId());
+        AlbumResponseDto.StoryAlbumListDto stories = albumQueryService.getStoryAlbum(member.getId(), page);
         return ApiResponse.onSuccess(stories);
     }
 

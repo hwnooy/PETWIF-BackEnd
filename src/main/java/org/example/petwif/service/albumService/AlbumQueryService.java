@@ -1,9 +1,11 @@
 package org.example.petwif.service.albumService;
 
+import io.swagger.models.auth.In;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Album;
 import org.example.petwif.domain.enums.AlbumSortType;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +15,8 @@ public interface AlbumQueryService {
 
     public AlbumResponseDto.DetailResultDto getAlbumDetails(Long albumId, Long memberId);
 
-    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId);
+    //public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId);
+    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId, Integer page);
 
     public AlbumResponseDto.MainPageAlbumListDto getMainpageAlbum(Long memberId);
 

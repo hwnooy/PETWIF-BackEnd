@@ -83,8 +83,7 @@ public class AlbumResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StoryAlbumListDto{
-        private List<StoryAlbumResultDto> stories;
-
+        List<StoryAlbumResultDto> stories;
     }
 
     // 2-2. 메인 페이지 내에서 앨범 게시글 형식 조회

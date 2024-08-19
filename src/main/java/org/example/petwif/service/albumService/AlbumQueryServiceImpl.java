@@ -1,5 +1,6 @@
 package org.example.petwif.service.albumService;
 
+import io.swagger.models.auth.In;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
@@ -12,13 +13,14 @@ import org.example.petwif.repository.albumRepository.AlbumBookmarkRepository;
 import org.example.petwif.repository.albumRepository.AlbumLikeRepository;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import javax.print.attribute.standard.PageRanges;
+import java.awt.print.Pageable;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,23 +84,23 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     //=============================== 2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식)================================//
     // 2-1. 앨범 조회 -> 스토리형식 조회
     @Override
-    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId) {
+    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId, Integer page) {
 
         List<Member> friends = memberRepository.findFriendsByMemberId(memberId);
         List<AlbumResponseDto.StoryAlbumResultDto> stories = new ArrayList<>();
 
-       for(Member friend : friends){
-        List<Album> albums = albumRepository.findByMemberIdOrderByUpdatedAtDesc(friend.getId());
-        for (Album album : albums){
-           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findFriendAndAllAlbum(album))
-                stories.add(convertToStoryAlbumResultDto(album));
+        for(Member friend : friends){
+            List<Album> albums = albumRepository.findByMemberIdOrderByUpdatedAtDesc(friend.getId());
+            for (Album album : albums){
+                if(albumCheckAccessService.checkAccessInBool(album, memberId) && findScope(album))
+                    stories.add(convertToStoryAlbumResultDto(album));
 
+            }
         }
-       }
         return new AlbumResponseDto.StoryAlbumListDto(stories);
     }
 
-    private boolean findFriendAndAllAlbum(Album album){
+    private boolean findScope(Album album){
         if(album.getScope().equals(Scope.FRIEND) || album.getScope().equals(Scope.ALL)){
             return true;
         }
@@ -114,6 +116,27 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .updatedAT(album.getUpdatedAt())
                 .build();
     }
+
+    //Slice 포함해서
+/*    @Override
+    public Slice<Album> getStoryAlbum(Long memberId, Integer page) {
+        // Pageable 객체 생성
+        Pageable pageable = (Pageable) PageRequest.of(page, 10);
+
+
+        // 친구 목록 조회
+        List<Long> friendIds = memberRepository.findFriendsByMemberId(memberId)
+                .stream()
+                .map(Member::getId)
+                .collect(Collectors.toList());
+
+        Slice<Album> albumsSlice = albumRepository.findStoryAlbumsByMemberIds(friendIds, pageable)
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) &&
+                        album.getScope() != Scope.MY);
+
+        return albumsSlice;
+    }*/
+
 
     // 2-2. 앨범 조회 -> 게시글 형식 조회
     @Override
@@ -229,7 +252,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     }
 
 
-    //=================================== 5. 북마크한 앨범 에서 앨범 조회====================================//
+    //=================================== 5. 북마크한 앨범 에서 앨범 조회 ====================================//
     @Override
     public AlbumResponseDto.MemberBookmarkAlbumListDto getMemberBookmarkAlbums(Long memberId){
         List<Album> albums = albumRepository.findAll().stream()
