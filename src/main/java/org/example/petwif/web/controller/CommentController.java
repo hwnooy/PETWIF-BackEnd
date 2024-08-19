@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 //@RequestMapping("//comments")
 @RequiredArgsConstructor
-//@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CommentController {
 
     private final CommentService commentService;

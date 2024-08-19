@@ -36,7 +36,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/chats")
-//@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ChatController {
 
     private final ChatCommandService chatCommandService;

@@ -20,7 +20,7 @@ import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/member")
-//@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MemberController {
 
     private final MemberService memberService;
