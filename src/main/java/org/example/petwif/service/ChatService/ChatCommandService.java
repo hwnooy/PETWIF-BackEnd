@@ -14,4 +14,8 @@ public interface ChatCommandService {
 
     //채팅방 나가기 = memberChatRoom
     void deleteChatRoom(Long memberId, Long chatRoomId);
+
+    //채팅 신고
+    Chat reportChat(Long memberId, Long chatRoomId, ChatRequestDTO.ReportChatDTO request);
+
 }

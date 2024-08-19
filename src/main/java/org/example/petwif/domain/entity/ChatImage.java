@@ -1,16 +1,14 @@
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 
 @Entity
 @Getter
+@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ChatImage extends BaseEntity {
 
@@ -20,8 +18,13 @@ public class ChatImage extends BaseEntity {
 
     private String imageUrl;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "chat_id")
     private Chat chat;
+
+    //채팅 이미지
+    public void setChat(Chat chat) {
+        this.chat = chat;
+    }
 
 }

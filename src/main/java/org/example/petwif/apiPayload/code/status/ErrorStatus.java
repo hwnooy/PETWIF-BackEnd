@@ -72,7 +72,9 @@ public enum ErrorStatus implements BaseErrorCode {
     BLOCK_PAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4003", "차단 리스트를 확인할 수 없습니다. 유효하지 않은 페이지입니다."),
 
     // Chat Error
-    CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방을 찾을 수 없습니다.");
+    CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방을 찾을 수 없습니다."),
+    CHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT4001", "채팅을 찾을 수 없습니다."),
+    CHAT_ACCESS_RESTRICTED(HttpStatus.FORBIDDEN, "CHAT4002", "채팅을 보낼 권한이 없습니다.");
 
 
     private final HttpStatus httpStatus;

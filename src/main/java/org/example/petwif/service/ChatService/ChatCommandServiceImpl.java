@@ -6,10 +6,7 @@ import org.example.petwif.S3.Uuid;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.converter.ChatConverter;
-import org.example.petwif.domain.entity.Chat;
-import org.example.petwif.domain.entity.ChatImage;
-import org.example.petwif.domain.entity.ChatRoom;
-import org.example.petwif.domain.entity.Member;
+import org.example.petwif.domain.entity.*;
 import org.example.petwif.domain.enums.ChatRoomStatus;
 import org.example.petwif.repository.*;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
@@ -30,6 +27,8 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     private final AmazonS3Manager s3Manager;
     private final UuidRepository uuidRepository;
     private final ChatImageRepository chatImageRepository;
+    private final ChatReportRepository chatReportRepository;
+    private final BlockRepository blockRepository;
 
     @Override
     @Transactional
@@ -63,7 +62,11 @@ public class ChatCommandServiceImpl implements ChatCommandService {
             throw new IllegalArgumentException("Invalid chat room");
         }
 
-        if (chatRoom.getChatRoomStatus() == ChatRoomStatus.INACTIVE){ //채팅방이 비활성화 상태일 경우, 다시 활성화 상태로
+        if (blockRepository.existsByMember_IdAndTarget_Id(chatRoom.getMember().getId(), memberId)) { //차단 여부 확인 -> 차단한 사용자가 채팅 메시지를 보내려고 할 경우
+            throw new GeneralException(ErrorStatus.CHAT_ACCESS_RESTRICTED);
+        }
+
+        if (chatRoom.getChatRoomStatus() == ChatRoomStatus.INACTIVE) { //채팅방이 비활성화 상태일 경우, 다시 활성화 상태로
             chatRoom.setChatRoomStatus(ChatRoomStatus.ACTIVE);
             chatRoom.setMemberStatus(false);
             chatRoom.setOtherStatus(false);
@@ -74,30 +77,20 @@ public class ChatCommandServiceImpl implements ChatCommandService {
         chat.setMember(member);
 
         //채팅 사진 전송
-        List<ChatImage> chatImages = Optional.ofNullable(request.getChatImages())
-                .orElse(Collections.emptyList())
-                .stream()
-                .map(multipartFile -> {
-                    try {
-                        String uuid = UUID.randomUUID().toString() + ".jpg";
-                        System.out.println("Generated UUID: " + uuid);
-                        Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+        if (request.getChatImages() != null && !request.getChatImages().isEmpty()) {
+            String uuid = UUID.randomUUID().toString() + ".jpg";
+            Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
 
-                        String pictureUrl = s3Manager.uploadFile(s3Manager.generateChatKeyName(savedUuid), multipartFile);
-                        return ChatConverter.toChatImage(pictureUrl, chat);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
-                    }
+            String pictureUrl = s3Manager.uploadFile(s3Manager.generateChatKeyName(savedUuid), request.getChatImages());
+            ChatImage chatImage = ChatConverter.toChatImage(pictureUrl, chat);
 
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            chatImage.setChat(chat);
+            chat.setChatImage(chatImage);
 
-        if (!chatImages.isEmpty()) {
-            chatImageRepository.saveAll(chatImages);
+            chatImage.setImageUrl(chatImage.getImageUrl());
+
+            chatImageRepository.save(chatImage);
         }
-
         return chatRepository.save(chat);
     }
 
@@ -119,12 +112,41 @@ public class ChatCommandServiceImpl implements ChatCommandService {
             throw new IllegalArgumentException("Member not found in this chat room");
         }
 
+        //둘 다 나갈 시에 채팅방 삭제
         if (chatRoom.isMemberStatus() && chatRoom.isOtherStatus()){
             chatRoomRepository.delete(chatRoom);
         } else {
             chatRoom.setChatRoomStatus(ChatRoomStatus.INACTIVE);
             chatRoomRepository.save(chatRoom);
         }
+    }
+
+    @Override
+    @Transactional
+    public Chat reportChat(Long memberId, Long chatRoomId, ChatRequestDTO.ReportChatDTO request) { //채팅 신고
+        Chat chat = ChatConverter.toChatReport(request);
+        ChatReport chatReport = new ChatReport();
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.CHATROOM_NOT_FOUND));
+
+        if (!chatRoom.getMember().equals(member) && !chatRoom.getOther().equals(member)) { //채팅방에 없는 사용자가 채팅 메시지를 신고하려고 할 경우
+            throw new IllegalArgumentException("Invalid chat room");
+        }
+
+        chatRoom.setMember(member);
+
+        chat.setChatRoom(chatRoom);
+        chat.setMember(member);
+
+        chatReport.setChat(chat);
+        chat.incrementReport();
+
+        chatReportRepository.save(chatReport);
+
+        return chatRepository.save(chat);
     }
 }
 

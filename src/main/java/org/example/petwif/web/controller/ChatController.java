@@ -75,30 +75,18 @@ public class ChatController {
         return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
     }
 
-    //채팅 전송 - 미완료 (WebSocket - JWT와 연동이 안됨)
-//    @MessageMapping(value = "/chatRoom/{chatRoomId}/sending")
-//    @Operation(summary = "채팅 메시지 전송 API - WebSocket")
-//    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendingChat(Map<String, Object> payload,
-//                                                                      @RequestHeader("Authorization") String authorizationHeader,
-//                                                                      @ModelAttribute ChatRequestDTO.SendChatDTO request) {
-//
-//        Member member = memberService.getMemberByToken(authorizationHeader);
-//        Long memberId = member.getId();
-//
-//        if (payload.containsKey("memberId")) {
-//            memberId = ((Number) payload.get("memberId")).longValue();
-//        }
-//
-//        Long chatRoomId = ((Number) payload.get("chatRoomId")).longValue();
-//
-//        //메시지 저장
-//        Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
-//
-//        //메시지 전송
-//        messagingTemplate.convertAndSend("/sub" + chatRoomId , request);
-//
-//        return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
-//    }
+    //채팅 신고
+    @PostMapping("/chatRoom/{chatRoomId}/report")
+    @Operation(summary = "채팅 신고 API")
+    public ApiResponse<ChatResponseDTO.ReportChatResultDTO> reportChat(@RequestHeader ("Authorization") String authorizationHeader,
+                                                                       @RequestBody ChatRequestDTO.ReportChatDTO request,
+                                                                       @PathVariable(name = "chatRoomId") Long chatRoomId) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
+
+        Chat chat = chatCommandService.reportChat(memberId, chatRoomId, request);
+        return ApiResponse.onSuccess(ChatConverter.reportChatResultDTO(chat));
+    }
 
     //채팅창 화면 조회 - 완
     @GetMapping("/chatRoom/{chatRoomId}")

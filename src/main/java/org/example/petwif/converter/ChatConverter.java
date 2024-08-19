@@ -45,12 +45,27 @@ public class ChatConverter {
                 .build();
     }
 
+    public static Chat toChatReport(ChatRequestDTO.ReportChatDTO request) { //채팅 신고
+        return Chat.builder()
+                .id(request.getChatId())
+                .content(request.getContent())
+                .build();
+    }
+
+    public static ChatResponseDTO.ReportChatResultDTO reportChatResultDTO(Chat chat) {
+        return ChatResponseDTO.ReportChatResultDTO.builder()
+                .memberId(chat.getMember().getId())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     public static ChatResponseDTO.ChatPreviewDTO toChatPreviewDTO(Chat chat) { //채팅창 화면 조회
         return ChatResponseDTO.ChatPreviewDTO.builder()
                 .chatId(chat.getId())
                 .memberId(chat.getMember().getId())
                 .content(chat.getContent())
-                .imageUrl(chat.getMember().getProfile_url())
+                .imageUrl(chat.getChatImage().getImageUrl())
+                .profileUrl(chat.getMember().getProfile_url())
                 .nickName(chat.getMember().getNickname())
                 .createdAt(LocalDateTime.now())
                 .build();
