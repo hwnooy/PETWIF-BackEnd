@@ -14,7 +14,7 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     //List<Album> findAlbumsByMember(List<Member> friends, Scope FRIEND);
 
     //3. 탐색 페이지에서 앨범 조회 서비스에 필요한 메서드
-    List<Album> findAllByOrderByCreatedAtDesc();
+    List<Album> findAllByOrderByUpdatedAtDesc();
 
     List<Album> findAlbumsByMemberId(Long pageOwnerId);
 

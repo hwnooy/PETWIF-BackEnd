@@ -159,7 +159,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     //=============================== 3. 탐색 페이지에서 앨범 조회 서비스================================//
     @Override
     public AlbumResponseDto.SearchAlbumListDto getSearchableAlbums(Long memberId) {
-        List<Album> albums = albumRepository.findAllByOrderByCreatedAtDesc();
+        List<Album> albums = albumRepository.findAllByOrderByUpdatedAtDesc();
 
         List<AlbumResponseDto.SearchAlbumDto> accessibleAlbums = albums.stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
@@ -224,7 +224,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 return Comparator.comparingInt(AlbumResponseDto.UserAlbumViewDto::getBookmarkCount).reversed();
             case LATEST:
             default:
-                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getAlbumId).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
+                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getUpdatedAt).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
         }
     }
 
