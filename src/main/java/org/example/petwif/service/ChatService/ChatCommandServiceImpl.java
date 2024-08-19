@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -59,10 +58,10 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
 
         if (!chatRoom.getMember().equals(member) && !chatRoom.getOther().equals(member)) { //채팅방에 없는 사용자가 채팅 메시지를 보내려고 할 경우
-            throw new IllegalArgumentException("Invalid chat room");
+            throw new GeneralException(ErrorStatus.CHAT_ACCESS_RESTRICTED);
         }
 
-        if (blockRepository.existsByMember_IdAndTarget_Id(chatRoom.getMember().getId(), memberId)) { //차단 여부 확인 -> 차단한 사용자가 채팅 메시지를 보내려고 할 경우
+        if (blockRepository.existsByMember_IdAndTarget_Id(chatRoom.getMember().getId(), chatRoom.getOther().getId())) { //차단 여부 확인 -> 차단한 사용자가 채팅 메시지를 보내려고 할 경우
             throw new GeneralException(ErrorStatus.CHAT_ACCESS_RESTRICTED);
         }
 
