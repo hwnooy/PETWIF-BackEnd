@@ -24,8 +24,6 @@ public class ChatRequestDTO {
 
     @Getter
     public static class ReportChatDTO { //채팅 신고
-        @NotNull
-        private Long chatId;
         @NotBlank
         private String content; //채팅 신고 사유
     }

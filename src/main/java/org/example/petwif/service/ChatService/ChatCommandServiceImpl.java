@@ -122,14 +122,16 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
     @Override
     @Transactional
-    public Chat reportChat(Long memberId, Long chatRoomId, ChatRequestDTO.ReportChatDTO request) { //채팅 신고
-        Chat chat = ChatConverter.toChatReport(request);
-        ChatReport chatReport = new ChatReport();
+    public ChatReport reportChat(Long memberId, Long chatRoomId, Long chatId, ChatRequestDTO.ReportChatDTO request) { //채팅 신고
+        ChatReport chatReport = ChatConverter.toChatReport(request);
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.CHATROOM_NOT_FOUND));
+        Chat chat = chatRepository.findChatById(chatId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.CHAT_NOT_FOUND));
+
 
         if (!chatRoom.getMember().equals(member) && !chatRoom.getOther().equals(member)) { //채팅방에 없는 사용자가 채팅 메시지를 신고하려고 할 경우
             throw new GeneralException(ErrorStatus.CHAT_ACCESS_RESTRICTED);
@@ -141,11 +143,11 @@ public class ChatCommandServiceImpl implements ChatCommandService {
         chat.setMember(member);
 
         chatReport.setChat(chat);
+        chatReport.setMember(member);
+
         chat.incrementReport();
 
-        chatReportRepository.save(chatReport);
-
-        return chatRepository.save(chat);
+        return chatReportRepository.save(chatReport);
     }
 }
 

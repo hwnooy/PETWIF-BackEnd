@@ -2,6 +2,7 @@ package org.example.petwif.converter;
 
 import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatImage;
+import org.example.petwif.domain.entity.ChatReport;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
@@ -46,16 +47,15 @@ public class ChatConverter {
                 .build();
     }
 
-    public static Chat toChatReport(ChatRequestDTO.ReportChatDTO request) { //채팅 신고
-        return Chat.builder()
-                .id(request.getChatId())
+    public static ChatReport toChatReport(ChatRequestDTO.ReportChatDTO request) { //채팅 신고
+        return ChatReport.builder()
                 .content(request.getContent())
                 .build();
     }
 
-    public static ChatResponseDTO.ReportChatResultDTO reportChatResultDTO(Chat chat) {
+    public static ChatResponseDTO.ReportChatResultDTO reportChatResultDTO(ChatReport chatReport) {
         return ChatResponseDTO.ReportChatResultDTO.builder()
-                .memberId(chat.getMember().getId())
+                .memberId(chatReport.getMember().getId())
                 .createdAt(LocalDateTime.now())
                 .build();
     }

@@ -1,6 +1,7 @@
 package org.example.petwif.service.ChatService;
 
 import org.example.petwif.domain.entity.Chat;
+import org.example.petwif.domain.entity.ChatReport;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 
@@ -16,6 +17,6 @@ public interface ChatCommandService {
     void deleteChatRoom(Long memberId, Long chatRoomId);
 
     //채팅 신고
-    Chat reportChat(Long memberId, Long chatRoomId, ChatRequestDTO.ReportChatDTO request);
+    ChatReport reportChat(Long memberId, Long chatRoomId, Long chatId, ChatRequestDTO.ReportChatDTO request);
 
 }

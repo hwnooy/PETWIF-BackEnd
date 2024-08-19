@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.converter.ChatConverter;
 import org.example.petwif.domain.entity.Chat;
+import org.example.petwif.domain.entity.ChatReport;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.service.ChatService.ChatCommandService;
@@ -21,14 +22,11 @@ import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.data.domain.Slice;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -80,12 +78,13 @@ public class ChatController {
     @Operation(summary = "채팅 신고 API")
     public ApiResponse<ChatResponseDTO.ReportChatResultDTO> reportChat(@RequestHeader ("Authorization") String authorizationHeader,
                                                                        @RequestBody ChatRequestDTO.ReportChatDTO request,
-                                                                       @PathVariable(name = "chatRoomId") Long chatRoomId) {
+                                                                       @PathVariable(name = "chatRoomId") Long chatRoomId,
+                                                                       @RequestParam(name = "chatId") Long chatId) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Chat chat = chatCommandService.reportChat(memberId, chatRoomId, request);
-        return ApiResponse.onSuccess(ChatConverter.reportChatResultDTO(chat));
+        ChatReport chatReport = chatCommandService.reportChat(memberId, chatRoomId, chatId, request);
+        return ApiResponse.onSuccess(ChatConverter.reportChatResultDTO(chatReport));
     }
 
     //채팅창 화면 조회 - 완
@@ -107,7 +106,7 @@ public class ChatController {
     }
 
     //채팅방 목록 조회 - 완
-    @GetMapping("/chatRoom")
+    @GetMapping("/")
     @Operation(summary = "채팅방 목록 조회 API", description = "전체 채팅방 목록을 조회하는 API이며, 페이징을 포함합니다. query String 으로 page 번호를 주세요")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -127,7 +126,7 @@ public class ChatController {
     }
 
     //가장 최근 채팅 조회 - 완
-    @GetMapping("/chatRoom/last-chat/{chatRoomId}")
+    @GetMapping("/chatRoom/{chatRoomId}/last-chat")
     @Operation(summary = "가장 최근 채팅 조회 API", description = "가장 최근 전송된 채팅을 조회하는 API")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
