@@ -22,4 +22,6 @@ public interface AlbumBookmarkRepository extends JpaRepository<AlbumBookmark, Lo
 
     @Query("SELECT ab.album.id FROM AlbumBookmark ab WHERE ab.member.id = :memberId")
     List<Long> findBookmarkedAlbumIdsByMemberId(@Param("memberId") Long memberId);
+
+    boolean existsByAlbumAndMemberId(Album album, Long memberId);
 }

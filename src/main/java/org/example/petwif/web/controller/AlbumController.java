@@ -68,7 +68,7 @@ public class AlbumController {
 
 
     //==앨범 수정==//
-    @PatchMapping(value = "/albums/{albumId}", consumes = "multipart/form-data")
+    @PatchMapping(value = "/albums/{albumId}")//, consumes = "multipart/form-data")
     @Operation(summary = "앨범 수정 API", description = "앨범을 생성 후 수정하는 API 입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -78,12 +78,11 @@ public class AlbumController {
     })
     public ApiResponse<AlbumResponseDto.UpdateResultDto> updateAlbum(@ExistAlbum @PathVariable("albumId") Long albumId,
                                                                      @RequestPart(value = "requestDto") AlbumRequestDto.UpdateRequestDto requestDto,
-                                                                     @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
-                                                                     @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
-                                                                     @RequestHeader("Authorization") String authorizationHeader)
-                                                                      {
+                                                                     //@RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
+                                                                     //@RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
+                                                                     @RequestHeader("Authorization") String authorizationHeader){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Album updatedAlbum = albumService.updateAlbum(albumId, member.getId(), requestDto, coverImage, albumImages);
+        Album updatedAlbum = albumService.updateAlbum(albumId, member.getId(), requestDto);//, coverImage, albumImages);
         return ApiResponse.onSuccess(AlbumConverter.UpdatedAlbumResultDto(updatedAlbum));
     }
 

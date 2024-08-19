@@ -24,11 +24,13 @@ public class AlbumConverter {
                 .albumId(album.getId())
                 .memberId(member.getId())
                 .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
                 .build();
     }
 
     public static AlbumResponseDto.UpdateResultDto UpdatedAlbumResultDto(Album album){
         return AlbumResponseDto.UpdateResultDto.builder()
+                .albumId(album.getId())
                 .updatedAt(LocalDateTime.now())
                 .build();
     }

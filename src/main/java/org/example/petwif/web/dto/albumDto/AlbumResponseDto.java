@@ -27,12 +27,14 @@ public class AlbumResponseDto {
         Long albumId;
         Long memberId;
         LocalDateTime createdAt;
+        LocalDateTime updatedAt;
     }
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class UpdateResultDto{
+        Long albumId;
         LocalDateTime updatedAt;
     }
 
@@ -48,15 +50,17 @@ public class AlbumResponseDto {
         private String title;
         private String content;
         private Scope scope;
-        private LocalDateTime createdAt;
         private LocalDateTime updatedAt;
-        private AlbumImage coverImage;
-        private List<AlbumImage> albumImages;
+        private String coverImageUrl;
+        private List<String> albumImages;
         private int viewCount;
         private int likeCount;
         private int everyCommentCount;
         private int bookmarkCount;
+        private boolean isLiked;
+        private boolean isBookmarked;
         private List<CommentResponseDto> comments;
+
     }
 
     //====================================================================//
@@ -69,7 +73,7 @@ public class AlbumResponseDto {
         private Long albumId;
         private String nickName;
         private String profileImageUrl;
-        private LocalDateTime createdAt;
+        private LocalDateTime updatedAT;
     }
 
     //2-2 메인 페이지 내의 앨범 스토리들을 리스트로 합치는 dto
@@ -91,12 +95,14 @@ public class AlbumResponseDto {
     public static class MainPageAlbumResultDto {
         private Long albumId;
         private String content;
-        private LocalDateTime createdAt;
-        private AlbumImage coverImage;
+        private LocalDateTime updatedAt;
+        private String coverImageUrl;
         private int likeCount;
         private String nickName;
         private String profileImageUrl;
         private Long memberId;
+        private boolean isLiked;
+        private boolean isBookmarked;
         private List<CommentResponseDto> comments;
     }
 
@@ -111,14 +117,14 @@ public class AlbumResponseDto {
     }
 
     // 2-3. 위에 두개 합친거!
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class MainPageContentDto{
-        private StoryAlbumListDto storyAlbumListDto;
-        private MainPageAlbumListDto mainpageAlbumListDto;
-    }
+//    @Builder
+//    @Getter
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    public static class MainPageContentDto{
+//        private StoryAlbumListDto storyAlbumListDto;
+//        private MainPageAlbumListDto mainpageAlbumListDto;
+//    }
     //====================================================================//
     // 3. 탐색 페이지에서 앨범 조회 dto
     @Builder
@@ -131,6 +137,7 @@ public class AlbumResponseDto {
         private int likeCount;
         private int bookmarkCount;
         private int commentCount;
+        private LocalDateTime updatedAt;
     }
     @Builder
     @Getter
@@ -153,6 +160,7 @@ public class AlbumResponseDto {
         private int likeCount;
         private int bookmarkCount;
         private int commentCount;
+        private LocalDateTime updatedAt;
     }
 
     @Builder
@@ -175,6 +183,7 @@ public class AlbumResponseDto {
         private int likeCount;
         private int bookmarkCount;
         private int commentCount;
+        private LocalDateTime updatedAt;
     }
     @Builder
     @Getter

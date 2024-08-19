@@ -47,10 +47,14 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     public AlbumResponseDto.DetailResultDto getAlbumDetails(Long albumId, Long memberId){
         Album album =  albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
-
         //차단, 친구인지 확인
        albumCheckAccessService.checkAccess(album, memberId);
 
+       List<String> albumImageUrls = album.getAlbumImages().stream()
+               .map(AlbumImage::getImageURL)
+               .collect(Collectors.toList());;
+       boolean isLiked = albumLikeRepository.existsByAlbumAndMemberId(album, memberId);
+       boolean isBookmarked = albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId);
 
        List<Comment> comments = commentRepository.findByAlbum(album); //댓글 리스트
        return AlbumResponseDto.DetailResultDto.builder()
@@ -58,17 +62,20 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                .title(album.getTitle())
                .content(album.getContent())
                .scope(album.getScope())
-               .createdAt(album.getCreatedAt())
                .updatedAt(album.getUpdatedAt())
-               .coverImage(album.getCoverImage())
-               .albumImages(new ArrayList<>(album.getAlbumImages()))
+               .updatedAt(album.getUpdatedAt())
+               .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
+               .albumImages(albumImageUrls)
                .viewCount(album.getView())
                .likeCount(albumLikeRepository.countByAlbum(album))
                .everyCommentCount(comments.size())
                .bookmarkCount(albumBookmarkRepository.countByAlbum(album))
+               .isLiked(isLiked)
+               .isBookmarked(isBookmarked)
                .comments(comments.stream()
                        .map(c -> new CommentResponseDto(c))
                        .collect(Collectors.toList()))
+
                .build();
        }
 
@@ -81,9 +88,9 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         List<AlbumResponseDto.StoryAlbumResultDto> stories = new ArrayList<>();
 
        for(Member friend : friends){
-        List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(friend.getId());
+        List<Album> albums = albumRepository.findByMemberIdOrderByUpdatedAtDesc(friend.getId());
         for (Album album : albums){
-           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findFrindAndAllAlbum(album))
+           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findFriendAndAllAlbum(album))
                 stories.add(convertToStoryAlbumResultDto(album));
 
         }
@@ -91,7 +98,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         return new AlbumResponseDto.StoryAlbumListDto(stories);
     }
 
-    private boolean findFrindAndAllAlbum(Album album){
+    private boolean findFriendAndAllAlbum(Album album){
         if(album.getScope().equals(Scope.FRIEND) || album.getScope().equals(Scope.ALL)){
             return true;
         }
@@ -104,7 +111,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .albumId(album.getId())
                 .nickName(album.getMember().getNickname())
                 .profileImageUrl(album.getMember().getProfile_url())
-                .createdAt(album.getCreatedAt())
+                .updatedAT(album.getUpdatedAt())
                 .build();
     }
 
@@ -114,12 +121,15 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         List<Member> notFriends = memberRepository.findNonFriendsByMemberId(memberId);
         List<AlbumResponseDto.MainPageAlbumResultDto> posts = new ArrayList<>();
 
+
         for(Member notFriend : notFriends){
-            List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(notFriend.getId());
+            List<Album> albums = albumRepository.findByMemberIdOrderByUpdatedAtDesc(notFriend.getId());
             for (Album album : albums){
+                boolean isLiked = albumLikeRepository.existsByAlbumAndMemberId(album, memberId);
+                boolean isBookmarked = albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId);
                 List<Comment> comments = commentRepository.findByAlbum(album);
                 if(albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope().equals(Scope.ALL))
-                    posts.add(convertToPostAlbumResultDto(album, comments));
+                    posts.add(convertToPostAlbumResultDto(album, comments, isLiked, isBookmarked));
 
             }
         }
@@ -127,16 +137,18 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
          //댓글 리스트
     }
 
-    private AlbumResponseDto.MainPageAlbumResultDto convertToPostAlbumResultDto(Album album, List<Comment> comments){
+    private AlbumResponseDto.MainPageAlbumResultDto convertToPostAlbumResultDto(Album album, List<Comment> comments, boolean isLiked, boolean isBookmarked){
         return AlbumResponseDto.MainPageAlbumResultDto.builder()
                 .albumId(album.getId())
                 .content(album.getContent())
-                .createdAt(album.getCreatedAt())
-                .coverImage(album.getCoverImage())
+                .updatedAt(album.getUpdatedAt())
+                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
                 .likeCount(album.getAlbumLikes().size())
                 .nickName(album.getMember().getNickname())
                 .profileImageUrl(album.getMember().getProfile_url())
                 .memberId(album.getMember().getId())
+                .isLiked(isLiked)
+                .isBookmarked(isBookmarked)
                 .comments(comments.stream()
                         .map(c -> new CommentResponseDto(c))
                         .collect(Collectors.toList()))
@@ -169,6 +181,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .likeCount(albumLikeRepository.countByAlbum(album))
                 .bookmarkCount(albumBookmarkRepository.countByAlbum(album))
                 .commentCount(commentRepository.findByAlbum(album).size())
+                .updatedAt(album.getUpdatedAt())
                 .build();
     }
 
@@ -197,6 +210,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .likeCount(album.getAlbumLikes().size())
                 .bookmarkCount(album.getAlbumBookmarks().size())
                 .commentCount(album.getCommentList().size())
+                .updatedAt(album.getUpdatedAt())
                 .build();
     }
 
@@ -247,6 +261,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .likeCount(albumLikeRepository.countByAlbum(album))
                 .bookmarkCount(albumBookmarkRepository.countByAlbum(album))
                 .commentCount(commentRepository.findByAlbum(album).size())
+                .updatedAt(album.getUpdatedAt())
                 .build();
     }
 
