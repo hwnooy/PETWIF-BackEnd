@@ -51,7 +51,6 @@ public enum ErrorStatus implements BaseErrorCode {
     ALBUM_IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND,"ALBUM4004", "앨범 내의 이미지를 찾을 수 없습니다."),
     ALBUM_IMAGE_UPLOAD_FAILED(HttpStatus.BAD_REQUEST,"ALBUM4005", "앨범의 이미지 업로드를 실패했습니다."),
 
-
     // AlbumLike Error
     ALBUM_LIKE_EXIST(HttpStatus.CONFLICT, "ALBUM4006", "이미 앨범 좋아요가 있습니다."),
     ALBUM_LIKE_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4007", "앨범 좋아요가 존재하지 않습니다."),
@@ -62,10 +61,8 @@ public enum ErrorStatus implements BaseErrorCode {
     ALBUM_BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4010", "앨범 북마크가 존재하지 않습니다."),
     ALBUM_BOOKMARK_PAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "ALBUM4011", "앨범 북마크 리스트를 찾을 수 없습니다."),
 
-
     // AlbumReport Error
     ALBUM_REPORT_EXIST(HttpStatus.CONFLICT, "ALBUM4012", "이미 신고를 했습니다."),
-
 
     BLOCK_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "BLOCK4001", "이미 차단된 사용자입니다."),
     BLOCK_NOT_FOUND(HttpStatus.BAD_REQUEST, "BLOCK4002", "차단한 내역을 찾을 수 없습니다."),
@@ -73,6 +70,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     // Chat Error
     CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방을 찾을 수 없습니다."),
+    CHATROOM_ACCESS_RESTRICTED(HttpStatus.FORBIDDEN, "CHATROOM4002", "채팅방을 만들 권한이 없습니다."),
     CHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT4001", "채팅을 찾을 수 없습니다."),
     CHAT_ACCESS_RESTRICTED(HttpStatus.FORBIDDEN, "CHAT4002", "채팅을 보낼 권한이 없습니다.");
 

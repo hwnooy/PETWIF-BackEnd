@@ -56,7 +56,6 @@ public class ChatCommandServiceImpl implements ChatCommandService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-
         if (!chatRoom.getMember().equals(member) && !chatRoom.getOther().equals(member)) { //채팅방에 없는 사용자가 채팅 메시지를 보내려고 할 경우
             throw new GeneralException(ErrorStatus.CHAT_ACCESS_RESTRICTED);
         }
@@ -111,7 +110,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
             throw new IllegalArgumentException("Member not found in this chat room");
         }
 
-        //둘 다 나갈 시에 채팅방 삭제
+        //둘 다 나갈 시, 채팅방 삭제
         if (chatRoom.isMemberStatus() && chatRoom.isOtherStatus()){
             chatRoomRepository.delete(chatRoom);
         } else {
