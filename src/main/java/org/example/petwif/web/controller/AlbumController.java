@@ -36,7 +36,6 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Validated
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AlbumController {
     private final AlbumLikeService albumLikeService;
     private final AlbumService albumService;
