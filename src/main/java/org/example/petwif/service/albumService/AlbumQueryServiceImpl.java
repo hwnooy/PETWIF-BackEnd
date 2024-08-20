@@ -150,6 +150,10 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         friendIds.add(memberId); //나도 뻬줘야지!! 나는 추천 앨범에 있으면 안됨!
 
         Slice<Album> notFriendAlbums = albumRepository.findPublicAlbumsByNonFriends(friendIds, Scope.ALL, PageRequest.of(page, 10));
+        if(notFriendAlbums.isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
+
         // 그사람들중에서 앨범 공개범위가 all인 앨범들을 slice에 저장
         return notFriendAlbums.map(album -> convertToMainPageAlbumResultDto(album, memberId));
 
@@ -191,6 +195,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope() != Scope.MY)
                 .collect(Collectors.toList());
 
+
         return new SliceImpl<Album>(accessibleAlbums, PageRequest.of(page,10), allMemberAlbums.hasNext());
 
     }
@@ -210,6 +215,9 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .map(this::convertToUserAlbumDto)
                 .sorted(getComparator(sortType))
                 .collect(Collectors.toList());
+        if(albumDtos.isEmpty()){
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
 
         return new SliceImpl<>(albumDtos, PageRequest.of(page, 10), allPageownerAlbums.hasNext());
     }
@@ -253,7 +261,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .collect(Collectors.toList());
 
         if (accessibleAlbums.isEmpty()) {
-            throw new GeneralException(ErrorStatus.ALBUM_LIST_NOT_FOUND);
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
         }
 
         // 결과를 MemberBookmarkAlbumListDto 객체로 래핑하여 반환

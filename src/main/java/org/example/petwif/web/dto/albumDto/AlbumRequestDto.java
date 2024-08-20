@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.entity.AlbumImage;
 import org.example.petwif.domain.enums.Scope;
+import org.example.petwif.domain.enums.StickerType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -60,4 +61,13 @@ public class AlbumRequestDto {
     public static class ReportRequestDto{
         private String reportReason;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class StickerRequestDto{
+        private String stickerName;
+        StickerType stickerType;
+    }
+
 }
