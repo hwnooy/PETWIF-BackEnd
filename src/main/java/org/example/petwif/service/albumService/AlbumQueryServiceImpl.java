@@ -147,7 +147,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         List<Long> friendIds = friendList.stream()
                 .map(friend -> friend.getFriend().getId()).collect(Collectors.toList());
 
-        friendIds.add(memberId); //나도 뻬줘야지!!
+        friendIds.add(memberId); //나도 뻬줘야지!! 나는 추천 앨범에 있으면 안됨!
 
         Slice<Album> notFriendAlbums = albumRepository.findPublicAlbumsByNonFriends(friendIds, Scope.ALL, PageRequest.of(page, 10));
         // 그사람들중에서 앨범 공개범위가 all인 앨범들을 slice에 저장
