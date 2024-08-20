@@ -202,18 +202,19 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
 
     //=========================== 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함============================//
     @Override
-    public AlbumResponseDto.UserAlbumViewListDto getMemberPageAlbums(Long memberId, Long pageOwnerId, AlbumSortType sortType) {
-        List<Album> albums = albumRepository.findAlbumsByMemberId(pageOwnerId);
-        List<AlbumResponseDto.UserAlbumViewDto> albumDtos = albums.stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
+    public Slice<AlbumResponseDto.UserAlbumViewDto> getMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType) {
+        //Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, sortType.getSortField()));
+        Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberId(pageOwnerId);
+       /* List<Album> accessibleAlbums = allPageownerAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))
+                .collect(Collectors.toList());*/
+        List<AlbumResponseDto.UserAlbumViewDto> albumDtos = allPageownerAlbums.stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))
                 .map(this::convertToUserAlbumDto)
                 .sorted(getComparator(sortType))
                 .collect(Collectors.toList());
 
-        return AlbumResponseDto.UserAlbumViewListDto.builder()
-                .albums(albumDtos)
-                .totalAlbumCount(albumDtos.size())
-                .build();
+        return new SliceImpl<>(albumDtos, PageRequest.of(page, 10), allPageownerAlbums.hasNext());
     }
 
     private AlbumResponseDto.UserAlbumViewDto convertToUserAlbumDto(Album album) {
@@ -223,7 +224,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .likeCount(album.getAlbumLikes().size())
                 .bookmarkCount(album.getAlbumBookmarks().size())
                 .commentCount(album.getCommentList().size())
-                .updatedAt(album.getUpdatedAt())
+                .updatedAT(album.getUpdatedAt())
                 .build();
     }
 
@@ -237,7 +238,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 return Comparator.comparingInt(AlbumResponseDto.UserAlbumViewDto::getBookmarkCount).reversed();
             case LATEST:
             default:
-                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getUpdatedAt).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
+                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getUpdatedAT).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
         }
     }
 
@@ -253,10 +254,10 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         List<Album> accessibleAlbums = thisMemberBookmarkedAlbums.getContent().stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope() != Scope.MY)
                 .collect(Collectors.toList());
-       /* // 조회된 앨범이 없다면 예외 발생
-        if (bookmarkedAlbums.isEmpty()) {
+
+        if (accessibleAlbums.isEmpty()) {
             throw new GeneralException(ErrorStatus.ALBUM_LIST_NOT_FOUND);
-        }*/
+        }
 
         // 결과를 MemberBookmarkAlbumListDto 객체로 래핑하여 반환
         return new SliceImpl<Album>(accessibleAlbums, PageRequest.of(page, 10),thisMemberBookmarkedAlbums.hasNext());

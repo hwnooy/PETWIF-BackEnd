@@ -1,6 +1,7 @@
 package org.example.petwif.service.albumService;
 
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
@@ -12,6 +13,8 @@ import org.example.petwif.repository.AlbumRepository;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.repository.albumRepository.AlbumLikeRepository;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,9 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
     private final AlbumRepository albumRepository;
     private final MemberRepository memberRepository;
     private final AlbumLikeRepository albumLikeRepository;
+    private final EntityManager em;
+
+
     private final AlbumCheckAccessService albumCheckAccessService;
 
 
@@ -33,23 +39,20 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
     @Transactional
     @Override
     public void addAlbumLike(Long albumId, Long memberId){
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
         albumCheckAccessService.checkAccess(album, memberId);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        //좋아요 중복 방지 => 손봐야함
-        albumLikeRepository.findByAlbumAndMember(album, member).ifPresent(report -> {
-            throw new GeneralException(ErrorStatus.ALBUM_LIKE_EXIST);
-        });
-
+        if(albumLikeRepository.existsByAlbumAndMemberId(album, memberId))throw new GeneralException(ErrorStatus.ALBUM_LIKE_EXIST);
 
         AlbumLike albumLike = AlbumLike.builder()
                 .album(album)
                 .member(member)
                 .build();
-        albumLikeRepository.save(albumLike);
+        albumLikeRepository.saveAndFlush(albumLike);
+        em.flush();
     }
 
     //좋아요 삭제
@@ -61,7 +64,7 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
         albumCheckAccessService.checkAccess(album, memberId);
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        AlbumLike albumLike = albumLikeRepository.findByAlbumAndMember(album, member)
+        AlbumLike albumLike = albumLikeRepository.findByAlbumIdAndMemberId(albumId, memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_LIKE_NOT_FOUND));
 
        albumLikeRepository.delete(albumLike);
@@ -69,24 +72,21 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
 
     //좋아요 목록 보이기
     @Override
-    public List<AlbumResponseDto.LikeResultDto> getAlbumLikes(Long albumId, Long memberId) {
+    public Slice<AlbumResponseDto.LikeResultDto> getAlbumLikes(Long albumId, Long memberId, Integer page) {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
 
         albumCheckAccessService.checkAccess(album, memberId);
 
-        List<AlbumLike> likes = albumLikeRepository.findByAlbum(album);
-        if(likes.isEmpty())throw new GeneralException(ErrorStatus.ALBUM_LIKE_PAGE_NOT_FOUND);
-        return likes.stream()
-                .map(like -> new AlbumResponseDto.LikeResultDto(like.getMember().getId(), like.getMember().getNickname(), like.getMember().getProfile_url()))
-                .collect(Collectors.toList());
+        Slice<AlbumLike> likes = albumLikeRepository.findByAlbum(album, PageRequest.of(page, 10));
+        if (likes.isEmpty()) {
+            throw new GeneralException(ErrorStatus.ALBUM_LIKE_PAGE_NOT_FOUND);
+        }
+
+        return likes.map(like -> new AlbumResponseDto.LikeResultDto(
+                like.getMember().getId(), like.getMember().getNickname(), like.getMember().getProfile_url()
+        ));
     }
 
 
-    //좋아요 수 세기
-    public int countAlbumLikes(Long albumId){
-        Album album = albumRepository.findById(albumId)
-                .orElseThrow(()-> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
-        return albumLikeRepository.countByAlbum(album);
-    }
 }

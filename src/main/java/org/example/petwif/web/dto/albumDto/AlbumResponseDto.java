@@ -90,7 +90,7 @@ public class AlbumResponseDto {
          boolean hasNext;
     }
 
-    // 2-2. 메인 페이지 내에서 앨범 게시글 형식 조회
+    // 2-3. 메인 페이지 내에서 앨범 게시글 형식 조회
     @Builder
     @Getter
     @NoArgsConstructor
@@ -109,7 +109,7 @@ public class AlbumResponseDto {
          List<CommentResponseDto> comments;
     }
 
-    // 메인 페이지의 앨범 들을 리스트로 변환 해주는 dto
+    // 2-4. 메인 페이지의 앨범 들을 리스트로 변환 해주는 dto
     @Builder
     @Getter
     @NoArgsConstructor
@@ -122,15 +122,6 @@ public class AlbumResponseDto {
         boolean hasNext;
     }
 
-    // 2-3. 위에 두개 합친거!
-//    @Builder
-//    @Getter
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    public static class MainPageContentDto{
-//        private StoryAlbumListDto storyAlbumListDto;
-//        private MainPageAlbumListDto mainpageAlbumListDto;
-//    }
     //====================================================================//
     // 3. 탐색 페이지에서 앨범 조회 dto
     @Builder
@@ -170,7 +161,7 @@ public class AlbumResponseDto {
         private int likeCount;
         private int bookmarkCount;
         private int commentCount;
-        private LocalDateTime updatedAt;
+        private LocalDateTime updatedAT;
     }
 
     @Builder
@@ -179,6 +170,10 @@ public class AlbumResponseDto {
     @AllArgsConstructor
     public static class UserAlbumViewListDto {
         private List<UserAlbumViewDto> albums;
+        Integer listSize;
+        boolean isFirst;
+        boolean isLast;
+        boolean hasNext;
         private int totalAlbumCount;
     }
     //====================================================================//
@@ -225,6 +220,10 @@ public class AlbumResponseDto {
     @AllArgsConstructor
     public static class LikeListDto{
         private List<LikeResultDto> likes;
+        Integer listSize;
+        boolean isFirst;
+        boolean isLast;
+        boolean hasNext;
     }
 
     //==앨범 북마크, 특정 앨범에 들어가서 북마크 확인할 때==//

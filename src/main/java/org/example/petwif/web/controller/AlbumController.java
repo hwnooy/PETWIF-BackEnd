@@ -128,7 +128,7 @@ public class AlbumController {
     }
 
 
-    //== 2-1. 메인 페이지에서 앨범 조회, 스토리형식 ==//
+    //== 2-1. 메인 페이지에서 앨범 조회, 스토리형식 ==////slice완료
 
     @GetMapping("/stories")
     @ApiResponses({
@@ -144,7 +144,7 @@ public class AlbumController {
         return ApiResponse.onSuccess(AlbumConverter.convertToStoryAlbumResultListDto(albumSlice));
     }
 
-    //== 2-2, 메인 페이지에서 앨범 조회, 게시글 형식 ==//
+    //== 2-2, 메인 페이지에서 앨범 조회, 게시글 형식 ==////slice완료
     @GetMapping("/posts")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -162,7 +162,7 @@ public class AlbumController {
         return ApiResponse.onSuccess(albumListDto);
     }
 
-    //== 3. 탐색 페이지에서 앨범 조회 ==// //탐색 화면입니다.
+    //== 3. 탐색 페이지에서 앨범 조회 ==// //탐색 화면입니다.//slice완료
     @GetMapping("/albums/search")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -177,8 +177,6 @@ public class AlbumController {
         Slice<Album> albumSlice = albumQueryService.getSearchableAlbums(member.getId(), page);
         return ApiResponse.onSuccess(AlbumConverter.convertToSearchAlbumListDto(albumSlice));
 
-        //return
-       // return ApiResponse.onSuccess(null);
     }
 
 
@@ -194,9 +192,12 @@ public class AlbumController {
     public ApiResponse<AlbumResponseDto.UserAlbumViewListDto> getUserAlbums(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("userId") Long pageOwnerId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType) {
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.UserAlbumViewListDto albumListDto = albumQueryService.getMemberPageAlbums(member.getId(), pageOwnerId, sortType);
+        Slice<AlbumResponseDto.UserAlbumViewDto> albumSlice = albumQueryService.getMemberPageAlbums(pageOwnerId,member.getId(), page, sortType);
+        AlbumResponseDto.UserAlbumViewListDto albumListDto = AlbumConverter.convertToUserAlbumViewListDto(albumSlice);
+
         return ApiResponse.onSuccess(albumListDto);
     }
 
@@ -262,11 +263,12 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 좋아요 리스트 조회 API", description = "특정 앨범에 대해 좋아요를 누른 사람의 목록이 나오는 API 입니다. 좋아요가 없다면 에러")
-    public ApiResponse<AlbumResponseDto.LikeListDto> getAlbumList(@ExistAlbum @PathVariable Long albumId, @RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<Slice<AlbumResponseDto.LikeResultDto>> getLikeList(@ExistAlbum @PathVariable Long albumId,
+                                                                  @RequestHeader("Authorization") String authorizationHeader,
+                                                                  @RequestParam(name = "page", defaultValue = "0") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        List<AlbumResponseDto.LikeResultDto> likes  = albumLikeService.getAlbumLikes(albumId, member.getId());
-        AlbumResponseDto.LikeListDto likeListDto = new AlbumResponseDto.LikeListDto(likes);
-        return ApiResponse.onSuccess(likeListDto);
+        Slice<AlbumResponseDto.LikeResultDto> albumLikeSlice = albumLikeService.getAlbumLikes(albumId, member.getId(), page);
+        return ApiResponse.onSuccess(albumLikeSlice);
     }
 
 
@@ -311,11 +313,12 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 북마크 리스트 조회 API", description = "앨범내애 북마크 버튼을 눌렀을 때 북마크 목록이 나오는 API 입니다")
-    public ApiResponse<AlbumResponseDto.BookmarkListDto> getBookmarkList(@ExistAlbum @PathVariable Long albumId, @RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<Slice<AlbumResponseDto.BookmarkResultDto>> getBookmarkList(@ExistAlbum @PathVariable Long albumId,
+                                                                         @RequestHeader("Authorization") String authorizationHeader,
+                                                                         @RequestParam(name = "page") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        List<AlbumResponseDto.BookmarkResultDto> bookmarks = albumBookmarkService.getAlbumBookmarks(albumId, member.getId());
-        AlbumResponseDto.BookmarkListDto bookmarkListDto = new AlbumResponseDto.BookmarkListDto(bookmarks);
-        return ApiResponse.onSuccess(bookmarkListDto);
+        Slice<AlbumResponseDto.BookmarkResultDto> bookmarks = albumBookmarkService.getAlbumBookmarks(albumId, member.getId(), page);
+        return ApiResponse.onSuccess(bookmarks);
     }
 
     //=======================================앨범 신고============================================//

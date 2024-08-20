@@ -37,7 +37,10 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
                 }
                 break;
             case FRIEND:
-                if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
+                if(album.getMember().getId().equals(currentUserId)){
+                    break;
+                }
+                else if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
                     throw new GeneralException(ErrorStatus.ALBUM_ACCESS_RESTRICTED);
                 }
                 break;
@@ -63,7 +66,10 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
                 }
                 break;
             case FRIEND:
-                if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
+                if(album.getMember().getId().equals(currentUserId)){
+                    return true;
+                }
+                else if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
                     return false; //공개 범위가 친구인데 currentUserId가 album의 작성자와 친구가 아니면 false 리턴
                 }
                 break;

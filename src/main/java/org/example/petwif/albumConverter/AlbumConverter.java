@@ -3,10 +3,8 @@ package org.example.petwif.albumConverter;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.example.petwif.domain.entity.Album;
-import org.example.petwif.domain.entity.AlbumImage;
-import org.example.petwif.domain.entity.Comment;
-import org.example.petwif.domain.entity.Member;
+import org.example.petwif.domain.entity.*;
+import org.example.petwif.repository.AlbumRepository;
 import org.example.petwif.repository.CommentRepository;
 import org.example.petwif.repository.albumRepository.AlbumBookmarkRepository;
 import org.example.petwif.repository.albumRepository.AlbumLikeRepository;
@@ -53,6 +51,9 @@ public class AlbumConverter {
                 .build();
     }
 
+
+    //====================================================================//
+    // 2. 메인 페이지 내에서 앨범 스토리 형식 조회
     public static AlbumResponseDto.StoryAlbumResultDto convertToStoryAlbumResultDto(Album album) {
         return AlbumResponseDto.StoryAlbumResultDto.builder()
                 .albumId(album.getId())
@@ -98,6 +99,7 @@ public class AlbumConverter {
                 .build();
     }*/
 
+
     public static AlbumResponseDto.MainPageAlbumListDto convertToMainpageAlbumResultListDto(Slice<AlbumResponseDto.MainPageAlbumResultDto> albumSlice){
         List<AlbumResponseDto.MainPageAlbumResultDto> albums = Optional.ofNullable(albumSlice.getContent())
                 .orElse(Collections.emptyList());  // getContent가 null이면 빈 리스트 반환
@@ -110,6 +112,9 @@ public class AlbumConverter {
                 .hasNext(albumSlice.hasNext())
                 .build();
     }
+
+    //====================================================================//
+    // 3. 탐색 페이지에서 앨범 조회 dto
 
     public static AlbumResponseDto.SearchAlbumDto convertToSearchAlbumDto(Album album){
         return AlbumResponseDto.SearchAlbumDto.builder()
@@ -135,6 +140,37 @@ public class AlbumConverter {
                 .build();
     }
 
+    //====================================================================//
+    // 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함
+    //sevice에서 컨버트함
+    public static AlbumResponseDto.UserAlbumViewDto convertToUserAlbumViewDto(Album album) {
+        return AlbumResponseDto.UserAlbumViewDto.builder()
+                .albumId(album.getId())
+                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
+                .likeCount(album.getAlbumLikes().size())
+                .bookmarkCount(album.getAlbumBookmarks().size())
+                .commentCount(album.getCommentList().size())
+                .updatedAT(album.getUpdatedAt())
+                .build();
+    }
+
+    public static AlbumResponseDto.UserAlbumViewListDto convertToUserAlbumViewListDto(Slice<AlbumResponseDto.UserAlbumViewDto> albumSlice){
+        List<AlbumResponseDto.UserAlbumViewDto> albums = Optional.ofNullable(albumSlice.getContent())
+                .orElse(Collections.emptyList());  // getContent가 null이면 빈 리스트 반환
+
+        return AlbumResponseDto.UserAlbumViewListDto.builder()
+                .albums(albums)
+                .listSize(albumSlice.getSize())
+                .isFirst(albumSlice.isFirst())
+                .isLast(albumSlice.isLast())
+                .hasNext(albumSlice.hasNext())
+                .totalAlbumCount(albums.size())
+                .build();
+    }
+    //====================================================================//
+    // 5. 북마크한 앨범에서 앨범 조회
+
+
     public static AlbumResponseDto.MemberBookmarkAlbumDto convertToMemberBookmarkAlbumDto(Album album){
         return AlbumResponseDto.MemberBookmarkAlbumDto.builder()
                 .albumId(album.getId())
@@ -157,6 +193,11 @@ public class AlbumConverter {
                     .hasNext(bookmarkedAlbums.hasNext())
                     .build();
     }
+
+    //====================================================================//
+    /*public static AlbumResponseDto.LikeResultDto convertToLikeResultDto(AlbumLike albumLike){
+        return*/
+
 
 
 
