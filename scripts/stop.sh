@@ -2,7 +2,6 @@
 
 PROJECT_ROOT="/home/ubuntu/app"
 JAR_FILE="$PROJECT_ROOT/petwif.jar"
-PROFILES="--spring.profiles.active=prod"
 
 APP_LOG="$PROJECT_ROOT/application.log"
 ERROR_LOG="$PROJECT_ROOT/error.log"
