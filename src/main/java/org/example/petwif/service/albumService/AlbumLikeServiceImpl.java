@@ -72,20 +72,15 @@ public class AlbumLikeServiceImpl implements AlbumLikeService{
 
     //좋아요 목록 보이기
     @Override
-    public Slice<AlbumResponseDto.LikeResultDto> getAlbumLikes(Long albumId, Long memberId, Integer page) {
+    public Slice<AlbumLike> getAlbumLikes(Long albumId, Long memberId, Integer page) {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
 
         albumCheckAccessService.checkAccess(album, memberId);
 
         Slice<AlbumLike> likes = albumLikeRepository.findByAlbum(album, PageRequest.of(page, 10));
-        if (likes.isEmpty()) {
-            throw new GeneralException(ErrorStatus.ALBUM_LIKE_PAGE_NOT_FOUND);
-        }
-
-        return likes.map(like -> new AlbumResponseDto.LikeResultDto(
-                like.getMember().getId(), like.getMember().getNickname(), like.getMember().getProfile_url()
-        ));
+        if(likes.isEmpty())throw new GeneralException(ErrorStatus.ALBUM_LIKE_PAGE_NOT_FOUND);
+        return likes;
     }
 
 

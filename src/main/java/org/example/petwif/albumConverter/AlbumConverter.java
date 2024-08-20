@@ -193,12 +193,4 @@ public class AlbumConverter {
                     .hasNext(bookmarkedAlbums.hasNext())
                     .build();
     }
-
-    //====================================================================//
-    /*public static AlbumResponseDto.LikeResultDto convertToLikeResultDto(AlbumLike albumLike){
-        return*/
-
-
-
-
 }

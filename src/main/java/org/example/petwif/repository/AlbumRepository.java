@@ -17,7 +17,7 @@ import java.util.List;
 
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
-   @Query("SELECT a FROM Album a WHERE a.member.id IN :friendIds ORDER BY a.updatedAt DESC")
+    @Query("SELECT a FROM Album a WHERE a.member.id IN :friendIds ORDER BY a.updatedAt DESC")
     Slice<Album> findByMemberIdInOrderByUpdatedAtDesc(List<Long> friendIds, PageRequest pageRequest);
 
     @Query("SELECT a FROM Album a WHERE a.member.id NOT IN :friendIds AND a.scope = :scope ORDER BY a.updatedAt DESC ")

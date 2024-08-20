@@ -65,14 +65,13 @@ public class AlbumBookmarkServiceImpl implements AlbumBookmarkService{
 
     // 북마크 리스트 조회
     @Override
-    public Slice<AlbumResponseDto.BookmarkResultDto> getAlbumBookmarks(Long albumId, Long memberId, Integer page) {
+    public Slice<AlbumBookmark> getAlbumBookmarks(Long albumId, Long memberId, Integer page) {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
         albumCheckAccessService.checkAccess(album, memberId);
         Slice<AlbumBookmark> bookmarks = albumBookmarkRepository.findByAlbum(album, PageRequest.of(page, 10));
-        if (bookmarks.isEmpty()) throw new GeneralException(ErrorStatus.ALBUM_BOOKMARK_PAGE_NOT_FOUND);
-        return bookmarks.map(bookmark -> new AlbumResponseDto.BookmarkResultDto(
-                bookmark.getMember().getId(), bookmark.getMember().getNickname(), bookmark.getMember().getProfile_url()
-        ));
+        if(bookmarks.isEmpty())throw new GeneralException(ErrorStatus.ALBUM_BOOKMARK_PAGE_NOT_FOUND);
+        return bookmarks;
+
     }
 }

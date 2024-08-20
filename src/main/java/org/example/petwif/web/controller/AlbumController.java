@@ -15,10 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.albumConverter.AlbumConverter;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
-import org.example.petwif.domain.entity.Album;
-import org.example.petwif.domain.entity.AlbumLike;
-import org.example.petwif.domain.entity.Comment;
-import org.example.petwif.domain.entity.Member;
+import org.example.petwif.domain.entity.*;
 import org.example.petwif.domain.enums.AlbumSortType;
 import org.example.petwif.repository.AlbumRepository;
 import org.example.petwif.repository.MemberRepository;
@@ -35,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -263,12 +261,26 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 좋아요 리스트 조회 API", description = "특정 앨범에 대해 좋아요를 누른 사람의 목록이 나오는 API 입니다. 좋아요가 없다면 에러")
-    public ApiResponse<Slice<AlbumResponseDto.LikeResultDto>> getLikeList(@ExistAlbum @PathVariable Long albumId,
+    public ApiResponse<AlbumResponseDto.LikeListDto> getLikeList(@ExistAlbum @PathVariable Long albumId,
                                                                   @RequestHeader("Authorization") String authorizationHeader,
                                                                   @RequestParam(name = "page", defaultValue = "0") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Slice<AlbumResponseDto.LikeResultDto> albumLikeSlice = albumLikeService.getAlbumLikes(albumId, member.getId(), page);
-        return ApiResponse.onSuccess(albumLikeSlice);
+        Slice<AlbumLike> albumLikeSlice = albumLikeService.getAlbumLikes(albumId, member.getId(), page);
+        List<AlbumResponseDto.LikeResultDto> likes = albumLikeSlice.getContent().stream()
+                .map(like -> new AlbumResponseDto.LikeResultDto(
+                        like.getMember().getId(),
+                        like.getMember().getNickname(),
+                        like.getMember().getProfile_url()))
+                .collect(Collectors.toList());
+
+        AlbumResponseDto.LikeListDto likeListDto = AlbumResponseDto.LikeListDto.builder()
+                .likes(likes)
+                .listSize(likes.size())
+                .isFirst(albumLikeSlice.isFirst())
+                .isLast(albumLikeSlice.isLast())
+                .hasNext(albumLikeSlice.hasNext())
+                .build();
+        return ApiResponse.onSuccess(likeListDto);
     }
 
 
@@ -313,12 +325,26 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 북마크 리스트 조회 API", description = "앨범내애 북마크 버튼을 눌렀을 때 북마크 목록이 나오는 API 입니다")
-    public ApiResponse<Slice<AlbumResponseDto.BookmarkResultDto>> getBookmarkList(@ExistAlbum @PathVariable Long albumId,
+    public ApiResponse<AlbumResponseDto.BookmarkListDto> getBookmarkList(@ExistAlbum @PathVariable Long albumId,
                                                                          @RequestHeader("Authorization") String authorizationHeader,
                                                                          @RequestParam(name = "page") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Slice<AlbumResponseDto.BookmarkResultDto> bookmarks = albumBookmarkService.getAlbumBookmarks(albumId, member.getId(), page);
-        return ApiResponse.onSuccess(bookmarks);
+        Slice<AlbumBookmark> memberBookmarkSlice = albumBookmarkService.getAlbumBookmarks(albumId, member.getId(), page);
+        List<AlbumResponseDto.BookmarkResultDto> bookmarks = memberBookmarkSlice.getContent().stream()
+                .map(bookmark -> new AlbumResponseDto.BookmarkResultDto(
+                        bookmark.getMember().getId(),
+                        bookmark.getMember().getNickname(),
+                        bookmark.getMember().getProfile_url()))
+                .collect(Collectors.toList());
+
+        AlbumResponseDto.BookmarkListDto bookmarkListDto = AlbumResponseDto.BookmarkListDto.builder()
+                .bookmarks(bookmarks)
+                .listSize(bookmarks.size())
+                .isFirst(memberBookmarkSlice.isFirst())
+                .isLast(memberBookmarkSlice.isLast())
+                .hasNext(memberBookmarkSlice.hasNext())
+                .build();
+        return ApiResponse.onSuccess(bookmarkListDto);
     }
 
     //=======================================앨범 신고============================================//

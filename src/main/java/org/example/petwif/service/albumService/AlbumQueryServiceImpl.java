@@ -144,9 +144,6 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
 
         //친구 인 사람 목록 조회, 아이디까지 찾았지 !! 여기서 빼주는거임!
         List<Friend> friendList = friendRepository.findByMember_IdAndStatus(memberId, FriendStatus.ACCEPTED);
-        if (friendList.isEmpty()) {
-            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
-        }
         List<Long> friendIds = friendList.stream()
                 .map(friend -> friend.getFriend().getId()).collect(Collectors.toList());
 

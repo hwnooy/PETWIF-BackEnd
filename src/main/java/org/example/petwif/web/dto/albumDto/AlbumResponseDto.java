@@ -242,5 +242,9 @@ public class AlbumResponseDto {
     @AllArgsConstructor
     public static class BookmarkListDto{
         private List<BookmarkResultDto> bookmarks;
+        Integer listSize;
+        boolean isFirst;
+        boolean isLast;
+        boolean hasNext;
     }
 }
