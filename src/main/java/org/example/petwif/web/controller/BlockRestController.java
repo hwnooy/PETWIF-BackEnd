@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @RequestMapping("/blocks")
+//@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class BlockRestController {
 
     private final BlockCommandService blockCommandService;;
