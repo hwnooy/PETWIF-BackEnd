@@ -39,10 +39,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated()  // 그 외의 모든 요청은 인증 필요
                 )
                 .apply(new JwtSecurityConfig(tokenProvider));
-                //.apply(new JwtSecurityConfig(tokenProvider));
 
         return http.build();
     }
+
 // 애초에 막혀있어서 못했네...
 
     @Bean
