@@ -19,10 +19,21 @@ public class ChatResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SendChatResultDTO { //채팅 보내기 - 메시지 내용
+    public static class SendChatResultDTO { //채팅 보내기
         private Long chatId;
         private LocalDateTime createdAt;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReportChatResultDTO { //채팅 신고
+        private Long memberId;
+        private LocalDateTime createdAt;
+    }
+
+
     @Builder
     @Getter
     @NoArgsConstructor
@@ -32,9 +43,11 @@ public class ChatResponseDTO {
         private Long memberId;
         private String content;
         private String imageUrl;
+        private String profileUrl;
         private String nickName;
         private LocalDateTime createdAt;
     }
+
     @Builder
     @Getter
     @NoArgsConstructor

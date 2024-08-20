@@ -19,11 +19,12 @@ public class ChatRequestDTO {
         @NotBlank
         private String content;
         @Nullable
-        private List<MultipartFile> chatImages = new ArrayList<>();
+        private MultipartFile chatImages;
     }
 
     @Getter
-    public static class imageUploadDTO{
-        private List<MultipartFile> chatImages;
+    public static class ReportChatDTO { //채팅 신고
+        @NotBlank
+        private String content; //채팅 신고 사유
     }
 }

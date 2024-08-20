@@ -2,6 +2,7 @@ package org.example.petwif.converter;
 
 import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatImage;
+import org.example.petwif.domain.entity.ChatReport;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.example.petwif.web.dto.ChatDTO.ChatResponseDTO;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ChatConverter {
@@ -45,12 +47,26 @@ public class ChatConverter {
                 .build();
     }
 
+    public static ChatReport toChatReport(ChatRequestDTO.ReportChatDTO request) { //채팅 신고
+        return ChatReport.builder()
+                .content(request.getContent())
+                .build();
+    }
+
+    public static ChatResponseDTO.ReportChatResultDTO reportChatResultDTO(ChatReport chatReport) {
+        return ChatResponseDTO.ReportChatResultDTO.builder()
+                .memberId(chatReport.getMember().getId())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
     public static ChatResponseDTO.ChatPreviewDTO toChatPreviewDTO(Chat chat) { //채팅창 화면 조회
         return ChatResponseDTO.ChatPreviewDTO.builder()
                 .chatId(chat.getId())
                 .memberId(chat.getMember().getId())
                 .content(chat.getContent())
-                .imageUrl(chat.getMember().getProfile_url())
+                .imageUrl(Optional.ofNullable(chat.getChatImage()).map(ChatImage::getImageUrl).orElse(null))
+                .profileUrl(chat.getMember().getProfile_url())
                 .nickName(chat.getMember().getNickname())
                 .createdAt(LocalDateTime.now())
                 .build();

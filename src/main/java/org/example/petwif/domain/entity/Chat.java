@@ -12,9 +12,8 @@ import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Builder
-@DynamicUpdate
-@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Chat extends BaseEntity {
@@ -39,8 +38,13 @@ public class Chat extends BaseEntity {
 
     private String imageUrl;
 
+    @OneToOne(mappedBy = "chat", cascade = CascadeType.ALL)
+    private ChatImage chatImage;
+
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL)
-    private List<ChatImage> chatImages = new ArrayList<>();
+    private List<ChatReport> chatReports = new ArrayList<>();
+
+    private Integer reportCount = 0;
 
     //채팅 보내기
     public void setChatRoom(ChatRoom chatRoom) {
@@ -51,5 +55,22 @@ public class Chat extends BaseEntity {
     public void setMember(Member member) {
         this.member = member;
         member.getChatList().add(this);
+    }
+
+    public void setChatImage(ChatImage chatImage) {
+        this.chatImage = chatImage;
+
+        if (chatImage != null) {
+            chatImage.setChat(this);
+        }
+    }
+
+    //채팅 신고
+    public void incrementReport() {
+        if (this.reportCount == null) {
+            this.reportCount = 1;
+        } else {
+            this.reportCount++;
+        }
     }
 }
