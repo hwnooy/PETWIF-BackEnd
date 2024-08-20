@@ -16,6 +16,7 @@ else
   echo "$TIME_NOW > 실행중인 $CURRENT_PID 애플리케이션 종료 " >> $DEPLOY_LOG
   kill -15 $CURRENT_PID
 fi
+
 # JAR 파일 실행
 echo "$TIME_NOW > $JAR_FILE 파일 실행" >> $DEPLOY_LOG
 nohup java -jar $JAR_FILE --spring.profiles.active=prod > "$PROJECT_ROOT/application.log" 2> "$PROJECT_ROOT/error.log" &
