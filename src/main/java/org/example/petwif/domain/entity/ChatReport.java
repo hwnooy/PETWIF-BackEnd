@@ -8,23 +8,27 @@ import org.example.petwif.domain.common.BaseEntity;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
-public class ChatImage extends BaseEntity {
+public class ChatReport extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="member_id")
+    private Member member;
 
-    @OneToOne
-    @JoinColumn(name = "chat_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="chat_id")
     private Chat chat;
 
-    //채팅 이미지
+    private String content; //채팅 신고 사유
+
+    //채팅 신고
     public void setChat(Chat chat) {
         this.chat = chat;
+        chat.getChatReports().add(this);
     }
-
 }

@@ -1,10 +1,7 @@
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.ChatRoomStatus;
 import org.hibernate.annotations.DynamicInsert;
@@ -15,8 +12,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@DynamicUpdate
-@DynamicInsert
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
