@@ -12,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
@@ -19,15 +20,22 @@ import org.springframework.web.filter.CorsFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final TokenProvider tokenProvider;
-    private final CorsFilter corsFilter;
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())   // CSRF 비활성화
-                .cors(cors -> {})
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .cors(cors -> {
+                    cors.configurationSource(request -> {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowCredentials(true);
+                        config.addAllowedOrigin("http://localhost:5173"); // '*' 대신 명시적 출처 사용
+                        config.addAllowedHeader("*");
+                        config.addAllowedMethod("*");
+                        return config;
+                    });
+                })
+                //.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -49,11 +57,5 @@ public class SecurityConfig {
     public BCryptPasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
-
-
-//    @Bean
-//    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
 }
 
