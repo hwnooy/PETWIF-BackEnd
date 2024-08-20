@@ -70,10 +70,10 @@ public class AlbumResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class StoryAlbumResultDto{
-        private Long albumId;
-        private String nickName;
-        private String profileImageUrl;
-        private LocalDateTime updatedAT;
+         Long albumId;
+         String nickName;
+         String profileImageUrl;
+         LocalDateTime updatedAT;
     }
 
     //2-2 메인 페이지 내의 앨범 스토리들을 리스트로 합치는 dto
@@ -84,6 +84,10 @@ public class AlbumResponseDto {
     @AllArgsConstructor
     public static class StoryAlbumListDto{
         List<StoryAlbumResultDto> stories;
+         Integer listSize;
+         boolean isFirst;
+         boolean isLast;
+         boolean hasNext;
     }
 
     // 2-2. 메인 페이지 내에서 앨범 게시글 형식 조회
@@ -92,17 +96,17 @@ public class AlbumResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MainPageAlbumResultDto {
-        private Long albumId;
-        private String content;
-        private LocalDateTime updatedAt;
-        private String coverImageUrl;
-        private int likeCount;
-        private String nickName;
-        private String profileImageUrl;
-        private Long memberId;
-        private boolean isLiked;
-        private boolean isBookmarked;
-        private List<CommentResponseDto> comments;
+         Long albumId;
+         String content;
+         LocalDateTime updatedAT;
+         String coverImageUrl;
+         int likeCount;
+         String nickName;
+         String profileImageUrl;
+         Long memberId;
+         boolean isLiked;
+         boolean isBookmarked;
+         List<CommentResponseDto> comments;
     }
 
     // 메인 페이지의 앨범 들을 리스트로 변환 해주는 dto
@@ -112,7 +116,10 @@ public class AlbumResponseDto {
     @AllArgsConstructor
     public static class MainPageAlbumListDto{
         private List<MainPageAlbumResultDto> mainpageAlbums;
-
+        Integer listSize;
+        boolean isFirst;
+        boolean isLast;
+        boolean hasNext;
     }
 
     // 2-3. 위에 두개 합친거!
@@ -136,14 +143,18 @@ public class AlbumResponseDto {
         private int likeCount;
         private int bookmarkCount;
         private int commentCount;
-        private LocalDateTime updatedAt;
+        private LocalDateTime updatedAT;
     }
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class SearchAlbumListDto{
-        private List<SearchAlbumDto> albums;
+        private List<SearchAlbumDto> searchAlbums;
+        Integer listSize;
+        boolean isFirst;
+        boolean isLast;
+        boolean hasNext;
     }
 
     //====================================================================//
@@ -182,14 +193,18 @@ public class AlbumResponseDto {
         private int likeCount;
         private int bookmarkCount;
         private int commentCount;
-        private LocalDateTime updatedAt;
+        private LocalDateTime updatedAT;
     }
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberBookmarkAlbumListDto{
-        private List<MemberBookmarkAlbumDto> albums;
+        private List<MemberBookmarkAlbumDto> bookmarkedAlbums;
+        Integer listSize;
+        boolean isFirst;
+        boolean isLast;
+        boolean hasNext;
     }
 
 

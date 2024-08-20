@@ -54,8 +54,13 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
 
 
     // memberId와 friendId를 사용해서 친구 관계가 있는지 확인하는 쿼리 입니다. 앨범 공개 범위 로직을 위해 추가했습니다! - 현일
-    @Query("SELECT COUNT(f) > 0 FROM Friend f WHERE (f.member.id = :memberId AND f.friend.id = :friendId) OR (f.member.id = :friendId AND f.friend.id = :memberId)")
-    boolean isFriend(@Param("memberId") Long memberId, @Param("friendId") Long friendId);
+    @Query("SELECT COUNT(f) > 0 FROM Friend f WHERE " +
+            "((f.member.id = :memberId AND f.friend.id = :friendId AND f.status = :status) OR " +
+            "(f.member.id = :friendId AND f.friend.id = :memberId AND f.status = :status))")
+    boolean isFriend(@Param("memberId") Long memberId, @Param("friendId") Long friendId, @Param("status") FriendStatus status);
 
 
+
+    //친구 찾기리스트
+    List<Friend> findByMember_IdAndStatus(Long memberId, FriendStatus friendStatus);
 }

@@ -13,19 +13,20 @@ import java.util.Optional;
 public interface AlbumQueryService {
     Optional<Album> findAlbum(Long AlbumId);
 
+    //앨범 세부페이지
     public AlbumResponseDto.DetailResultDto getAlbumDetails(Long albumId, Long memberId);
 
-    //public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId);
-    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId, Integer page);
-
-    public AlbumResponseDto.MainPageAlbumListDto getMainpageAlbum(Long memberId);
+    //메인페이지 -> 스토리형식
+    public Slice<Album> getStoryAlbum(Long memberId, Integer page);
+    //메인페이지 -> 게시글형식
+    public Slice<AlbumResponseDto.MainPageAlbumResultDto> getMainpageAlbum(Long memberId, Integer page);
 
     //탐색 페이지에서 앨범 조회
-    public AlbumResponseDto.SearchAlbumListDto getSearchableAlbums(Long memberId);
+    public Slice<Album> getSearchableAlbums(Long memberId, Integer page);
 
     // 사용자 페이지에서 앨범 조회
     public AlbumResponseDto.UserAlbumViewListDto getMemberPageAlbums(Long memberId, Long pageOwnerId, AlbumSortType sortType);
 
     //북마크한 앨범 조회
-    public AlbumResponseDto.MemberBookmarkAlbumListDto getMemberBookmarkAlbums(Long memberId);
+    public Slice<Album> getMemberBookmarkAlbums(Long memberId, Integer page);
 }

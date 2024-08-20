@@ -16,18 +16,26 @@ import java.awt.print.Pageable;
 import java.util.List;
 
 public interface AlbumRepository extends JpaRepository<Album, Long> {
-    //List<Album> findAlbumsByMember(List<Member> friends, Scope FRIEND);
 
     //3. 탐색 페이지에서 앨범 조회 서비스에 필요한 메서드
-    List<Album> findAllByOrderByUpdatedAtDesc();
+   // List<Album> findAllByOrderByUpdatedAtDesc();
+
+    //Album findAlbumByMemberId(Long friendId);
 
     List<Album> findAlbumsByMemberId(Long pageOwnerId);
 
-    List<Album> findByMemberIdOrderByUpdatedAtDesc(Long memberId);
 
-   /* Slice<Album> findStoryAlbumsByMemberId(Long memberId, PageRequest pageRequest);
 
-    @Query("SELECT a FROM Album a WHERE a.member.id IN :friendIds ORDER BY a.createdAt DESC")
-    Slice<Album> findStoryAlbumsByMemberIds(List<Long> friendIds, Pageable pageable);*/
+   @Query("SELECT a FROM Album a WHERE a.member.id IN :friendIds ORDER BY a.updatedAt DESC")
+    Slice<Album> findByMemberIdInOrderByUpdatedAtDesc(List<Long> friendIds, PageRequest pageRequest);
 
+    @Query("SELECT a FROM Album a WHERE a.member.id NOT IN :friendIds AND a.scope = :scope ORDER BY a.updatedAt DESC ")
+    Slice<Album> findPublicAlbumsByNonFriends(List<Long> friendIds, Scope scope, PageRequest pageRequest);
+
+
+    @Query("SELECT a FROM Album a WHERE a.member.id IN :allMemberIds ORDER BY a.updatedAt DESC")
+    Slice<Album> findAllByMemberIds(@Param("allMemberIds") List<Long> memberIds, PageRequest pageRequest);
+
+    @Query("SELECT a FROM Album a WHERE a.id IN :ids order by a.updatedAt DESC ")
+    Slice<Album> findAllByIds(@Param("ids") List<Long> ids, PageRequest pageRequest);
 }

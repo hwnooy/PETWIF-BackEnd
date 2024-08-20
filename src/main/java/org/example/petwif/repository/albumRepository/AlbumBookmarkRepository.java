@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +25,6 @@ public interface AlbumBookmarkRepository extends JpaRepository<AlbumBookmark, Lo
     List<Long> findBookmarkedAlbumIdsByMemberId(@Param("memberId") Long memberId);
 
     boolean existsByAlbumAndMemberId(Album album, Long memberId);
+
+
 }
