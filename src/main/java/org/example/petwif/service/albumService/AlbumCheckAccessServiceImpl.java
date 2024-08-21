@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Album;
+import org.example.petwif.domain.enums.FriendStatus;
 import org.example.petwif.repository.BlockRepository;
 import org.example.petwif.repository.FriendRepository;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,10 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
                 }
                 break;
             case FRIEND:
-                if (!friendRepository.isFriend(currentUserId, album.getMember().getId())) {
+                if(album.getMember().getId().equals(currentUserId)){
+                    break;
+                }
+                else if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
                     throw new GeneralException(ErrorStatus.ALBUM_ACCESS_RESTRICTED);
                 }
                 break;
@@ -49,12 +53,11 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
     }
 
     @Override
-    public boolean checkAccessInBool(Album album, Long currentUserId) {
+    public boolean checkAccessInBool(Album album, Long currentUserId) { //차단 당하지 않았고, 친구라면 앨범 공갬범위 친구 볼수있고, 친구 아니라면 all만 볼수있음
         // 차단 여부 확인
         if (blockRepository.existsByMember_IdAndTarget_Id(album.getMember().getId(), currentUserId)) {
            return false;
         }
-
         // 공개 범위에 따른 접근 권한 확인
         switch (album.getScope()) {
             case MY:
@@ -63,8 +66,11 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
                 }
                 break;
             case FRIEND:
-                if (!friendRepository.isFriend(currentUserId, album.getMember().getId())) {
-                    return false;
+                if(album.getMember().getId().equals(currentUserId)){
+                    return true;
+                }
+                else if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
+                    return false; //공개 범위가 친구인데 currentUserId가 album의 작성자와 친구가 아니면 false 리턴
                 }
                 break;
             case ALL:

@@ -10,6 +10,8 @@ import org.example.petwif.repository.AlbumRepository;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.repository.albumRepository.AlbumBookmarkRepository;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,14 +65,13 @@ public class AlbumBookmarkServiceImpl implements AlbumBookmarkService{
 
     // 북마크 리스트 조회
     @Override
-    public List<AlbumResponseDto.BookmarkResultDto> getAlbumBookmarks(Long albumId, Long memberId){
+    public Slice<AlbumBookmark> getAlbumBookmarks(Long albumId, Long memberId, Integer page) {
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
         albumCheckAccessService.checkAccess(album, memberId);
-        List<AlbumBookmark> bookmarks = albumBookmarkRepository.findByAlbum(album);
+        Slice<AlbumBookmark> bookmarks = albumBookmarkRepository.findByAlbum(album, PageRequest.of(page, 10));
         if(bookmarks.isEmpty())throw new GeneralException(ErrorStatus.ALBUM_BOOKMARK_PAGE_NOT_FOUND);
-        return bookmarks.stream()
-                .map(bookmark ->new AlbumResponseDto.BookmarkResultDto(bookmark.getMember().getId(), bookmark.getMember().getNickname(), bookmark.getMember().getProfile_url()))
-                .collect(Collectors.toList());
+        return bookmarks;
+
     }
 }
