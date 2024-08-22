@@ -72,7 +72,7 @@ public class MemberController {
         }
     }
 
-    @PatchMapping("/addEtc")  // 이것도 완료, 나중에 accessToken 처리하기
+    @PatchMapping("/addEtc")
     public ApiResponse<String> addEtcInfo(@RequestHeader("Authorization") String authorizationHeader,
                                           @RequestBody MemberEtcInfoRequestDto dto) {
         Member member = memberService.getMemberByToken(authorizationHeader);
@@ -118,38 +118,36 @@ public class MemberController {
         }
     }
 
-    // db cascade 문제로 실패
     @DeleteMapping("/delete")
     public ApiResponse<String> deleteMember(@RequestParam("id") Long id){
         try {
             Member member = memberRepository.findByMemberId(id);
-            System.out.println(member);
             memberService.deleteMember(id);
-            return ApiResponse.onSuccess(member.getEmail()+"님 삭제 완료");
+            return ApiResponse.onSuccess("id : "+ id +" , "+ member.getEmail()+"님 삭제 완료");
         } catch (Exception e) {
             return ApiResponse.onFailure("500", "존재하지 않는 회원입니다. ", null);
         }
     }
 
-@PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ApiResponse<String> uploadImage(
-        @RequestHeader("Authorization") String authorizationHeader,
-        @RequestParam("file") MultipartFile file) {
+    @PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> uploadImage(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam("file") MultipartFile file) {
 
-    Member member = memberService.getMemberByToken(authorizationHeader);
-    Long memberId = member.getId();
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
 
-    try {
-        // S3에 파일 업로드 및 URL 반환
-        String keyName =  file.getOriginalFilename()+ "/"+ memberId;
-        String fileUrl = amazonS3Manager.uploadFile(keyName, file);
+        try {
+            // S3에 파일 업로드 및 URL 반환
+            String keyName =  file.getOriginalFilename()+ "/"+ memberId;
+            String fileUrl = amazonS3Manager.uploadFile(keyName, file);
 
-        memberService.uploadProfile(memberId, fileUrl);
+            memberService.uploadProfile(memberId, fileUrl);
 
-        return ApiResponse.onSuccess(fileUrl);
-    } catch (Exception e) {
-        return ApiResponse.onFailure("400", "error", e.getMessage());
+            return ApiResponse.onSuccess(fileUrl);
+        } catch (Exception e) {
+            return ApiResponse.onFailure("400", "error", e.getMessage());
+        }
     }
-}
 
 }
