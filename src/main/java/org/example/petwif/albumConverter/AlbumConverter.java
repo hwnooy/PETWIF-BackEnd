@@ -171,6 +171,7 @@ public class AlbumConverter {
     // 5. 북마크한 앨범에서 앨범 조회
 
 
+    //이것도 service에서 변화함
     public static AlbumResponseDto.MemberBookmarkAlbumDto convertToMemberBookmarkAlbumDto(Album album){
         return AlbumResponseDto.MemberBookmarkAlbumDto.builder()
                 .albumId(album.getId())
