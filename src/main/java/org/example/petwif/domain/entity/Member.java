@@ -74,11 +74,20 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Block> blockList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "target", cascade = CascadeType.ALL)
+    private List<Block> blockTargetList = new ArrayList<>();
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Friend> friendList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "friend", cascade = CascadeType.ALL)
+    private List<Friend> friendFriendList = new ArrayList<>();
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Notification> notificationList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "relatedMember", cascade = CascadeType.ALL)
+    private List<Notification> notificationRelatedMemberList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Chat> chatList = new ArrayList<>();
