@@ -6,4 +6,6 @@ public interface AlbumCheckAccessService {
     public void checkAccess(Album album, Long currentUserId);
 
     public boolean checkAccessInBool(Album album, Long currentUserId);
+
+    public boolean checkAccessInBoolForSearch(Album album, Long currentUserId);
 }

@@ -1,10 +1,8 @@
+/*
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.StickerType;
 
@@ -12,10 +10,11 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Sticker extends BaseEntity {
+public class Sticker {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,7 +25,5 @@ public class Sticker extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private StickerType stickerType;
-
-
-
 }
+*/
