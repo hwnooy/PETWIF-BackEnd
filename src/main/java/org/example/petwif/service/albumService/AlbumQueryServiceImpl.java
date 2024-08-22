@@ -145,17 +145,23 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         //친구 인 사람 목록 조회, 아이디까지 찾았지 !! 여기서 빼주는거임!
         List<Friend> friendList = friendRepository.findByMember_IdAndStatus(memberId, FriendStatus.ACCEPTED);
         List<Long> friendIds = friendList.stream()
-                .map(friend -> friend.getFriend().getId()).collect(Collectors.toList());
+                .map(friend -> friend.getFriend().getId())
+                .collect(Collectors.toList());
 
         friendIds.add(memberId); //나도 뻬줘야지!! 나는 추천 앨범에 있으면 안됨!
 
         Slice<Album> notFriendAlbums = albumRepository.findPublicAlbumsByNonFriends(friendIds, Scope.ALL, PageRequest.of(page, 10));
+        List<AlbumResponseDto.MainPageAlbumResultDto> albumResultDtos = notFriendAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBoolForSearch(album, memberId))
+                .map(album ->convertToMainPageAlbumResultDto(album, memberId))
+                .collect(Collectors.toList());
+
         if(notFriendAlbums.isEmpty()) {
             return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
         }
-
         // 그사람들중에서 앨범 공개범위가 all인 앨범들을 slice에 저장
-        return notFriendAlbums.map(album -> convertToMainPageAlbumResultDto(album, memberId));
+        //return notFriendAlbums.map(album -> convertToMainPageAlbumResultDto(album, memberId));
+        return new SliceImpl<>(albumResultDtos, PageRequest.of(page,10), notFriendAlbums.hasNext());
 
     }
 
