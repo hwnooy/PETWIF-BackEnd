@@ -49,6 +49,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
                                        @Param("blockedMemberIds") List<Long> blockedMemberIds,
                                        PageRequest pageRequest);
 
+    boolean existsByMember_IdAndFriend_Id(Long memberId, Long friendId);
 
 
 
