@@ -205,11 +205,8 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     //=========================== 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함============================//
     @Override
     public Slice<AlbumResponseDto.UserAlbumViewDto> getMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType) {
-        //Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, sortType.getSortField()));
         Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberId(pageOwnerId);
-       /* List<Album> accessibleAlbums = allPageownerAlbums.getContent().stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))
-                .collect(Collectors.toList());*/
+
         List<AlbumResponseDto.UserAlbumViewDto> albumDtos = allPageownerAlbums.stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))
                 .map(this::convertToUserAlbumDto)
@@ -250,23 +247,47 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
 
     //=================================== 5. 북마크한 앨범 에서 앨범 조회 ====================================//
     @Override
-    public Slice<Album> getMemberBookmarkAlbums(Long memberId, Integer page){
+    public Slice<AlbumResponseDto.MemberBookmarkAlbumDto> getMemberBookmarkAlbums(Long memberId, Integer page, AlbumSortType sortType){
         // 접근 가능한 앨범 중에서 사용자가 북마크한 앨범만 필터링
         List<Long> bookmarkedAlbumIds = albumBookmarkRepository.findBookmarkedAlbumIdsByMemberId(memberId);
 
         Slice<Album> thisMemberBookmarkedAlbums = albumRepository.findAllByIds(bookmarkedAlbumIds, PageRequest.of(page,10));
 
-        List<Album> accessibleAlbums = thisMemberBookmarkedAlbums.getContent().stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope() != Scope.MY)
+        List<AlbumResponseDto.MemberBookmarkAlbumDto> accessibleAlbums = thisMemberBookmarkedAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
+                .map(this::convertToMemberBookmarkAlbumDto)
+                .sorted(getBookmarkComparator(sortType))
                 .collect(Collectors.toList());
 
         if (accessibleAlbums.isEmpty()) {
             return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
         }
+        return new SliceImpl<>(accessibleAlbums, PageRequest.of(page, 10), thisMemberBookmarkedAlbums.hasNext());
+    }
 
-        // 결과를 MemberBookmarkAlbumListDto 객체로 래핑하여 반환
-        return new SliceImpl<Album>(accessibleAlbums, PageRequest.of(page, 10),thisMemberBookmarkedAlbums.hasNext());
+    private AlbumResponseDto.MemberBookmarkAlbumDto convertToMemberBookmarkAlbumDto(Album album) {
+        return AlbumResponseDto.MemberBookmarkAlbumDto.builder()
+                .albumId(album.getId())
+                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
+                .likeCount(album.getAlbumLikes().size())
+                .bookmarkCount(album.getAlbumBookmarks().size())
+                .commentCount(album.getCommentList().size())
+                .updatedAT(album.getUpdatedAt())
+                .build();
+    }
 
+    private Comparator<AlbumResponseDto.MemberBookmarkAlbumDto> getBookmarkComparator(AlbumSortType sortType) {
+        switch (sortType) {
+            case LIKES:
+                return Comparator.comparingInt(AlbumResponseDto.MemberBookmarkAlbumDto::getLikeCount).reversed();
+            case COMMENTS:
+                return Comparator.comparingInt(AlbumResponseDto.MemberBookmarkAlbumDto::getCommentCount).reversed();
+            case BOOKMARKS:
+                return Comparator.comparingInt(AlbumResponseDto.MemberBookmarkAlbumDto::getBookmarkCount).reversed();
+            case LATEST:
+            default:
+                return Comparator.comparing(AlbumResponseDto.MemberBookmarkAlbumDto::getUpdatedAT).reversed();
+        }
     }
 
 
