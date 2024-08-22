@@ -146,7 +146,7 @@ public ApiResponse<String> uploadImage(
 
         memberService.uploadProfile(memberId, fileUrl);
 
-        return ApiResponse.onSuccess("사진 업로드 완료");
+        return ApiResponse.onSuccess(fileUrl);
     } catch (Exception e) {
         return ApiResponse.onFailure("400", "error", e.getMessage());
     }
