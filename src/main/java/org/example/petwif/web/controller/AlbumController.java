@@ -178,7 +178,7 @@ public class AlbumController {
     }
 
 
-    // 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함
+    // 4. 사용자 페이지에서 앨범 조회 => 나, 다른사람 포함
     @GetMapping("/users/{userId}/albums")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -193,6 +193,7 @@ public class AlbumController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType) {
         Member member = memberService.getMemberByToken(authorizationHeader);
+
         Slice<AlbumResponseDto.UserAlbumViewDto> albumSlice = albumQueryService.getMemberPageAlbums(pageOwnerId,member.getId(), page, sortType);
         AlbumResponseDto.UserAlbumViewListDto albumListDto = AlbumConverter.convertToUserAlbumViewListDto(albumSlice);
 
@@ -209,10 +210,14 @@ public class AlbumController {
     })
     @Operation(summary = "북마크한 앨범 조회 API", description = "사용자가 북마크한 앨범 리스트를 보는 API입니다. 앨범 세부 페이지에서 북마크한 사람 보는것과 다릅니다.")
     public ApiResponse<AlbumResponseDto.MemberBookmarkAlbumListDto> getMemberBookmarkAlbums(@RequestHeader("Authorization") String authorizationHeader,
-                                                                                            @RequestParam(name = "page", defaultValue = "0") Integer page){
+                                                                                            @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                                            @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Slice<Album> albumSlice = albumQueryService.getMemberBookmarkAlbums(member.getId(), page);
-        return ApiResponse.onSuccess(AlbumConverter.convertToMemberBookmarkAlbumListDto(albumSlice));
+
+        Slice<AlbumResponseDto.MemberBookmarkAlbumDto> albumSlice = albumQueryService.getMemberBookmarkAlbums(member.getId(), page, sortType);
+        AlbumResponseDto.MemberBookmarkAlbumListDto albumListDto = AlbumConverter.convertToMemberBookmarkAlbumListDto(albumSlice);
+
+        return ApiResponse.onSuccess(albumListDto);
     }
 
 

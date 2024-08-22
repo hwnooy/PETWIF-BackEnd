@@ -28,5 +28,5 @@ public interface AlbumQueryService {
     public Slice<AlbumResponseDto.UserAlbumViewDto> getMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType);
 
     //북마크한 앨범 조회
-    public Slice<Album> getMemberBookmarkAlbums(Long memberId, Integer page);
+    public Slice<AlbumResponseDto.MemberBookmarkAlbumDto> getMemberBookmarkAlbums(Long memberId, Integer page, AlbumSortType sortType);
 }

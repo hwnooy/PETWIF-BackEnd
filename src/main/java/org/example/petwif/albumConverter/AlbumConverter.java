@@ -182,11 +182,11 @@ public class AlbumConverter {
                 .build();
     }
 
-    public static AlbumResponseDto.MemberBookmarkAlbumListDto convertToMemberBookmarkAlbumListDto(Slice<Album> bookmarkedAlbums){
-            List<AlbumResponseDto.MemberBookmarkAlbumDto> memberBookmarkAlbumDtoList = bookmarkedAlbums.stream()
-                .map(AlbumConverter::convertToMemberBookmarkAlbumDto).collect(Collectors.toList());
+    public static AlbumResponseDto.MemberBookmarkAlbumListDto convertToMemberBookmarkAlbumListDto(Slice<AlbumResponseDto.MemberBookmarkAlbumDto> bookmarkedAlbums){
+        List<AlbumResponseDto.MemberBookmarkAlbumDto> albums = Optional.ofNullable(bookmarkedAlbums.getContent())
+                .orElse(Collections.emptyList());  // getContent가 null이면 빈 리스트 반환
             return AlbumResponseDto.MemberBookmarkAlbumListDto.builder()
-                    .bookmarkedAlbums(memberBookmarkAlbumDtoList)
+                    .bookmarkedAlbums(albums)
                     .listSize(bookmarkedAlbums.getSize())
                     .isFirst(bookmarkedAlbums.isFirst())
                     .isLast(bookmarkedAlbums.isLast())
