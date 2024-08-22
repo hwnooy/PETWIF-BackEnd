@@ -16,10 +16,10 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -65,13 +65,24 @@ public class ChatQueryServiceImpl implements ChatQueryService{
         Slice<ChatRoom> MemberPage = chatRoomRepository.findAllByMember(member, PageRequest.of(page, 10));
         Slice<ChatRoom> OtherPage = chatRoomRepository.findAllByOther(other, PageRequest.of(page, 10));
 
-        //member, other Slice 내용 통합 후 중복 제거
-        List<ChatRoom> ChatRoomList = Stream.concat(MemberPage.getContent().stream(), OtherPage.getContent().stream()).distinct().collect(Collectors.toList());
+        //member, other Slice 내용 통합
+        List<ChatRoom> ChatRoomList = new ArrayList<>();
+        ChatRoomList.addAll(MemberPage.getContent());
+        ChatRoomList.addAll(OtherPage.getContent());
+
+        //사용자가 나가지 않은 채팅방만 조회할 수 있게함
+        List<ChatRoom> chatRooms = ChatRoomList.stream().filter(chatRoom -> {
+            if (chatRoom.getMember().getId().equals(memberId)) {
+                return !chatRoom.isMemberStatus();
+            } else if (chatRoom.getOther().getId().equals(otherId)) {
+                return !chatRoom.isOtherStatus();
+            } return false;
+        }).distinct().collect(Collectors.toList());
 
         //Slice 생성
         boolean hasNext = ChatRoomList.size() > 10; //size가 10보다 클 경우 다음 페이지로 넘어감
 
-        return new SliceImpl<>(ChatRoomList, pageable, hasNext);
+        return new SliceImpl<>(chatRooms, pageable, hasNext);
     }
 
     //가장 최근 채팅 조회
