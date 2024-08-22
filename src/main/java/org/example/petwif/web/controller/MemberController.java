@@ -10,6 +10,7 @@ import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
+import org.example.petwif.service.StickerService.StickerService;
 import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -71,7 +72,7 @@ public class MemberController {
         }
     }
 
-    @PatchMapping("/addEtc")  // 이것도 완료, 나중에 accessToken 처리하기
+    @PatchMapping("/addEtc")
     public ApiResponse<String> addEtcInfo(@RequestHeader("Authorization") String authorizationHeader,
                                           @RequestBody MemberEtcInfoRequestDto dto) {
         Member member = memberService.getMemberByToken(authorizationHeader);
@@ -90,9 +91,10 @@ public class MemberController {
 
 
     @PatchMapping("/change/pw")   // 이것도 완료
-    public ApiResponse<String> changePassword(@RequestHeader("Authorization") String authorizationHeader,
-                                              @RequestBody PasswordChangeRequestDto dto){
-        Member member = memberService.getMemberByToken(authorizationHeader);
+    public ApiResponse<String> changePassword(@RequestParam String email, @Valid @RequestBody PasswordChangeRequestDto dto){
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + email));
+
         Long id = member.getId();
         try {
             if (memberService.changePassword(id, dto)) return ApiResponse.onSuccess("비밀번호 바꾸기 완료");
@@ -116,38 +118,36 @@ public class MemberController {
         }
     }
 
-    // db cascade 문제로 실패
     @DeleteMapping("/delete")
     public ApiResponse<String> deleteMember(@RequestParam("id") Long id){
         try {
             Member member = memberRepository.findByMemberId(id);
-            System.out.println(member);
             memberService.deleteMember(id);
-            return ApiResponse.onSuccess(member.getEmail()+"님 삭제 완료");
+            return ApiResponse.onSuccess("id : "+ id +" , "+ member.getEmail()+"님 삭제 완료");
         } catch (Exception e) {
             return ApiResponse.onFailure("500", "존재하지 않는 회원입니다. ", null);
         }
     }
 
-@PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-public ApiResponse<String> uploadImage(
-        @RequestHeader("Authorization") String authorizationHeader,
-        @RequestParam("file") MultipartFile file) {
+    @PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<String> uploadImage(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam("file") MultipartFile file) {
 
-    Member member = memberService.getMemberByToken(authorizationHeader);
-    Long memberId = member.getId();
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
 
-    try {
-        // S3에 파일 업로드 및 URL 반환
-        String keyName =  file.getOriginalFilename()+ "/"+ memberId;
-        String fileUrl = amazonS3Manager.uploadFile(keyName, file);
+        try {
+            // S3에 파일 업로드 및 URL 반환
+            String keyName =  file.getOriginalFilename()+ "/"+ memberId;
+            String fileUrl = amazonS3Manager.uploadFile(keyName, file);
 
-        memberService.uploadProfile(memberId, fileUrl);
+            memberService.uploadProfile(memberId, fileUrl);
 
-        return ApiResponse.onSuccess("사진 업로드 완료");
-    } catch (Exception e) {
-        return ApiResponse.onFailure("400", "error", e.getMessage());
+            return ApiResponse.onSuccess(fileUrl);
+        } catch (Exception e) {
+            return ApiResponse.onFailure("400", "error", e.getMessage());
+        }
     }
-}
 
 }

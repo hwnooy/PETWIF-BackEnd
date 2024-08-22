@@ -15,10 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.albumConverter.AlbumConverter;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
-import org.example.petwif.domain.entity.Album;
-import org.example.petwif.domain.entity.AlbumLike;
-import org.example.petwif.domain.entity.Member;
+import org.example.petwif.domain.entity.*;
 import org.example.petwif.domain.enums.AlbumSortType;
+import org.example.petwif.repository.AlbumRepository;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.albumService.*;
@@ -26,12 +25,14 @@ import org.example.petwif.validation.annotation.ExistAlbum;
 import org.example.petwif.validation.annotation.ExistMember;
 import org.example.petwif.web.dto.albumDto.AlbumRequestDto;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,7 +69,7 @@ public class AlbumController {
 
 
     //==앨범 수정==//
-    @PatchMapping(value = "/albums/{albumId}", consumes = "multipart/form-data")
+    @PatchMapping(value = "/albums/{albumId}")//, consumes = "multipart/form-data")
     @Operation(summary = "앨범 수정 API", description = "앨범을 생성 후 수정하는 API 입니다.")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -78,12 +79,11 @@ public class AlbumController {
     })
     public ApiResponse<AlbumResponseDto.UpdateResultDto> updateAlbum(@ExistAlbum @PathVariable("albumId") Long albumId,
                                                                      @RequestPart(value = "requestDto") AlbumRequestDto.UpdateRequestDto requestDto,
-                                                                     @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
-                                                                     @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
-                                                                     @RequestHeader("Authorization") String authorizationHeader)
-                                                                      {
+                                                                     //@RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
+                                                                     //@RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
+                                                                     @RequestHeader("Authorization") String authorizationHeader){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        Album updatedAlbum = albumService.updateAlbum(albumId, member.getId(), requestDto, coverImage, albumImages);
+        Album updatedAlbum = albumService.updateAlbum(albumId, member.getId(), requestDto);//, coverImage, albumImages);
         return ApiResponse.onSuccess(AlbumConverter.UpdatedAlbumResultDto(updatedAlbum));
     }
 
@@ -126,7 +126,7 @@ public class AlbumController {
     }
 
 
-    //== 2-1. 메인 페이지에서 앨범 조회, 스토리형식 ==//
+    //== 2-1. 메인 페이지에서 앨범 조회, 스토리형식 ==////slice완료
 
     @GetMapping("/stories")
     @ApiResponses({
@@ -136,13 +136,13 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "메인 페이지에서 스토리 형식으로 앨범 조회 API", description = "메인페이지에서 앨범 조회, 스토리 형식으로 조회하는 API입니다.")
-    public ApiResponse<AlbumResponseDto.StoryAlbumListDto> getStoryAlbums(@RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.StoryAlbumListDto> getStoryAlbums(@RequestHeader("Authorization") String authorizationHeader, @RequestParam(name = "page", defaultValue = "0") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.StoryAlbumListDto stories = albumQueryService.getStoryAlbum(member.getId());
-        return ApiResponse.onSuccess(stories);
+        Slice<Album> albumSlice = albumQueryService.getStoryAlbum(member.getId(), page);
+        return ApiResponse.onSuccess(AlbumConverter.convertToStoryAlbumResultListDto(albumSlice));
     }
 
-    //== 2-2, 메인 페이지에서 앨범 조회, 게시글 형식 ==//
+    //== 2-2, 메인 페이지에서 앨범 조회, 게시글 형식 ==////slice완료
     @GetMapping("/posts")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -151,13 +151,16 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "메인 페이지에서 게시글 형식으로 앨범 조회 API", description = "메인페이지에서 앨범 조회, 게시글 형식으로 조회하는 API입니다.")
-    public ApiResponse<AlbumResponseDto.MainPageAlbumListDto> getMainpageAlbums(@RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.MainPageAlbumListDto> getMainpageAlbums(@RequestHeader("Authorization") String authorizationHeader,
+                                                                                @RequestParam(name = "page", defaultValue = "0") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.MainPageAlbumListDto posts = albumQueryService.getMainpageAlbum(member.getId());
-        return ApiResponse.onSuccess(posts);
+        Slice<AlbumResponseDto.MainPageAlbumResultDto> albumSlice = albumQueryService.getMainpageAlbum(member.getId(), page);
+        AlbumResponseDto.MainPageAlbumListDto albumListDto = AlbumConverter.convertToMainpageAlbumResultListDto(albumSlice);
+
+        return ApiResponse.onSuccess(albumListDto);
     }
 
-    //== 3. 탐색 페이지에서 앨범 조회 ==// //탐색 화면입니다.
+    //== 3. 탐색 페이지에서 앨범 조회 ==// //탐색 화면입니다.//slice완료
     @GetMapping("/albums/search")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -166,16 +169,16 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "탐색 페이지에서 앨범 조회 API", description = "탐색 페이지에 들어갔을 때 앨범 리스트를 보는 API입니다.")
-    public ApiResponse<AlbumResponseDto.SearchAlbumListDto> getSearchAlbums(@RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.SearchAlbumListDto> getSearchAlbums(@RequestHeader("Authorization") String authorizationHeader,
+                                                                            @RequestParam(name = "page", defaultValue = "0") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.SearchAlbumListDto albums = albumQueryService.getSearchableAlbums(member.getId());
+        Slice<Album> albumSlice = albumQueryService.getSearchableAlbums(member.getId(), page);
+        return ApiResponse.onSuccess(AlbumConverter.convertToSearchAlbumListDto(albumSlice));
 
-        //return
-        return ApiResponse.onSuccess(albums);
     }
 
 
-    // 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함
+    // 4. 사용자 페이지에서 앨범 조회 => 나, 다른사람 포함
     @GetMapping("/users/{userId}/albums")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -187,13 +190,17 @@ public class AlbumController {
     public ApiResponse<AlbumResponseDto.UserAlbumViewListDto> getUserAlbums(
             @RequestHeader("Authorization") String authorizationHeader,
             @PathVariable("userId") Long pageOwnerId,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType) {
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.UserAlbumViewListDto albumListDto = albumQueryService.getMemberPageAlbums(member.getId(), pageOwnerId, sortType);
+
+        Slice<AlbumResponseDto.UserAlbumViewDto> albumSlice = albumQueryService.getMemberPageAlbums(pageOwnerId,member.getId(), page, sortType);
+        AlbumResponseDto.UserAlbumViewListDto albumListDto = AlbumConverter.convertToUserAlbumViewListDto(albumSlice);
+
         return ApiResponse.onSuccess(albumListDto);
     }
 
-    // 5. 북마크한 앨범 에서 앨범 조회
+    // 5. 북마크한 앨범 에서 앨범 조회 //slice완료
     @GetMapping("/albums/memberBookmark")
     @ApiResponses({
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
@@ -202,10 +209,15 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "북마크한 앨범 조회 API", description = "사용자가 북마크한 앨범 리스트를 보는 API입니다. 앨범 세부 페이지에서 북마크한 사람 보는것과 다릅니다.")
-    public ApiResponse<AlbumResponseDto.MemberBookmarkAlbumListDto> getMemberBookmarkAlbums(@RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.MemberBookmarkAlbumListDto> getMemberBookmarkAlbums(@RequestHeader("Authorization") String authorizationHeader,
+                                                                                            @RequestParam(name = "page", defaultValue = "0") Integer page,
+                                                                                            @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        AlbumResponseDto.MemberBookmarkAlbumListDto bookmarkedAlbums = albumQueryService.getMemberBookmarkAlbums(member.getId());
-        return ApiResponse.onSuccess(bookmarkedAlbums);
+
+        Slice<AlbumResponseDto.MemberBookmarkAlbumDto> albumSlice = albumQueryService.getMemberBookmarkAlbums(member.getId(), page, sortType);
+        AlbumResponseDto.MemberBookmarkAlbumListDto albumListDto = AlbumConverter.convertToMemberBookmarkAlbumListDto(albumSlice);
+
+        return ApiResponse.onSuccess(albumListDto);
     }
 
 
@@ -254,10 +266,25 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 좋아요 리스트 조회 API", description = "특정 앨범에 대해 좋아요를 누른 사람의 목록이 나오는 API 입니다. 좋아요가 없다면 에러")
-    public ApiResponse<AlbumResponseDto.LikeListDto> getAlbumList(@ExistAlbum @PathVariable Long albumId, @RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.LikeListDto> getLikeList(@ExistAlbum @PathVariable Long albumId,
+                                                                  @RequestHeader("Authorization") String authorizationHeader,
+                                                                  @RequestParam(name = "page", defaultValue = "0") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        List<AlbumResponseDto.LikeResultDto> likes  = albumLikeService.getAlbumLikes(albumId, member.getId());
-        AlbumResponseDto.LikeListDto likeListDto = new AlbumResponseDto.LikeListDto(likes);
+        Slice<AlbumLike> albumLikeSlice = albumLikeService.getAlbumLikes(albumId, member.getId(), page);
+        List<AlbumResponseDto.LikeResultDto> likes = albumLikeSlice.getContent().stream()
+                .map(like -> new AlbumResponseDto.LikeResultDto(
+                        like.getMember().getId(),
+                        like.getMember().getNickname(),
+                        like.getMember().getProfile_url()))
+                .collect(Collectors.toList());
+
+        AlbumResponseDto.LikeListDto likeListDto = AlbumResponseDto.LikeListDto.builder()
+                .likes(likes)
+                .listSize(likes.size())
+                .isFirst(albumLikeSlice.isFirst())
+                .isLast(albumLikeSlice.isLast())
+                .hasNext(albumLikeSlice.hasNext())
+                .build();
         return ApiResponse.onSuccess(likeListDto);
     }
 
@@ -303,10 +330,25 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
     @Operation(summary = "앨범 북마크 리스트 조회 API", description = "앨범내애 북마크 버튼을 눌렀을 때 북마크 목록이 나오는 API 입니다")
-    public ApiResponse<AlbumResponseDto.BookmarkListDto> getBookmarkList(@ExistAlbum @PathVariable Long albumId, @RequestHeader("Authorization") String authorizationHeader){
+    public ApiResponse<AlbumResponseDto.BookmarkListDto> getBookmarkList(@ExistAlbum @PathVariable Long albumId,
+                                                                         @RequestHeader("Authorization") String authorizationHeader,
+                                                                         @RequestParam(name = "page") Integer page){
         Member member = memberService.getMemberByToken(authorizationHeader);
-        List<AlbumResponseDto.BookmarkResultDto> bookmarks = albumBookmarkService.getAlbumBookmarks(albumId, member.getId());
-        AlbumResponseDto.BookmarkListDto bookmarkListDto = new AlbumResponseDto.BookmarkListDto(bookmarks);
+        Slice<AlbumBookmark> memberBookmarkSlice = albumBookmarkService.getAlbumBookmarks(albumId, member.getId(), page);
+        List<AlbumResponseDto.BookmarkResultDto> bookmarks = memberBookmarkSlice.getContent().stream()
+                .map(bookmark -> new AlbumResponseDto.BookmarkResultDto(
+                        bookmark.getMember().getId(),
+                        bookmark.getMember().getNickname(),
+                        bookmark.getMember().getProfile_url()))
+                .collect(Collectors.toList());
+
+        AlbumResponseDto.BookmarkListDto bookmarkListDto = AlbumResponseDto.BookmarkListDto.builder()
+                .bookmarks(bookmarks)
+                .listSize(bookmarks.size())
+                .isFirst(memberBookmarkSlice.isFirst())
+                .isLast(memberBookmarkSlice.isLast())
+                .hasNext(memberBookmarkSlice.hasNext())
+                .build();
         return ApiResponse.onSuccess(bookmarkListDto);
     }
 

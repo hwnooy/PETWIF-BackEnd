@@ -3,6 +3,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.petwif.domain.entity.Comment;
+import org.example.petwif.domain.entity.CommentImage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +17,7 @@ public class CommentResponseDto {
     private Long id;
     private String content;
     private String name;
+    private List<String> imageUrl;
   
     private List<CommentResponseDto> childComments; // 대댓글 목록
 
@@ -26,8 +28,12 @@ public class CommentResponseDto {
         this.id = comment.getId();
         this.content = comment.getContent();
         this.name = comment.getMember().getName();
+        this.imageUrl=comment.getCommentImages().stream()
+                .map(CommentImage::getPictureUrl)
+                .collect(Collectors.toList());
         this.childComments = comment.getChildComments().stream()
                 .map(CommentResponseDto::new)
                 .collect(Collectors.toList()); // 대댓글 리스트를 재귀적으로 처리
+
     }
 }

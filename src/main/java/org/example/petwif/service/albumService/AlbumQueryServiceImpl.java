@@ -6,19 +6,18 @@ import org.example.petwif.apiPayload.code.status.ErrorStatus;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.*;
 import org.example.petwif.domain.enums.AlbumSortType;
+import org.example.petwif.domain.enums.FriendStatus;
 import org.example.petwif.domain.enums.Scope;
 import org.example.petwif.repository.*;
 import org.example.petwif.repository.albumRepository.AlbumBookmarkRepository;
 import org.example.petwif.repository.albumRepository.AlbumLikeRepository;
 import org.example.petwif.web.dto.CommentDto.CommentResponseDto;
 import org.example.petwif.web.dto.albumDto.AlbumResponseDto;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,10 +46,14 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     public AlbumResponseDto.DetailResultDto getAlbumDetails(Long albumId, Long memberId){
         Album album =  albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
-
         //차단, 친구인지 확인
        albumCheckAccessService.checkAccess(album, memberId);
 
+       List<String> albumImageUrls = album.getAlbumImages().stream()
+               .map(AlbumImage::getImageURL)
+               .collect(Collectors.toList());;
+       boolean isLiked = albumLikeRepository.existsByAlbumAndMemberId(album, memberId);
+       boolean isBookmarked = albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId);
 
        List<Comment> comments = commentRepository.findByAlbum(album); //댓글 리스트
        return AlbumResponseDto.DetailResultDto.builder()
@@ -58,40 +61,42 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                .title(album.getTitle())
                .content(album.getContent())
                .scope(album.getScope())
-               .createdAt(album.getCreatedAt())
                .updatedAt(album.getUpdatedAt())
-               .coverImage(album.getCoverImage())
-               .albumImages(new ArrayList<>(album.getAlbumImages()))
+               .updatedAt(album.getUpdatedAt())
+               .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
+               .albumImages(albumImageUrls)
                .viewCount(album.getView())
                .likeCount(albumLikeRepository.countByAlbum(album))
                .everyCommentCount(comments.size())
                .bookmarkCount(albumBookmarkRepository.countByAlbum(album))
+               .isLiked(isLiked)
+               .isBookmarked(isBookmarked)
                .comments(comments.stream()
                        .map(c -> new CommentResponseDto(c))
                        .collect(Collectors.toList()))
+
                .build();
        }
 
     //=============================== 2. 앨범 조회 -> 메인 페이지 (스토리형식 + 게시글형식)================================//
     // 2-1. 앨범 조회 -> 스토리형식 조회
-    @Override
-    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId) {
+/*    @Override
+    public AlbumResponseDto.StoryAlbumListDto getStoryAlbum(Long memberId, Integer page) {
 
         List<Member> friends = memberRepository.findFriendsByMemberId(memberId);
         List<AlbumResponseDto.StoryAlbumResultDto> stories = new ArrayList<>();
 
-       for(Member friend : friends){
-        List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(friend.getId());
-        for (Album album : albums){
-           if(albumCheckAccessService.checkAccessInBool(album, memberId) && findFrindAndAllAlbum(album))
-                stories.add(convertToStoryAlbumResultDto(album));
-
+        for(Member friend : friends){
+            List<Album> albums = albumRepository.findByMemberIdOrderByUpdatedAtDesc(friend.getId());
+            for (Album album : albums){
+                if(albumCheckAccessService.checkAccessInBool(album, memberId) && findScope(album))
+                    stories.add(convertToStoryAlbumResultDto(album));
+            }
         }
-       }
         return new AlbumResponseDto.StoryAlbumListDto(stories);
     }
 
-    private boolean findFrindAndAllAlbum(Album album){
+    private boolean findScope(Album album){
         if(album.getScope().equals(Scope.FRIEND) || album.getScope().equals(Scope.ALL)){
             return true;
         }
@@ -104,40 +109,69 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .albumId(album.getId())
                 .nickName(album.getMember().getNickname())
                 .profileImageUrl(album.getMember().getProfile_url())
-                .createdAt(album.getCreatedAt())
+                .updatedAT(album.getUpdatedAt())
                 .build();
+    }*/
+
+    //Slice 포함해서
+    @Override
+    public Slice<Album> getStoryAlbum(Long memberId, Integer page) {
+       // 친구 목록 조회
+        List<Friend> friendList = friendRepository.findByMember_IdAndStatus(memberId, FriendStatus.ACCEPTED);
+        if (friendList.isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
+        List<Long> friendIds = friendList.stream()
+                .map(friend -> friend.getFriend().getId()).collect(Collectors.toList());
+
+        Slice<Album> friendsAlbums = albumRepository.findByMemberIdInOrderByUpdatedAtDesc(friendIds, PageRequest.of(page, 10));
+        List<Album> accessibleAlbums = friendsAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope() != Scope.MY)
+                .collect(Collectors.toList());
+
+        return new SliceImpl<Album>(accessibleAlbums, PageRequest.of(page, 10),friendsAlbums.hasNext());
+
     }
+
 
     // 2-2. 앨범 조회 -> 게시글 형식 조회
     @Override
-    public AlbumResponseDto.MainPageAlbumListDto getMainpageAlbum(Long memberId){
-        List<Member> notFriends = memberRepository.findNonFriendsByMemberId(memberId);
-        List<AlbumResponseDto.MainPageAlbumResultDto> posts = new ArrayList<>();
+    public Slice<AlbumResponseDto.MainPageAlbumResultDto> getMainpageAlbum(Long memberId, Integer page){
+      /*  List<Member> notFriendList = memberRepository.findNonFriendsByMemberId(memberId);
+        if(notFriendList.isEmpty()){return new SliceImpl<>(Collections.emptyList());}
+        List<Long> notFriendIds = notFriendList.stream()
+                .map(member -> member.getId()).collect(Collectors.toList());*/
 
-        for(Member notFriend : notFriends){
-            List<Album> albums = albumRepository.findByMemberIdOrderByCreatedAtDesc(notFriend.getId());
-            for (Album album : albums){
-                List<Comment> comments = commentRepository.findByAlbum(album);
-                if(albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope().equals(Scope.ALL))
-                    posts.add(convertToPostAlbumResultDto(album, comments));
+        //친구 인 사람 목록 조회, 아이디까지 찾았지 !! 여기서 빼주는거임!
+        List<Friend> friendList = friendRepository.findByMember_IdAndStatus(memberId, FriendStatus.ACCEPTED);
+        List<Long> friendIds = friendList.stream()
+                .map(friend -> friend.getFriend().getId()).collect(Collectors.toList());
 
-            }
+        friendIds.add(memberId); //나도 뻬줘야지!! 나는 추천 앨범에 있으면 안됨!
+
+        Slice<Album> notFriendAlbums = albumRepository.findPublicAlbumsByNonFriends(friendIds, Scope.ALL, PageRequest.of(page, 10));
+        if(notFriendAlbums.isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
         }
-        return new AlbumResponseDto.MainPageAlbumListDto(posts);
-         //댓글 리스트
+
+        // 그사람들중에서 앨범 공개범위가 all인 앨범들을 slice에 저장
+        return notFriendAlbums.map(album -> convertToMainPageAlbumResultDto(album, memberId));
+
     }
 
-    private AlbumResponseDto.MainPageAlbumResultDto convertToPostAlbumResultDto(Album album, List<Comment> comments){
+    private AlbumResponseDto.MainPageAlbumResultDto convertToMainPageAlbumResultDto(Album album, Long memberId) {
         return AlbumResponseDto.MainPageAlbumResultDto.builder()
                 .albumId(album.getId())
                 .content(album.getContent())
-                .createdAt(album.getCreatedAt())
-                .coverImage(album.getCoverImage())
+                .updatedAT(album.getUpdatedAt())
+                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
                 .likeCount(album.getAlbumLikes().size())
-                .nickName(album.getMember().getNickname())
-                .profileImageUrl(album.getMember().getProfile_url())
+                .nickName(Optional.ofNullable(album.getMember()).map(Member::getNickname).orElse("Unknown"))
+                .profileImageUrl(Optional.ofNullable(album.getMember()).map(Member::getProfile_url).orElse(null))
                 .memberId(album.getMember().getId())
-                .comments(comments.stream()
+                .isLiked(albumLikeRepository.existsByAlbumAndMemberId(album, memberId)) // 로그인한 사용자가 좋아요 했는지
+                .isBookmarked(albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId)) // 북마크 했는지
+                .comments(commentRepository.findByAlbum(album).stream()
                         .map(c -> new CommentResponseDto(c))
                         .collect(Collectors.toList()))
                 .build();
@@ -146,48 +180,43 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
 
     //=============================== 3. 탐색 페이지에서 앨범 조회 서비스================================//
     @Override
-    public AlbumResponseDto.SearchAlbumListDto getSearchableAlbums(Long memberId) {
-        List<Album> albums = albumRepository.findAllByOrderByCreatedAtDesc();
+    public Slice<Album> getSearchableAlbums(Long memberId, Integer page) {
+        List<Member> allMemberList = memberRepository.findAll();
+        if (allMemberList.isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList());
+        }
+        List<Long> allMemberIds = allMemberList.stream()
+                .map(member -> member.getId()).collect(Collectors.toList());
+        allMemberIds.remove(memberId); //자신의 앨범 제외!
 
-        List<AlbumResponseDto.SearchAlbumDto> accessibleAlbums = albums.stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
-                .map(this::convertToSearchAlbumDto)
+
+        Slice<Album> allMemberAlbums = albumRepository.findAllByMemberIds(allMemberIds, PageRequest.of(page, 10));
+        List<Album> accessibleAlbums = allMemberAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope() != Scope.MY)
                 .collect(Collectors.toList());
 
-        if(accessibleAlbums.isEmpty()){
-            throw new GeneralException(ErrorStatus.ALBUM_LIST_NOT_FOUND);
-        }
 
-        return new AlbumResponseDto.SearchAlbumListDto(accessibleAlbums);
-    }
+        return new SliceImpl<Album>(accessibleAlbums, PageRequest.of(page,10), allMemberAlbums.hasNext());
 
-    @Builder
-    private AlbumResponseDto.SearchAlbumDto convertToSearchAlbumDto(Album album) {
-        return AlbumResponseDto.SearchAlbumDto.builder()
-                .albumId(album.getId())
-                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
-                .likeCount(albumLikeRepository.countByAlbum(album))
-                .bookmarkCount(albumBookmarkRepository.countByAlbum(album))
-                .commentCount(commentRepository.findByAlbum(album).size())
-                .build();
     }
 
 
 
     //=========================== 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함============================//
     @Override
-    public AlbumResponseDto.UserAlbumViewListDto getMemberPageAlbums(Long memberId, Long pageOwnerId, AlbumSortType sortType) {
-        List<Album> albums = albumRepository.findAlbumsByMemberId(pageOwnerId);
-        List<AlbumResponseDto.UserAlbumViewDto> albumDtos = albums.stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
+    public Slice<AlbumResponseDto.UserAlbumViewDto> getMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType) {
+        Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberId(pageOwnerId);
+
+        List<AlbumResponseDto.UserAlbumViewDto> albumDtos = allPageownerAlbums.stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))
                 .map(this::convertToUserAlbumDto)
                 .sorted(getComparator(sortType))
                 .collect(Collectors.toList());
+        if(albumDtos.isEmpty()){
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
 
-        return AlbumResponseDto.UserAlbumViewListDto.builder()
-                .albums(albumDtos)
-                .totalAlbumCount(albumDtos.size())
-                .build();
+        return new SliceImpl<>(albumDtos, PageRequest.of(page, 10), allPageownerAlbums.hasNext());
     }
 
     private AlbumResponseDto.UserAlbumViewDto convertToUserAlbumDto(Album album) {
@@ -197,6 +226,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .likeCount(album.getAlbumLikes().size())
                 .bookmarkCount(album.getAlbumBookmarks().size())
                 .commentCount(album.getCommentList().size())
+                .updatedAT(album.getUpdatedAt())
                 .build();
     }
 
@@ -210,44 +240,54 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 return Comparator.comparingInt(AlbumResponseDto.UserAlbumViewDto::getBookmarkCount).reversed();
             case LATEST:
             default:
-                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getAlbumId).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
+                return Comparator.comparing(AlbumResponseDto.UserAlbumViewDto::getUpdatedAT).reversed(); // 최신순은 앨범 ID를 기준으로 역순 정렬
         }
     }
 
 
-    //=================================== 5. 북마크한 앨범 에서 앨범 조회====================================//
+    //=================================== 5. 북마크한 앨범 에서 앨범 조회 ====================================//
     @Override
-    public AlbumResponseDto.MemberBookmarkAlbumListDto getMemberBookmarkAlbums(Long memberId){
-        List<Album> albums = albumRepository.findAll().stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
-                .collect(Collectors.toList());
-
+    public Slice<AlbumResponseDto.MemberBookmarkAlbumDto> getMemberBookmarkAlbums(Long memberId, Integer page, AlbumSortType sortType){
         // 접근 가능한 앨범 중에서 사용자가 북마크한 앨범만 필터링
         List<Long> bookmarkedAlbumIds = albumBookmarkRepository.findBookmarkedAlbumIdsByMemberId(memberId);
-        List<AlbumResponseDto.MemberBookmarkAlbumDto> bookmarkedAlbums = albums.stream()
-                .filter(album -> bookmarkedAlbumIds.contains(album.getId()))
+
+        Slice<Album> thisMemberBookmarkedAlbums = albumRepository.findAllByIds(bookmarkedAlbumIds, PageRequest.of(page,10));
+
+        List<AlbumResponseDto.MemberBookmarkAlbumDto> accessibleAlbums = thisMemberBookmarkedAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
                 .map(this::convertToMemberBookmarkAlbumDto)
+                .sorted(getBookmarkComparator(sortType))
                 .collect(Collectors.toList());
 
-
-        // 조회된 앨범이 없다면 예외 발생
-        if (bookmarkedAlbums.isEmpty()) {
-            throw new GeneralException(ErrorStatus.ALBUM_LIST_NOT_FOUND);
+        if (accessibleAlbums.isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
         }
-
-        // 결과를 MemberBookmarkAlbumListDto 객체로 래핑하여 반환
-        return new AlbumResponseDto.MemberBookmarkAlbumListDto(bookmarkedAlbums);
-
+        return new SliceImpl<>(accessibleAlbums, PageRequest.of(page, 10), thisMemberBookmarkedAlbums.hasNext());
     }
 
     private AlbumResponseDto.MemberBookmarkAlbumDto convertToMemberBookmarkAlbumDto(Album album) {
         return AlbumResponseDto.MemberBookmarkAlbumDto.builder()
                 .albumId(album.getId())
                 .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
-                .likeCount(albumLikeRepository.countByAlbum(album))
-                .bookmarkCount(albumBookmarkRepository.countByAlbum(album))
-                .commentCount(commentRepository.findByAlbum(album).size())
+                .likeCount(album.getAlbumLikes().size())
+                .bookmarkCount(album.getAlbumBookmarks().size())
+                .commentCount(album.getCommentList().size())
+                .updatedAT(album.getUpdatedAt())
                 .build();
+    }
+
+    private Comparator<AlbumResponseDto.MemberBookmarkAlbumDto> getBookmarkComparator(AlbumSortType sortType) {
+        switch (sortType) {
+            case LIKES:
+                return Comparator.comparingInt(AlbumResponseDto.MemberBookmarkAlbumDto::getLikeCount).reversed();
+            case COMMENTS:
+                return Comparator.comparingInt(AlbumResponseDto.MemberBookmarkAlbumDto::getCommentCount).reversed();
+            case BOOKMARKS:
+                return Comparator.comparingInt(AlbumResponseDto.MemberBookmarkAlbumDto::getBookmarkCount).reversed();
+            case LATEST:
+            default:
+                return Comparator.comparing(AlbumResponseDto.MemberBookmarkAlbumDto::getUpdatedAT).reversed();
+        }
     }
 
 
