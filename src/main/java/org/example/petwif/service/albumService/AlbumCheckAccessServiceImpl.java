@@ -81,4 +81,36 @@ public class AlbumCheckAccessServiceImpl implements AlbumCheckAccessService{
         }
         return true;
     }
+    @Override
+    public boolean checkAccessInBoolForSearch(Album album, Long currentUserId){
+        // 차단 여부 확인 즉, 앨범의 주인이 현재 사용자를 확인했는지
+        if (blockRepository.existsByMember_IdAndTarget_Id(album.getMember().getId(), currentUserId)) {
+            return false;
+        }
+        if(blockRepository.existsByMember_IdAndTarget_Id(currentUserId, album.getMember().getId())){
+            return false;
+        }
+        // 공개 범위에 따른 접근 권한 확인
+        switch (album.getScope()) {
+            case MY:
+                if (!album.getMember().getId().equals(currentUserId)) {
+                    return false;
+                }
+                break;
+            case FRIEND:
+                if(album.getMember().getId().equals(currentUserId)){
+                    return true;
+                }
+                else if (!friendRepository.isFriend(currentUserId, album.getMember().getId(), FriendStatus.ACCEPTED)) {
+                    return false; //공개 범위가 친구인데 currentUserId가 album의 작성자와 친구가 아니면 false 리턴
+                }
+                break;
+            case ALL:
+                // 전체 공개이므로 추가 검증 필요 없음
+                return true;
+            default:
+                return true;
+        }
+        return true;
+    }
 }

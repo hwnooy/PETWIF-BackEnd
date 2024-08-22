@@ -177,23 +177,24 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .build();
     }
 
-
     //=============================== 3. 탐색 페이지에서 앨범 조회 서비스================================//
+    //08.22 [fix] 사실상 자신의 앨범을 제외하고 조회 가능한 앨범 전체 조회였습니다.
+    // 근데 차단한 사용자의 앨범은 나오지 않게 하도록 추가 요구사항이 있어서 수정 하였습니다.
     @Override
     public Slice<Album> getSearchableAlbums(Long memberId, Integer page) {
-        List<Member> allMemberList = memberRepository.findAll();
+        List<Member> allMemberList = memberRepository.findAll(); //일단 모든 사용자 다 가져와
         if (allMemberList.isEmpty()) {
             return new SliceImpl<>(Collections.emptyList());
         }
         List<Long> allMemberIds = allMemberList.stream()
-                .map(member -> member.getId()).collect(Collectors.toList());
-        allMemberIds.remove(memberId); //자신의 앨범 제외!
+                .map(member -> member.getId()).collect(Collectors.toList()); // 그사용자의 memberId 다 가져와
+        allMemberIds.remove(memberId); //자신의 앨범 제외! => 자신의 memberId 빼주고
 
 
-        Slice<Album> allMemberAlbums = albumRepository.findAllByMemberIds(allMemberIds, PageRequest.of(page, 10));
+        Slice<Album> allMemberAlbums = albumRepository.findAllByMemberIds(allMemberIds, PageRequest.of(page, 10)); //memberId로 앨범 다가져와
         List<Album> accessibleAlbums = allMemberAlbums.getContent().stream()
-                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId) && album.getScope() != Scope.MY)
-                .collect(Collectors.toList());
+                .filter(album -> albumCheckAccessService.checkAccessInBoolForSearch(album, memberId) && album.getScope() != Scope.MY)
+                .collect(Collectors.toList()); //그중 조회 가능한거 필터해줘
 
 
         return new SliceImpl<Album>(accessibleAlbums, PageRequest.of(page,10), allMemberAlbums.hasNext());
