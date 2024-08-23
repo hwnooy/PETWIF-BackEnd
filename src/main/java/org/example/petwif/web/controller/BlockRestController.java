@@ -86,11 +86,11 @@ public class BlockRestController {
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 차단 해제를 하는 멤버의 아이디(사용자), request header 입니다!")
     })
     public ApiResponse<Void> unblockMember(@RequestHeader("Authorization") String authorizationHeader,
-                                           @RequestBody @Valid BlockRequestDTO.BlockDTO request) {
+                                           @RequestParam String nickname) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Member target = memberService.getMemberByNickname(request.getNickname());
+        Member target = memberService.getMemberByNickname(nickname);
         Long targetId = target.getId();
 
         blockCommandService.unblockMember(memberId, targetId);
