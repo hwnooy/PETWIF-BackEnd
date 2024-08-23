@@ -1,4 +1,4 @@
-/*
+
 package org.example.petwif.repository;
 
 import org.example.petwif.domain.entity.MemberSticker;
@@ -10,4 +10,4 @@ import java.util.List;
 public interface MemberStickerRepository extends JpaRepository<MemberSticker, Long> {
     //List<MemberSticker> findByMemberId(Long memberId);
 }
-*/
+

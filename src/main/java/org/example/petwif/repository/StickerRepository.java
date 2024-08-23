@@ -1,4 +1,4 @@
-/*
+
 package org.example.petwif.repository;
 
 import org.example.petwif.domain.entity.Sticker;
@@ -19,4 +19,4 @@ public interface StickerRepository extends JpaRepository<Sticker, Long> {
 
     Optional<Sticker> findByStickerType(StickerType stickerType);
 }
-*/
+

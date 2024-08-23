@@ -21,7 +21,7 @@ public class MemberService {
     private final BCryptPasswordEncoder encoder;
     private final TokenProvider tokenProvider;
 
-    @Transactional
+    @Transactional   // 이메일로 회원가입할 때 멤버 생성자
     public EmailLoginResponse EmailSignup(EmailSignupRequestDTO dto) {
         // 동일한 이메일로 회원가입 안 됨, Optional<Member>와 isPresent()로 존재여부 찾아내기
         if (memberRepository.checkEmail(dto.getEmail(), "PETWIF").isPresent()) {
@@ -43,6 +43,7 @@ public class MemberService {
             member.setEmail(dto.getEmail());
             member.setPw(encoder.encode(pw1));
             member.setOauthProvider("PETWIF");
+            // 여기에 추가로 스티커 로직 구현
             memberRepository.save(member);
             return mapMemberToResponse(member);
         }
@@ -166,7 +167,7 @@ public class MemberService {
         memberRepository.deleteById(id);
     }
 
-    @Transactional
+    @Transactional   // 카카오 회원가입 할 때의 멤버 생성자
     public Long createUser(String email) {
         Member user = Member.builder()
                 .email(email)

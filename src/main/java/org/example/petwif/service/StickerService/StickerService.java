@@ -1,4 +1,4 @@
-/*
+
 package org.example.petwif.service.StickerService;
 
 import org.example.petwif.S3.AmazonS3Manager;
@@ -20,4 +20,4 @@ public interface StickerService {
 
     //void putStickerInDB(MultipartFile stickerImage, AlbumRequestDto.StickerRequestDto requestDto, Long memberId);
 }
-*/
+

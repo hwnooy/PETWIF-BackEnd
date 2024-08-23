@@ -1,4 +1,4 @@
-/*
+
 package org.example.petwif.service.StickerService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,20 +35,21 @@ import java.util.stream.Collectors;
 public class StickerServiceImpl implements StickerService{
 
     private final StickerRepository stickerRepository;
+    private final MemberRepository memberRepository;
     @Override
     public StickerResponseDto.StickerResultListDto getMyStickers(){
-        Sticker sticker1 = new Sticker();
-        Sticker sticker4= new Sticker();
-        Sticker sticker6 = new Sticker();
-        Sticker sticker7 = new Sticker();
-        Sticker sticker11 = new Sticker();
-        Sticker sticker12 = new Sticker();
-        sticker1 = stickerRepository.findById(1L);
-        sticker4 = stickerRepository.findById(4L);
-        sticker6 = stickerRepository.findById(6L);
-        sticker7 = stickerRepository.findById(7L);
-        sticker11 = stickerRepository.findById(11L);
-        sticker12 = stickerRepository.findById(12L);
+//        Sticker sticker1 = new Sticker();
+//        Sticker sticker4= new Sticker();
+//        Sticker sticker6 = new Sticker();
+//        Sticker sticker7 = new Sticker();
+//        Sticker sticker11 = new Sticker();
+//        Sticker sticker12 = new Sticker();
+        Sticker sticker1 = stickerRepository.findById(1L);
+        Sticker sticker4 = stickerRepository.findById(4L);
+        Sticker sticker6 = stickerRepository.findById(6L);
+        Sticker sticker7 = stickerRepository.findById(7L);
+        Sticker sticker11 = stickerRepository.findById(11L);
+        Sticker sticker12 = stickerRepository.findById(12L);
 
         List<Sticker> stickers = new ArrayList<>();
         stickers.add(sticker1);
@@ -63,19 +64,19 @@ public class StickerServiceImpl implements StickerService{
 
         return new StickerResponseDto.StickerResultListDto(stickerResultDtos);
     }
-*/
-/*
-    @Override
-    public StickerResponseDto.StickerResultListDto getMarketStickers(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
-        List<StickerResponseDto.StickerResultDto> stickerResultDtos = stickerRepository.findStickersByStickerType(StickerType.FORSALE).stream()
-                .map(this::convertToStickerResultDto)
-                .collect(Collectors.toList());
 
-        return new StickerResponseDto.StickerResultListDto(stickerResultDtos);
-    }
-*//*
+
+//    @Override
+//    public StickerResponseDto.StickerResultListDto getMarketStickers(Long memberId) {
+//        Member member = memberRepository.findById(memberId)
+//                .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
+//        List<StickerResponseDto.StickerResultDto> stickerResultDtos = stickerRepository.findStickersByStickerType(StickerType.FORSALE).stream()
+//                .map(this::convertToStickerResultDto)
+//                .collect(Collectors.toList());
+//
+//        return new StickerResponseDto.StickerResultListDto(stickerResultDtos);
+//    }
+
 
 
     // Entity를 DTO로 변환
@@ -89,4 +90,4 @@ public class StickerServiceImpl implements StickerService{
     }
 
 }
-*/
+
