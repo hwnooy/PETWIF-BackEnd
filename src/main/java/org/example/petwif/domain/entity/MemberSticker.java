@@ -1,4 +1,3 @@
-/*
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
@@ -30,7 +29,4 @@ public class MemberSticker extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-
-
 }
-*/

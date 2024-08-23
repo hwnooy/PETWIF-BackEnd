@@ -6,6 +6,8 @@ import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.StickerType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,4 +26,9 @@ public class Sticker {
 
     @Enumerated(EnumType.STRING)
     private StickerType stickerType;
+
+    @OneToMany(mappedBy = "sticker", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<MemberSticker> memberStickerList = new ArrayList<>();
+
 }

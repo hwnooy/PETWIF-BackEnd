@@ -47,6 +47,10 @@ public class Album extends BaseEntity {
     @Builder.Default
     private List<Comment> commentList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<AlbumReport> albumReports = new ArrayList<>();
+
    // @Column(nullable = false)
     private String title;
 
