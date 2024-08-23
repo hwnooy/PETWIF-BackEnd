@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    Optional<ChatRoom> findByMemberIdAndOtherIdAndChatRoomStatus(Long memberId, Long otherId, ChatRoomStatus status); //채팅방 생성 중복 처리
+    Optional<ChatRoom> findByMemberIdAndOtherId(Long memberId, Long otherId); //채팅방 중복 생성 방지
 
     Optional<ChatRoom> findChatRoomById(Long id);
 

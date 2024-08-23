@@ -4,7 +4,6 @@ import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.springframework.data.domain.Slice;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ChatQueryService {
