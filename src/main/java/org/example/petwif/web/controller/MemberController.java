@@ -60,12 +60,48 @@ public class MemberController {
         Long id = member.getId();
         try{
             if (memberService.checkNickName(id, nickname)){
-                return ApiResponse.onSuccess("닉네임 변경 성공");
+                String nick = nickname.getNickname();
+                return ApiResponse.onSuccess(nick+"으로 닉네임 변경 성공");
             } else {
                 return ApiResponse.onFailure("400", "이미 사용중인 닉네임니다.", "duplicated nickname");
             }
         } catch(Exception e){
             return ApiResponse.onFailure("500", "error", "internal error");
+        }
+    }
+
+    @PatchMapping("/nickname/beforeLogin")  // 닉네임 변경할 때 중복방지 및 변경 : 완료
+    public ApiResponse<String> changeNicknameBeforeLogin(@RequestParam String email, @RequestBody NicknameDto nickname){
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + email));
+        Long id = member.getId();
+        try{
+            if (memberService.checkNickName(id, nickname)){
+                String nick = nickname.getNickname();
+                return ApiResponse.onSuccess(nick+"으로 닉네임 변경 성공");
+            } else {
+                return ApiResponse.onFailure("400", "이미 사용중인 닉네임니다.", "duplicated nickname");
+            }
+        } catch(Exception e){
+            return ApiResponse.onFailure("500", "error", "internal error");
+        }
+    }
+
+    @PatchMapping("/addEtc/beforeLogin")
+    public ApiResponse<String> addEtcInfoBeforeLogin(@RequestParam String email,
+                                          @RequestBody MemberEtcInfoRequestDto dto) {
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + email));
+        Long memberId = member.getId();
+        try {
+            boolean isUpdated = memberService.MemberInfoAdd(memberId, dto);
+            if (isUpdated) {
+                return ApiResponse.onSuccess("회원정보 수정완료");
+            } else {
+                return ApiResponse.onFailure("404", "회원을 찾을 수 없습니다.", "회원정보 추가 실패");
+            }
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "서버 오류가 발생했습니다.", "회원정보 추가 실패");
         }
     }
 

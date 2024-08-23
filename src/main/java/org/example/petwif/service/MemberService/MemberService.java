@@ -112,6 +112,7 @@ public class MemberService {
     }
 
     public Boolean checkNickName(Long mId, NicknameDto nickname){
+
         if (memberRepository.checkNickname(nickname.getNickname()).isPresent()) {
             // 중복된 닉네임 존재
             return false;  // false 반환으로 중복된 이메일임을 알림
