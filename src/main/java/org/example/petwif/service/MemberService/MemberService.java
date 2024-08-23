@@ -65,6 +65,24 @@ public class MemberService {
         return tokenProvider.generateTokenDto(authentication);
     }
 
+    public EmailLoginAccessTokenResponse EmailLogin(LoginRequestDto dto){
+
+        String email = dto.getEmail();
+        TokenDto token = login(dto);
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Member with email " + email + " not found."));
+        EmailLoginAccessTokenResponse result = mapMemberToEmailResponse(token, member);
+        return result;
+    }
+    public EmailLoginAccessTokenResponse mapMemberToEmailResponse(TokenDto dto, Member member) {
+        return EmailLoginAccessTokenResponse.builder()
+                .accessToken(dto.getAccessToken())
+                .refreshToken(dto.getRefreshToken())
+                .id(member.getId())
+                .nickname(member.getNickname())
+                .build();
+    }
+
     @Transactional(readOnly = true)
     public Member getMemberByToken(String token) {
         // 토큰이 유효한지 검증

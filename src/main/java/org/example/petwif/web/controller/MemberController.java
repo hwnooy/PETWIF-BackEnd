@@ -41,10 +41,11 @@ public class MemberController {
 
 
     @PostMapping("/email/login")  // JWT 토큰을 생성하여 반환
-    public ApiResponse<TokenDto> login(@RequestBody LoginRequestDto dto) {
+    public ApiResponse<EmailLoginAccessTokenResponse> login(@RequestBody LoginRequestDto dto) {
         try {
-            TokenDto tokenDto = memberService.login(dto);
-            return ApiResponse.onSuccess(tokenDto);
+            //TokenDto tokenDto = memberService.login(dto);
+            EmailLoginAccessTokenResponse result = memberService.EmailLogin(dto);
+            return ApiResponse.onSuccess(result);
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         } catch (Exception e) {
