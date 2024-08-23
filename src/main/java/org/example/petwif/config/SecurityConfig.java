@@ -30,6 +30,9 @@ public class SecurityConfig {
                         CorsConfiguration config = new CorsConfiguration();
                         config.setAllowCredentials(true);
                         config.addAllowedOrigin("http://localhost:5173"); // '*' 대신 명시적 출처 사용
+                        config.addAllowedOrigin("https://petwif.netlify.app");
+                        config.addAllowedOrigin("https://main--petwif.netlify.app");
+                        config.addAllowedOrigin("https://dev--petwif.netlify.app");
                         config.addAllowedHeader("*");
                         config.addAllowedMethod("*");
                         return config;
