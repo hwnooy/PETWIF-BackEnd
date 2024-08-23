@@ -1,4 +1,3 @@
-/*
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
@@ -26,4 +25,3 @@ public class Sticker {
     @Enumerated(EnumType.STRING)
     private StickerType stickerType;
 }
-*/

@@ -1,4 +1,3 @@
-/*
 package org.example.petwif.service.StickerService;
 
 import lombok.RequiredArgsConstructor;
@@ -37,35 +36,15 @@ public class StickerServiceImpl implements StickerService{
     private final StickerRepository stickerRepository;
     @Override
     public StickerResponseDto.StickerResultListDto getMyStickers(){
-        Sticker sticker1 = new Sticker();
-        Sticker sticker4= new Sticker();
-        Sticker sticker6 = new Sticker();
-        Sticker sticker7 = new Sticker();
-        Sticker sticker11 = new Sticker();
-        Sticker sticker12 = new Sticker();
-        sticker1 = stickerRepository.findById(1L);
-        sticker4 = stickerRepository.findById(4L);
-        sticker6 = stickerRepository.findById(6L);
-        sticker7 = stickerRepository.findById(7L);
-        sticker11 = stickerRepository.findById(11L);
-        sticker12 = stickerRepository.findById(12L);
-
-        List<Sticker> stickers = new ArrayList<>();
-        stickers.add(sticker1);
-        stickers.add(sticker4);
-        stickers.add(sticker6);
-        stickers.add(sticker7);
-        stickers.add(sticker11);
-        stickers.add(sticker12);
+        List<Sticker> stickers = stickerRepository.findStickersByStickerType(StickerType.FREE);
         List<StickerResponseDto.StickerResultDto> stickerResultDtos = stickers.stream()
                 .map(this::convertToStickerResultDto)
                 .collect(Collectors.toList());
 
+
         return new StickerResponseDto.StickerResultListDto(stickerResultDtos);
     }
-*/
-/*
-    @Override
+    /*@Override
     public StickerResponseDto.StickerResultListDto getMarketStickers(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(()-> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -74,8 +53,8 @@ public class StickerServiceImpl implements StickerService{
                 .collect(Collectors.toList());
 
         return new StickerResponseDto.StickerResultListDto(stickerResultDtos);
-    }
-*//*
+    }*/
+
 
 
     // Entity를 DTO로 변환
@@ -89,4 +68,3 @@ public class StickerServiceImpl implements StickerService{
     }
 
 }
-*/

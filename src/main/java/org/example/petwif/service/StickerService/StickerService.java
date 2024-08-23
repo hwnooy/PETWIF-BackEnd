@@ -1,4 +1,3 @@
-/*
 package org.example.petwif.service.StickerService;
 
 import org.example.petwif.S3.AmazonS3Manager;
@@ -10,7 +9,6 @@ import org.example.petwif.web.dto.albumDto.AlbumRequestDto;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-@Service
 public interface StickerService {
 
     //public void assignStickersToNewMember(Long memberId);
@@ -20,4 +18,3 @@ public interface StickerService {
 
     //void putStickerInDB(MultipartFile stickerImage, AlbumRequestDto.StickerRequestDto requestDto, Long memberId);
 }
-*/
