@@ -137,10 +137,6 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     // 2-2. 앨범 조회 -> 게시글 형식 조회
     @Override
     public Slice<AlbumResponseDto.MainPageAlbumResultDto> getMainpageAlbum(Long memberId, Integer page){
-      /*  List<Member> notFriendList = memberRepository.findNonFriendsByMemberId(memberId);
-        if(notFriendList.isEmpty()){return new SliceImpl<>(Collections.emptyList());}
-        List<Long> notFriendIds = notFriendList.stream()
-                .map(member -> member.getId()).collect(Collectors.toList());*/
 
         //친구 인 사람 목록 조회, 아이디까지 찾았지 !! 여기서 빼주는거임!
         List<Friend> friendList = friendRepository.findByMember_IdAndStatus(memberId, FriendStatus.ACCEPTED);
@@ -212,7 +208,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     //=========================== 4. 특정 멤버의 앨범 페이지에서 앨범 조회 => 나, 다른사람 포함============================//
     @Override
     public Slice<AlbumResponseDto.UserAlbumViewDto> getMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType) {
-        Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberId(pageOwnerId);
+        Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberId(pageOwnerId, PageRequest.of(page, 10));
 
         List<AlbumResponseDto.UserAlbumViewDto> albumDtos = allPageownerAlbums.stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))

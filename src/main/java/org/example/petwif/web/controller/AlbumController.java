@@ -206,7 +206,7 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    @Operation(summary = "북마크한 앨범 조회에서 검색 한 화면 조회 API", description = "북마크한 앨범 조회에서 검색을 들어가면 해당 앨범 제목이 있는 앨범들이 검색되고 검색된 앨범들이 조회되는 API 입니다. 검색 항목이 일치하는 앨범이 없을시 빈 리스트를 반환합니다")
+    @Operation(summary = "사용자 앨범 조회에서 검색 한 화면 조회 API", description = "사용자 앨범 조회에서 검색을 들어가면 해당 앨범 제목이 있는 앨범들이 검색되고 검색된 앨범들이 조회되는 API 입니다. 검색 항목이 일치하는 앨범이 없을시 빈 리스트를 반환합니다")
     public ApiResponse<AlbumResponseDto.UserAlbumViewListDto> getSearchedUserAlbums(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam String nickname,
