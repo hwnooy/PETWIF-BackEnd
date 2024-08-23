@@ -14,19 +14,13 @@ import org.example.petwif.domain.entity.Sticker;
 import org.example.petwif.domain.enums.StickerType;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.repository.StickerRepository;
-import org.example.petwif.repository.UuidRepository;
-import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.stickerService.StickerService;
 import org.example.petwif.web.dto.StickerDto.StickerResponseDto;
-import org.example.petwif.web.dto.albumDto.AlbumRequestDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,7 +30,6 @@ import java.util.stream.Collectors;
 public class StickerServiceImpl implements StickerService {
 
     private final StickerRepository stickerRepository;
-    private final MemberRepository memberRepository;
     @Override
     public StickerResponseDto.StickerResultListDto getMyStickers(){
 //        Sticker sticker1 = new Sticker();

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class StickerController {
 
-    private final StickerService stickerService;
+    private final StickerServiceImpl stickerService;
 
 
     //앨범 생성시, 스티커 눌를때
