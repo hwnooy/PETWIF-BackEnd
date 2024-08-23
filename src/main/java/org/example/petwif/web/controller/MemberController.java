@@ -2,11 +2,9 @@ package org.example.petwif.web.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.S3.AmazonS3Manager;
 import org.example.petwif.apiPayload.ApiResponse;
-import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
@@ -15,8 +13,6 @@ import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
 
 @RestController
 @RequiredArgsConstructor

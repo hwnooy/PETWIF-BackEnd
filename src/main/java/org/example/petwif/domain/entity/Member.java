@@ -97,8 +97,8 @@ public class Member extends BaseEntity {
 
     //- 현일
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Album> albumList = new ArrayList<>();
-
 
 
     @Builder
