@@ -1,20 +1,10 @@
 
-package org.example.petwif.service.StickerService;
+package org.example.petwif.service.stickerService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.petwif.S3.AmazonS3Manager;
-import org.example.petwif.S3.Uuid;
-import org.example.petwif.apiPayload.code.status.ErrorStatus;
-import org.example.petwif.apiPayload.exception.GeneralException;
-import org.example.petwif.config.AmazonConfig;
-import org.example.petwif.domain.entity.AlbumImage;
-import org.example.petwif.domain.entity.Member;
 import org.example.petwif.domain.entity.Sticker;
-import org.example.petwif.domain.enums.StickerType;
-import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.repository.StickerRepository;
-import org.example.petwif.service.stickerService.StickerService;
 import org.example.petwif.web.dto.StickerDto.StickerResponseDto;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,4 +86,3 @@ public class StickerServiceImpl implements StickerService {
     }
 
 }
-

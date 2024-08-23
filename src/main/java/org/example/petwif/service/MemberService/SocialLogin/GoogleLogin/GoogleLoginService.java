@@ -155,6 +155,7 @@ public class GoogleLoginService {
 
     }
 
+    // 구글로 회원가입했을 때 멤버 생성자
     public TokenDto loginByGoogleAndSignUp(String authorizationCode) throws Exception {
         GoogleTokenResponse googleToken = getGoogleToken(authorizationCode);
         String token = googleToken.getAccessToken();
@@ -173,6 +174,7 @@ public class GoogleLoginService {
             member.setEmail(email);
             member.setOauthProvider("GOOGLE");
             member.setProfile_url(info.getPicture());
+            // 여기에 스티커 이어서 로직 구현
             memberRepository.save(member);
         }
         return tokenFinal;
