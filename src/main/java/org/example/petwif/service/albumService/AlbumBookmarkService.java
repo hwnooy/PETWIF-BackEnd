@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface AlbumBookmarkService {
     public void addBookmark(Long albumId, Long memberId);
     public void deleteBookmark(Long albumId, Long memberId);

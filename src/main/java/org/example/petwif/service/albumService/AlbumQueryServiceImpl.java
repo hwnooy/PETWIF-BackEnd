@@ -283,6 +283,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .build();
     }
 
+
     private Comparator<AlbumResponseDto.MemberBookmarkAlbumDto> getBookmarkComparator(AlbumSortType sortType) {
         switch (sortType) {
             case LIKES:
@@ -295,6 +296,30 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
             default:
                 return Comparator.comparing(AlbumResponseDto.MemberBookmarkAlbumDto::getUpdatedAT).reversed();
         }
+    }
+
+    //=================================== 5. 북마크한 앨범 에서 앨범 제목을 검색한 앨범 조회 ====================================//
+
+    public Slice<AlbumResponseDto.MemberBookmarkAlbumDto> getSearchedMemberBookmarkAlbums(Long memberId, Integer page, String albumTitle, AlbumSortType sortType){
+        // 접근 가능한 앨범 중에서 사용자가 북마크한 앨범만 필터링
+        if(albumTitle == null) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
+
+        List<Long> bookmarkedAlbumIds = albumBookmarkRepository.findBookmarkedAlbumIdsByMemberId(memberId);
+
+        Slice<Album> thisMemberBookmarkedAlbums = albumRepository.findAllByIdsAndTitleContaining(bookmarkedAlbumIds, albumTitle, PageRequest.of(page,10));
+
+        List<AlbumResponseDto.MemberBookmarkAlbumDto> accessibleAlbums = thisMemberBookmarkedAlbums.getContent().stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, memberId))
+                .map(this::convertToMemberBookmarkAlbumDto)
+                .sorted(getBookmarkComparator(sortType))
+                .collect(Collectors.toList());
+
+        if (accessibleAlbums.isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
+        return new SliceImpl<>(accessibleAlbums, PageRequest.of(page, 10), thisMemberBookmarkedAlbums.hasNext());
     }
 
 
