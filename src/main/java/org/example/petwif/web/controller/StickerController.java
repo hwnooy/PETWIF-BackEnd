@@ -3,7 +3,7 @@ package org.example.petwif.web.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.petwif.apiPayload.ApiResponse;
-import org.example.petwif.service.StickerService.StickerService;
+import org.example.petwif.service.stickerService.StickerService;
 import org.example.petwif.web.dto.StickerDto.StickerResponseDto;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
