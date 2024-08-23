@@ -29,10 +29,10 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     Slice<Album> findAllByMemberIds(@Param("allMemberIds") List<Long> memberIds, PageRequest pageRequest);
 
     @Query("SELECT a FROM Album a WHERE a.member.id = :currentUserId ORDER BY a.updatedAt DESC ")
-    Slice<Album> findAlbumByMemberId(@Param("currentUserId") Long currentUserId);
+    Slice<Album> findAlbumByMemberId(@Param("currentUserId") Long currentUserId, PageRequest pageRequest);
 
     @Query("SELECT a FROM Album a WHERE a.member.id = :memberId AND a.title LIKE %:title% ORDER BY  a.updatedAt DESC ")
-    Slice<Album> findAlbumByMemberIdAndTitleContaining(@Param("memberId") Long memberId, @Param("title") String title, Pageable pageable);
+    Slice<Album> findAlbumByMemberIdAndTitleContaining(@Param("memberId") Long memberId, @Param("title") String title, PageRequest pageRequest);
 
 
     @Query("SELECT a FROM Album a WHERE a.id IN :ids order by a.updatedAt DESC ")
