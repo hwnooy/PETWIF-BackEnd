@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface FriendQueryService {
 
     FriendStatus getFriendStatus(Long memberId, Long friendId);
-    Slice<Friend> getFriendList(Long memberId, Integer page);
+    Slice<Friend> getFriendList(Long memberId, Integer page, FriendStatus friendStatus);
     Slice<Friend> getRecFriendList(Long memberId, Integer page);
     Optional<Friend> findFriend(Long Id);
 }

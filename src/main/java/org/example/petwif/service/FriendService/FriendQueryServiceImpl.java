@@ -37,18 +37,13 @@ public class FriendQueryServiceImpl implements FriendQueryService {
 
         FriendStatus friendStatus = friend.getStatus();
 
-        Friend me = friendRepository.findByMember_IdAndFriend_Id(friendId, memberId).orElse(new Friend());
-        if (me.getStatus() == FriendStatus.PENDING) {
-            friendStatus = FriendStatus.RECEIVED;
-        }
-
         return friendStatus;
     }
 
     @Override
-    public Slice<Friend> getFriendList(Long memberId, Integer page) {
+    public Slice<Friend> getFriendList(Long memberId, Integer page, FriendStatus friendStatus) {
 
-        Slice<Friend> friendList = friendRepository.findByMember_IdAndStatusOrderByCreatedAt(memberId, FriendStatus.ACCEPTED, PageRequest.of(page, 5));
+        Slice<Friend> friendList = friendRepository.findByMember_IdAndStatusOrderByCreatedAt(memberId, friendStatus, PageRequest.of(page, 6));
 
         if (friendList.isEmpty() && page != 0) {
             throw new FriendHandler(ErrorStatus.FRIEND_PAGE_NOT_FOUND);
