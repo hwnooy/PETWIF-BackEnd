@@ -66,8 +66,8 @@ public class ChatConverter {
                 .memberId(chat.getMember().getId())
                 .content(chat.getContent())
                 .imageUrl(Optional.ofNullable(chat.getChatImage()).map(ChatImage::getImageUrl).orElse(null))
-                .profileUrl(chat.getMember().getProfile_url())
-                .nickName(chat.getMember().getNickname())
+                .profileUrl(chat.getChatRoom().getOther().getProfile_url())
+                .nickName(chat.getChatRoom().getOther().getNickname() )
                 .createdAt(LocalDateTime.now())
                 .build();
     }
@@ -90,8 +90,8 @@ public class ChatConverter {
                 .memberId(chatRoom.getMember().getId())
                 .otherId(chatRoom.getOther().getId())
                 .chatRoomId(chatRoom.getId())
-                .roomName(chatRoom.getMember().getNickname())
-                .imageUrl(chatRoom.getMember().getProfile_url())
+                .roomName(chatRoom.getOther().getNickname())
+                .imageUrl(chatRoom.getOther().getProfile_url())
                 .createdAt(LocalDateTime.now())
                 .build();
     }

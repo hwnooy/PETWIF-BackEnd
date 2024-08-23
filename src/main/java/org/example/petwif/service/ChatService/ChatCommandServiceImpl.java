@@ -32,7 +32,6 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     @Override
     @Transactional
     public ChatRoom createChatRoom(Long memberId, Long otherId, ChatRequestDTO.CreateChatRoomDTO request) { //채팅 생성
-        ChatRoom chatRoom = new ChatRoom();
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
@@ -40,10 +39,40 @@ public class ChatCommandServiceImpl implements ChatCommandService {
         Member other = memberRepository.findById(otherId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
-        chatRoom.setMember(member);
-        chatRoom.setOther(other);
+        //채팅방 중복 생성 방지
+        Optional<ChatRoom> existingChatRoom = chatRoomRepository.findByMemberIdAndOtherId(memberId, otherId)
+                .stream()
+                .findFirst();
 
-        return chatRoomRepository.save(chatRoom);
+        if (existingChatRoom.isPresent() && existingChatRoom.get().getChatRoomStatus().equals(ChatRoomStatus.ACTIVE)) {
+
+            throw new GeneralException(ErrorStatus.CHATROOM_ALREADY_EXIST);
+
+        } else if (existingChatRoom.isPresent() && existingChatRoom.get().isMemberStatus()) {
+            ChatRoom chatRoom = existingChatRoom.get();
+
+            chatRoom.setChatRoomStatus(ChatRoomStatus.ACTIVE);
+            chatRoom.setMemberStatus(false);
+
+            return chatRoomRepository.save(chatRoom);
+
+        } else if (existingChatRoom.isPresent() && existingChatRoom.get().isOtherStatus()) {
+            ChatRoom chatRoom = existingChatRoom.get();
+
+            chatRoom.setChatRoomStatus(ChatRoomStatus.ACTIVE);
+            chatRoom.setOtherStatus(false);
+
+            return chatRoomRepository.save(chatRoom);
+
+        } else {
+            ChatRoom chatRoom = new ChatRoom();
+
+            chatRoom.setMember(member);
+            chatRoom.setOther(other);
+            chatRoom.setChatRoomStatus(ChatRoomStatus.ACTIVE);
+
+            return chatRoomRepository.save(chatRoom);
+        }
     }
 
     @Override

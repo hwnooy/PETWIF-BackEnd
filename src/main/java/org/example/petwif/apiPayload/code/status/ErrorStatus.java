@@ -72,6 +72,7 @@ public enum ErrorStatus implements BaseErrorCode {
     // Chat Error
     CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHATROOM4001", "채팅방을 찾을 수 없습니다."),
     CHATROOM_ACCESS_RESTRICTED(HttpStatus.FORBIDDEN, "CHATROOM4002", "채팅방을 만들 권한이 없습니다."),
+    CHATROOM_ALREADY_EXIST(HttpStatus.BAD_REQUEST, "CHATROOM4003", "채팅방이 이미 존재합니다."),
     CHAT_NOT_FOUND(HttpStatus.BAD_REQUEST, "CHAT4001", "채팅을 찾을 수 없습니다."),
     CHAT_ACCESS_RESTRICTED(HttpStatus.FORBIDDEN, "CHAT4002", "채팅을 보낼 권한이 없습니다.");
 

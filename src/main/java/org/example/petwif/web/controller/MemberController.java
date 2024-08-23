@@ -10,7 +10,7 @@ import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
-import org.example.petwif.service.StickerService.StickerService;
+//import org.example.petwif.service.StickerService.StickerService;
 import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
