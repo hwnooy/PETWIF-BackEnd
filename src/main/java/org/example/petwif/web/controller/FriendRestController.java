@@ -177,11 +177,11 @@ public class FriendRestController {
             @Parameter(name = "Authorization", description = "JWT 토큰으로, 친구를 삭제하는 멤버의 아이디(사용자), request header 입니다!")
     })
     public ApiResponse<FriendResponseDTO.FriendResultDTO> deleteFriend(@RequestHeader("Authorization") String authorizationHeader,
-                                                                       @RequestBody @Valid FriendRequestDTO.FriendDTO request) {
+                                                                       @RequestParam String nickname) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Member target = memberService.getMemberByNickname(request.getNickname());
+        Member target = memberService.getMemberByNickname(nickname);
         Long friendId = target.getId();
 
         friendCommandService.deleteFriend(memberId, friendId);
