@@ -199,6 +199,31 @@ public class AlbumController {
         return ApiResponse.onSuccess(albumListDto);
     }
 
+    @GetMapping("/users/albums/searchTitle")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "COMMON200", description = "OK, 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH003", description = "access 토큰을 주세요!", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+    })
+    @Operation(summary = "북마크한 앨범 조회에서 검색 한 화면 조회 API", description = "북마크한 앨범 조회에서 검색을 들어가면 해당 앨범 제목이 있는 앨범들이 검색되고 검색된 앨범들이 조회되는 API 입니다. 검색 항목이 일치하는 앨범이 없을시 빈 리스트를 반환합니다")
+    public ApiResponse<AlbumResponseDto.UserAlbumViewListDto> getSearchedUserAlbums(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam String nickname,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType,
+            @RequestParam(name = "albumTitle") String albumTitle) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+
+        Member pageOwner = memberService.getMemberByNickname(nickname);
+        Long pageOwnerId = pageOwner.getId();
+
+        Slice<AlbumResponseDto.UserAlbumViewDto> albumSlice = albumQueryService.getSearchedMemberPageAlbums(pageOwnerId,member.getId(), page, sortType, albumTitle);
+        AlbumResponseDto.UserAlbumViewListDto albumListDto = AlbumConverter.convertToUserAlbumViewListDto(albumSlice);
+
+        return ApiResponse.onSuccess(albumListDto);
+    }
+
     // 5. 북마크한 앨범 에서 앨범 조회 //slice완료
     @GetMapping("/albums/memberBookmark")
     @ApiResponses({
@@ -223,7 +248,7 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    @Operation(summary = "북마크한 앨범 조회에서 검색 API", description = "북마크한 앨범 조회에서 검색을 들어가면 해당 앨범 제목이 있는 앨범들이 검색되는 API 입니다.")
+    @Operation(summary = "북마크한 앨범 조회에서 검색 한 화면 조회 API", description = "북마크한 앨범 조회에서 검색을 들어가면 해당 앨범 제목이 있는 앨범들이 검색되고 검색된 앨범들이 조회되는 API 입니다. 검색 항목이 일치하는 앨범이 없을시 빈 리스트를 반환합니다")
     public ApiResponse<AlbumResponseDto.MemberBookmarkAlbumListDto> getSearchedMemberBookmarkAlbums(@RequestHeader("Authorization") String authorizationHeader,
                                                                                                 @RequestParam(name = "page", defaultValue = "0") Integer page,
                                                                                                     @RequestParam(value = "sort_by", defaultValue = "LATEST") AlbumSortType sortType,

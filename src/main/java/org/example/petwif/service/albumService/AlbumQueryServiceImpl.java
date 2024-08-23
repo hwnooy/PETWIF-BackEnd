@@ -251,6 +251,25 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         }
     }
 
+    public Slice<AlbumResponseDto.UserAlbumViewDto> getSearchedMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType, String albumTitle){
+        if(albumTitle == null ||albumTitle.trim().isEmpty()) {
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
+        Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberIdAndTitleContaining(pageOwnerId, albumTitle, PageRequest.of(page, 10));
+
+        List<AlbumResponseDto.UserAlbumViewDto> albumDtos = allPageownerAlbums.stream()
+                .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))
+                .map(this::convertToUserAlbumDto)
+                .sorted(getComparator(sortType))
+                .collect(Collectors.toList());
+        if(albumDtos.isEmpty()){
+            return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
+        }
+
+        return new SliceImpl<>(albumDtos, PageRequest.of(page, 10), allPageownerAlbums.hasNext());
+    }
+
+
 
     //=================================== 5. 북마크한 앨범 에서 앨범 조회 ====================================//
     @Override
@@ -302,7 +321,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
 
     public Slice<AlbumResponseDto.MemberBookmarkAlbumDto> getSearchedMemberBookmarkAlbums(Long memberId, Integer page, String albumTitle, AlbumSortType sortType){
         // 접근 가능한 앨범 중에서 사용자가 북마크한 앨범만 필터링
-        if(albumTitle == null) {
+        if(albumTitle == null || albumTitle.trim().isEmpty()) {
             return new SliceImpl<>(Collections.emptyList()); // 비어있는 슬라이스 반환
         }
 
