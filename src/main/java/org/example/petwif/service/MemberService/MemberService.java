@@ -154,8 +154,9 @@ public class MemberService {
     }
 
 
-    public Boolean changePassword(Long id, PasswordChangeRequestDto dto){
-        Member member = memberRepository.findByMemberId(id);
+    public Boolean changePassword(String email, PasswordChangeRequestDto dto){
+        Member member = memberRepository.findMemberByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + email));
 
         String pw1 = dto.getChangePW();
         String pw2 = dto.getCheckChangePw();

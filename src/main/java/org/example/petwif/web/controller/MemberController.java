@@ -124,17 +124,17 @@ public class MemberController {
 
 
     @PatchMapping("/change/pw")   // 이것도 완료
-    public ApiResponse<String> changePassword(@RequestParam String email, @Valid @RequestBody PasswordChangeRequestDto dto){
-        Member member = memberRepository.findMemberByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + email));
+    public ApiResponse<String> changePassword(@RequestParam String email,
+                                              @Valid @RequestBody PasswordChangeRequestDto dto){
 
-        Long id = member.getId();
         try {
-            if (memberService.changePassword(id, dto)) return ApiResponse.onSuccess("비밀번호 바꾸기 완료");
+            if (memberService.changePassword(email, dto)) return ApiResponse.onSuccess("비밀번호 바꾸기 완료");
             else return ApiResponse.onFailure("400", "비밀번호 틀림", "비밀번호 수정 실패");
 
-        } catch (Exception e){
-            return ApiResponse.onFailure("400", "비밀번호 틀림", "비밀번호 수정 실패");
+        } catch (IllegalArgumentException e){
+            return ApiResponse.onFailure("400", e.getMessage(), "비밀번호 수정 실패");
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "서버 오류", "비밀번호 수정 실패");
         }
     }
 
