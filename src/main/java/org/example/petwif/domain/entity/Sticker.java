@@ -1,4 +1,3 @@
-
 package org.example.petwif.domain.entity;
 
 import jakarta.persistence.*;
@@ -7,6 +6,8 @@ import org.example.petwif.domain.common.BaseEntity;
 import org.example.petwif.domain.enums.StickerType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,5 +26,5 @@ public class Sticker {
 
     @Enumerated(EnumType.STRING)
     private StickerType stickerType;
-}
 
+}

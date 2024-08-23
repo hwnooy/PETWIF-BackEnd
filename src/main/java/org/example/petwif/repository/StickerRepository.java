@@ -1,4 +1,3 @@
-
 package org.example.petwif.repository;
 
 import org.example.petwif.domain.entity.Sticker;
@@ -12,11 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StickerRepository extends JpaRepository<Sticker, Long> {
-    Sticker findStickerByStickerType(StickerType type);
+    List<Sticker> findStickersByStickerType(StickerType type);
 
     @Query("SELECT s FROM Sticker s WHERE s.id = :id")
     Sticker findById(@Param("id") long id);
 
-    Optional<Sticker> findByStickerType(StickerType stickerType);
 }
-

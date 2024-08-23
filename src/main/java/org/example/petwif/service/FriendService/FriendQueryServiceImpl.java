@@ -37,6 +37,11 @@ public class FriendQueryServiceImpl implements FriendQueryService {
 
         FriendStatus friendStatus = friend.getStatus();
 
+        Friend me = friendRepository.findByMember_IdAndFriend_Id(friendId, memberId).orElse(new Friend());
+        if (me.getStatus() == FriendStatus.PENDING) {
+            friendStatus = FriendStatus.RECEIVED;
+        }
+
         return friendStatus;
     }
 

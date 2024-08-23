@@ -15,6 +15,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     @Query("SELECT a FROM Album a WHERE a.member.id IN :friendIds ORDER BY a.updatedAt DESC")
@@ -30,7 +31,14 @@ public interface AlbumRepository extends JpaRepository<Album, Long> {
     @Query("SELECT a FROM Album a WHERE a.member.id = :currentUserId ORDER BY a.updatedAt DESC ")
     Slice<Album> findAlbumByMemberId(@Param("currentUserId") Long currentUserId);
 
+    @Query("SELECT a FROM Album a WHERE a.member.id = :memberId AND a.title LIKE %:title% ORDER BY  a.updatedAt DESC ")
+    Slice<Album> findAlbumByMemberIdAndTitleContaining(@Param("memberId") Long memberId, @Param("title") String title, Pageable pageable);
+
 
     @Query("SELECT a FROM Album a WHERE a.id IN :ids order by a.updatedAt DESC ")
     Slice<Album> findAllByIds(@Param("ids") List<Long> ids, PageRequest pageRequest);
+
+    @Query("SELECT a FROM Album a WHERE a.id IN :ids AND a.title LIKE %:title% ORDER BY a.updatedAt DESC ")
+    Slice<Album> findAllByIdsAndTitleContaining(@Param("ids") List<Long> ids, @Param("title") String title, PageRequest pageRequest);
+
 }
