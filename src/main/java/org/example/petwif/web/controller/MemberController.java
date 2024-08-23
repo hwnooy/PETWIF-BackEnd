@@ -9,7 +9,6 @@ import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 //import org.example.petwif.service.StickerService.StickerService;
-import org.example.petwif.service.stickerService.MemberStickerService;
 import org.example.petwif.web.dto.MemberDto.*;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +23,6 @@ public class MemberController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final AmazonS3Manager amazonS3Manager;
-    private final MemberStickerService memberStickerService;
 
     @PostMapping("/register") // 동일한 이메일로 회원가입X, 비번 틀림 적용해서 회원가입 처리 완료
     public ApiResponse<EmailLoginResponse> registerNewMember(@RequestBody @Valid EmailSignupRequestDTO dto) {
@@ -141,7 +139,6 @@ public class MemberController {
             String fileUrl = amazonS3Manager.uploadFile(keyName, file);
 
             memberService.uploadProfile(memberId, fileUrl);
-            memberStickerService.assignStickersToNewMember(memberId); //현일 -> 프로필 사진 업로드 하면 membersticker 할당
 
             return ApiResponse.onSuccess(fileUrl);
         } catch (Exception e) {

@@ -27,8 +27,4 @@ public class Sticker {
     @Enumerated(EnumType.STRING)
     private StickerType stickerType;
 
-    @OneToMany(mappedBy = "sticker", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<MemberSticker> memberStickerList = new ArrayList<>();
-
 }
