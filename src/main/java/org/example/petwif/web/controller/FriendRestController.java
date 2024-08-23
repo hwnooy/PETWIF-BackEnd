@@ -125,7 +125,35 @@ public class FriendRestController {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Slice<Friend> friendList = friendQueryService.getFriendList(memberId, page);
+        Slice<Friend> friendList = friendQueryService.getFriendList(memberId, page, FriendStatus.ACCEPTED);
+        return ApiResponse.onSuccess(FriendConverter.friendListDTO(friendList));
+    }
+
+    @GetMapping("/status/requests")
+    @Operation(summary = "사용자의 친구 요청 목록 조회 API", description = "사용자의 친구 요청 목록을 조회하는 API이며, 페이징을 포함합니다. query String으로 page 번호를 주세요.")
+    @Parameters({
+            @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
+    })
+    public ApiResponse<FriendResponseDTO.FriendListDTO> getFriendRequestList(@RequestHeader("Authorization") String authorizationHeader,
+                                                                             @RequestParam(name = "page", defaultValue = "0") Integer page) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
+
+        Slice<Friend> friendList = friendQueryService.getFriendList(memberId, page, FriendStatus.PENDING);
+        return ApiResponse.onSuccess(FriendConverter.friendListDTO(friendList));
+    }
+
+    @GetMapping("/status/receive-requests")
+    @Operation(summary = "사용자의 받은 친구 요청 목록 조회 API", description = "사용자의 받은 친구 요청 목록을 조회하는 API이며, 페이징을 포함합니다. query String으로 page 번호를 주세요.")
+    @Parameters({
+            @Parameter(name = "Authorization", description = "JWT 토큰으로, 사용자의 아이디, request header 입니다!")
+    })
+    public ApiResponse<FriendResponseDTO.FriendListDTO> getReceivedRequestList(@RequestHeader("Authorization") String authorizationHeader,
+                                                                               @RequestParam(name = "page", defaultValue = "0") Integer page) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long memberId = member.getId();
+
+        Slice<Friend> friendList = friendQueryService.getFriendList(memberId, page, FriendStatus.RECEIVED);
         return ApiResponse.onSuccess(FriendConverter.friendListDTO(friendList));
     }
 

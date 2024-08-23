@@ -33,6 +33,12 @@ public class FriendCommandServiceImpl implements FriendCommandService {
             throw new FriendHandler(ErrorStatus.FRIEND_ALREADY_EXIST);
         }
 
+        Friend friend = friendRepository.findByMember_IdAndFriend_Id(friendId, memberId).orElse(new Friend());
+        friend.setMember(memberRepository.findById(friendId).get());
+        friend.setFriend(memberRepository.findById(memberId).get());
+        friend.setStatus(FriendStatus.RECEIVED);
+        friendRepository.save(friend);
+
         me.setMember(memberRepository.findById(memberId).get());
         me.setFriend(memberRepository.findById(friendId).get());
         me.setStatus(FriendStatus.PENDING);
@@ -49,6 +55,12 @@ public class FriendCommandServiceImpl implements FriendCommandService {
         if (me.getStatus() != FriendStatus.PENDING) {
             throw new FriendHandler(ErrorStatus.FRIEND_REQUEST_NOT_FOUND);
         }
+
+        Friend friend = friendRepository.findByMember_IdAndFriend_Id(friendId, memberId).orElseThrow(() -> new FriendHandler(ErrorStatus.FRIEND_REQUEST_NOT_FOUND));
+
+        friend.setStatus(FriendStatus.CANCELLED);
+
+        friendRepository.save(friend);
 
         me.setStatus(FriendStatus.CANCELLED);
 
