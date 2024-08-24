@@ -110,59 +110,12 @@ public class AlbumServiceImpl implements AlbumService {
             throw new GeneralException(ErrorStatus.ALBUM_UNAUTHORIZED);
         }
 
- /*//앨범 수정의 경우, 덮어 쓰는건지, 새로 저장해도 되는건지 잘 몰라서 프론트분들꼐서 앨범 제작을 어떻게 구현했는지 보고 짜겠습니다.
-       // 현재는 앨범 제목, 내용, 범위만 수정 가능한 상태입니다.
-        //1. 먼저 기존의 모든 앨범들을 삭제하고 다시 생성하는 메서드 입니다. 일단 주석 처리 하겠습니다.
-        //기존 앨범 표지 삭제
-        s3Manager.deleteFile(album.getCoverImage().getImageURL());
-        albumImageRepository.delete(album.getCoverImage());
-        album.setCoverImage(null);
-
-        //기존 앨범 내부 이미지들 삭제
-        album.getAlbumImages().forEach(image -> {
-            s3Manager.deleteFile(image.getImageURL());
-            albumImageRepository.delete(image);
-        });
-        album.getAlbumImages().clear();
-
-
-        //2. 그냥 덮어쓸때. setter를 고민했으나, 시간이 얼마 없어서 이런식으로 구현했습니다.
-
-        //새로운 앨범 표지 생성
-
-        String coverImageUuid = UUID.randomUUID().toString();
-        Uuid savedcoverUuid = uuidRepository.save(Uuid.builder().uuid(coverImageUuid).build());
-        String coverImageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(savedcoverUuid), coverImage);
-        AlbumImage newAlbumCoverImage = AlbumImage.builder()
-                .album(album)
-                .imageURL(coverImageUrl)
-                .build();
-        albumImageRepository.save(newAlbumCoverImage);
-        album.setCoverImage(newAlbumCoverImage);
-
-        // 새로운 앨범 이미지들 생성
-        List<AlbumImage> newImages = new ArrayList<>();
-        for (MultipartFile imageFile : albumImages) {
-            if (imageFile != null && !imageFile.isEmpty()) {
-                String imageUuid = UUID.randomUUID().toString();
-                Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(imageUuid).build());
-                String imageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(savedUuid), imageFile);
-                AlbumImage newImage = AlbumImage.builder()
-                        .album(album)
-                        .imageURL(imageUrl)
-                        .build();
-                albumImageRepository.save(newImage);
-                newImages.add(newImage);
-            }
-        }
-        album.setAlbumImages(newImages);*/
-
-
-        //업데이트
+      /*  //업데이트
         album.setTitle(requestDto.getTitle());
         album.setContent(requestDto.getContent());
-        album.setScope(requestDto.getScope());
-        //album.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getScope());
+        album.setScope(requestDto.getScope());*/
+
+        album.update(requestDto.getTitle(), requestDto.getContent(), requestDto.getScope());
         return albumRepository.save(album);
     }
 
