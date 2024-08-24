@@ -15,7 +15,6 @@ public class PetResponseDto {
     private PetGender gender;  // PetGender Enum 사용
     private Integer age;           // 기본형 int 사용
     private String petKind;
-    private String etc;        // etc 필드 추가
 }
 
 //@Builder
