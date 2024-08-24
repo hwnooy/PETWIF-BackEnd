@@ -1,9 +1,6 @@
 package org.example.petwif.web.dto.albumDto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.example.petwif.domain.entity.AlbumImage;
 import org.example.petwif.domain.enums.Scope;
 import org.example.petwif.domain.enums.StickerType;
@@ -14,6 +11,7 @@ import java.util.List;
 @Builder
 public class AlbumRequestDto {
     //==앨범 CRUD==//
+    @Setter
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
