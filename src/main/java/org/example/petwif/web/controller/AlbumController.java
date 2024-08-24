@@ -17,6 +17,7 @@ import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.*;
 import org.example.petwif.domain.enums.AlbumSortType;
+import org.example.petwif.domain.enums.Scope;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.albumService.*;
 import org.example.petwif.validation.annotation.ExistAlbum;
@@ -53,10 +54,17 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    public ApiResponse<AlbumResponseDto.SaveResultDto> createAlbum(  @ModelAttribute AlbumRequestDto.SaveRequestDto requestDto,
+    public ApiResponse<AlbumResponseDto.SaveResultDto> createAlbum(  //@ModelAttribute AlbumRequestDto.SaveRequestDto requestDto,
+                                                                     @RequestParam String title,
+                                                                     @RequestParam String content,
+                                                                     @RequestParam Scope scope,
                                                                      @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
                                                                      @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
                                                                      @RequestHeader("Authorization") String authorizationHeader ) {
+        AlbumRequestDto.SaveRequestDto requestDto = new AlbumRequestDto.SaveRequestDto();
+        requestDto.setTitle(title);
+        requestDto.setContent(content);
+        requestDto.setScope(scope);
         Member member = memberService.getMemberByToken(authorizationHeader);
         Album album = albumService.saveAlbum(requestDto, member.getId(), coverImage, albumImages);
         AlbumResponseDto.SaveResultDto saveResultDto = AlbumConverter.toAlbumResultDto(album, member);
