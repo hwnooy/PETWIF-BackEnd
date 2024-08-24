@@ -101,7 +101,7 @@ public class AlbumServiceImpl implements AlbumService {
     //앨범 수정
     @Override
     @Transactional
-    public Album updateAlbum(Long albumId, Long memberId, AlbumRequestDto.UpdateRequestDto requestDto){//, MultipartFile coverImage, MultipartFile[] albumImages) {
+    public Album updateAlbum(Long albumId, Long memberId, AlbumRequestDto.UpdateRequestDto requestDto){
         Album album = albumRepository.findById(albumId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
         Member member = memberRepository.findById(memberId)
