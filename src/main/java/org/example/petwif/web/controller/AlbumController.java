@@ -53,7 +53,7 @@ public class AlbumController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH004", description = "access 토큰 만료", content = @Content(schema = @Schema(implementation = ApiResponse.class))),
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH006", description = "access 토큰 모양이 이상함", content = @Content(schema = @Schema(implementation = ApiResponse.class)))
     })
-    public ApiResponse<AlbumResponseDto.SaveResultDto> createAlbum(  @RequestPart(value = "requestDto") AlbumRequestDto.SaveRequestDto requestDto,
+    public ApiResponse<AlbumResponseDto.SaveResultDto> createAlbum(  @ModelAttribute AlbumRequestDto.SaveRequestDto requestDto,
                                                                      @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
                                                                      @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
                                                                      @RequestHeader("Authorization") String authorizationHeader ) {
