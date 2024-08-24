@@ -6,6 +6,7 @@ import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.domain.entity.Pet;
+import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.PetService.PetService;
 import org.example.petwif.web.dto.PetDto.PetRequestDto;
@@ -23,6 +24,7 @@ public class PetController {
 
     private final PetService petService;
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @GetMapping("/view")
     public ApiResponse<List<PetResponseDto>> viewAllMyPets(@RequestHeader("Authorization")
@@ -41,6 +43,18 @@ public class PetController {
                                                     String authorizationHeader,
                                                     @RequestBody List<PetRequestDto> dto) {
         Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
+        try {
+            return ApiResponse.onSuccess(petService.addPet(id, dto));
+        } catch (Exception e) {
+            throw new GeneralException(_BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/add/beforeLogin")
+    public ApiResponse<List<PetResponseDto>> newPetBeforeLogin(@RequestParam String email,
+                                                               @RequestBody List<PetRequestDto> dto) {
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() ->new IllegalArgumentException("No member with "+email));
         Long id = member.getId();
         try {
             return ApiResponse.onSuccess(petService.addPet(id, dto));
