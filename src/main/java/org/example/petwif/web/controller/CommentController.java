@@ -56,9 +56,11 @@ public class CommentController {
     // 특정 앨범에 대한 댓글 목록 조회
     @GetMapping("/albums/{albumId}/comment")
     @Operation(summary = "특정 앨범에 대한 댓글 목록 조회 API")
-    public ApiResponse<List<CommentResponseDto>> getCommentsByAlbum(@PathVariable Long albumId) {
+    public ApiResponse<List<CommentResponseDto>> getCommentsByAlbum(@RequestHeader("Authorization") String authorizationHeader,@PathVariable Long albumId) {
         try {
-            List<CommentResponseDto> comments = commentService.commentList(albumId);
+            Member member = memberService.getMemberByToken(authorizationHeader);
+            Long memberId = member.getId();
+            List<CommentResponseDto> comments = commentService.commentList(albumId, memberId);
             return ApiResponse.onSuccess(comments);
         } catch (GeneralException e) {
             return ApiResponse.onFailure(e.getErrorReason().getHttpStatus().toString(), e.getErrorReason().getMessage(), null);

@@ -72,7 +72,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                .isLiked(isLiked)
                .isBookmarked(isBookmarked)
                .comments(comments.stream()
-                       .map(c -> new CommentResponseDto(c))
+                       .map(c -> new CommentResponseDto(c, false))
                        .collect(Collectors.toList()))
 
                .build();
@@ -174,7 +174,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .isLiked(albumLikeRepository.existsByAlbumAndMemberId(album, memberId)) // 로그인한 사용자가 좋아요 했는지
                 .isBookmarked(albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId)) // 북마크 했는지
                 .comments(commentRepository.findByAlbum(album).stream()
-                        .map(c -> new CommentResponseDto(c))
+                        .map(c -> new CommentResponseDto(c, false))
                         .collect(Collectors.toList()))
                 .build();
     }
@@ -209,6 +209,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
     @Override
     public Slice<AlbumResponseDto.UserAlbumViewDto> getMemberPageAlbums(Long pageOwnerId, Long currentUserId, Integer page, AlbumSortType sortType) {
         Slice<Album> allPageownerAlbums = albumRepository.findAlbumByMemberId(pageOwnerId, PageRequest.of(page, 10));
+
 
         List<AlbumResponseDto.UserAlbumViewDto> albumDtos = allPageownerAlbums.stream()
                 .filter(album -> albumCheckAccessService.checkAccessInBool(album, currentUserId))

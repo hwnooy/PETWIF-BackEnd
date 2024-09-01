@@ -102,14 +102,18 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public List<CommentResponseDto> commentList(Long id){
+    public List<CommentResponseDto> commentList(Long id, Long memberId){
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
         List<Comment> commentList=commentRepository.findByAlbum(album);
         return commentList.stream()
-                .map(comment-> CommentResponseDto.builder()
-                        .comment(comment)
-                        .build())
+                .map(comment-> {
+                    boolean isLiked = commentLikeRepository.existsByCommentIdAndMemberId(comment.getId(), memberId);
+                    return CommentResponseDto.builder()
+                            .comment(comment)
+                            .isLiked(isLiked)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
     @Override

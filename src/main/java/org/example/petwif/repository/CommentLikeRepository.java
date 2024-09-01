@@ -1,5 +1,6 @@
 package org.example.petwif.repository;
 
+import org.example.petwif.domain.entity.Album;
 import org.example.petwif.domain.entity.Comment;
 import org.example.petwif.domain.entity.CommentLike;
 import org.example.petwif.domain.entity.Member;
@@ -12,4 +13,7 @@ import java.util.Optional;
 public interface CommentLikeRepository extends JpaRepository<CommentLike, Long> {
 
     Optional<CommentLike> findByCommentIdAndMemberId(Long commentId, Long id);
+
+    boolean existsByCommentIdAndMemberId(Long Id, Long memberId);
+
 }

@@ -1,7 +1,6 @@
 package org.example.petwif.web.dto.albumDto;
 
 import lombok.*;
-import org.example.petwif.domain.entity.AlbumImage;
 import org.example.petwif.domain.enums.Scope;
 import org.example.petwif.domain.enums.StickerType;
 import org.springframework.web.multipart.MultipartFile;
