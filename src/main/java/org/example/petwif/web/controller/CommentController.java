@@ -1,6 +1,7 @@
 package org.example.petwif.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
@@ -102,7 +103,8 @@ public class CommentController {
     @Operation(summary = "댓글 좋아요 추가 API")
     public ApiResponse<String> likeComment(
             @RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable Long commentId) {
+            @PathVariable Long commentId,
+            HttpServletResponse response) {
         try {
             Member member = memberService.getMemberByToken(authorizationHeader);
             Long memberId = member.getId();
@@ -110,6 +112,7 @@ public class CommentController {
             commentService.likeComment(commentId, memberId);
             return ApiResponse.onSuccess("ok");
         } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return ApiResponse.onFailure("400", "Invalid request", null);
         } catch (GeneralException e) {
             return ApiResponse.onFailure(e.getErrorReason().getHttpStatus().toString(), e.getErrorReason().getMessage(), null);
@@ -121,7 +124,8 @@ public class CommentController {
     @Operation(summary = "댓글 좋아요 제거 API")
     public ApiResponse<String> unlikeComment(
             @RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable Long commentId)  {
+            @PathVariable Long commentId,
+            HttpServletResponse response)  {
         try {
             Member member = memberService.getMemberByToken(authorizationHeader);
             Long memberId = member.getId();
@@ -129,6 +133,7 @@ public class CommentController {
             commentService.unlikeComment(commentId, memberId);
             return ApiResponse.onSuccess("ok");
         } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return ApiResponse.onFailure("400", "Invalid request", null);
         } catch (GeneralException e) {
             return ApiResponse.onFailure(e.getErrorReason().getHttpStatus().toString(), e.getErrorReason().getMessage(), null);
