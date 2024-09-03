@@ -105,9 +105,11 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentResponseDto> commentList(Long id, Long memberId){
         Album album = albumRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.ALBUM_NOT_FOUND));
-        List<Comment> commentList=commentRepository.findByAlbum(album);
-        return commentList.stream()
-                .map(comment-> {
+        // 부모 댓글만 조회
+        List<Comment> parentComments = commentRepository.findByAlbumAndParentCommentIsNull(album);
+
+        return parentComments.stream()
+                .map(comment -> {
                     boolean isLiked = commentLikeRepository.existsByCommentIdAndMemberId(comment.getId(), memberId);
                     return CommentResponseDto.builder()
                             .comment(comment)
@@ -116,6 +118,7 @@ public class CommentServiceImpl implements CommentService {
                 })
                 .collect(Collectors.toList());
     }
+
     @Override
     public void updateComment(CommentRequestDto.UpdateDto commentUpdateRequestDto, Long CommentId){
         Comment comment = commentRepository.findById(CommentId)

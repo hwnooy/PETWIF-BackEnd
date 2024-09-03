@@ -89,8 +89,12 @@ public class CommentController {
     // 댓글 삭제
     @DeleteMapping("/comment/{commentId}")
     @Operation(summary = "댓글 삭제 API")
-    public ApiResponse<String> deleteComment(@PathVariable Long commentId) {
+    public ApiResponse<String> deleteComment(@RequestHeader("Authorization") String authorizationHeader,
+                                             @PathVariable Long commentId) {
         try {
+            Member member = memberService.getMemberByToken(authorizationHeader);
+            Long memberId = member.getId();
+
             commentService.deleteComment(commentId);
             return ApiResponse.onSuccess("ok");
         } catch (GeneralException e) {
