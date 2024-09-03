@@ -56,7 +56,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
        boolean isLiked = albumLikeRepository.existsByAlbumAndMemberId(album, memberId);
        boolean isBookmarked = albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId);
 
-       List<Comment> comments = commentRepository.findByAlbum(album); //댓글 리스트
+       List<Comment> comments = commentRepository.findByAlbumAndParentCommentIsNull(album); //댓글 리스트
        return AlbumResponseDto.DetailResultDto.builder()
                .albumId(album.getId())
                .title(album.getTitle())
@@ -174,11 +174,13 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                 .memberId(album.getMember().getId())
                 .isLiked(albumLikeRepository.existsByAlbumAndMemberId(album, memberId)) // 로그인한 사용자가 좋아요 했는지
                 .isBookmarked(albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId)) // 북마크 했는지
-                .comments(commentRepository.findByAlbum(album).stream()
+
+                .comments(commentRepository.findByAlbumAndParentCommentIsNull(album).stream()
                         .map(c->{
                             boolean isCommentLiked = commentLikeRepository.existsByCommentIdAndMemberId(c.getId(), memberId);
                             return new CommentResponseDto(c, isCommentLiked);
                         })
+
                         .collect(Collectors.toList()))
                 .build();
     }
