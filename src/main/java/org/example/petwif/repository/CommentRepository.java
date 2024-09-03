@@ -9,4 +9,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findByAlbum(Album album);
+
+    // 부모 댓글만 조회하는 메서드
+    List<Comment> findByAlbumAndParentCommentIsNull(Album album);
 }
