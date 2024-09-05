@@ -183,6 +183,16 @@ public class MemberService {
                 .build();
     }
 
+    public MemberInfoResponseDto mapMemberInfoToResponse(Member member){
+
+        return MemberInfoResponseDto.builder()
+                .id(member.getId())
+                .profile_url(member.getProfile_url())
+                .name(member.getName())
+                .nickname(member.getNickname())
+                .build();
+    }
+
     public void deleteMember(Long id){
         memberRepository.deleteById(id);
     }
