@@ -58,38 +58,55 @@ public class AlbumServiceImpl implements AlbumService {
 
         //====앨범 표지!====//
         //uuid 생성 및 저장
-        String uuid = UUID.randomUUID().toString();
-        Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
-        // s3에 이미지 업로드
-        String coverImageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(savedUuid),coverImage);
+        if (coverImage != null && !coverImage.isEmpty()) {  // coverImage가 null이 아니고 비어있지 않은지 확인
+            // UUID 생성 및 저장
+            String uuid = UUID.randomUUID().toString();
+            Uuid savedUuid = uuidRepository.save(Uuid.builder().uuid(uuid).build());
+            // S3에 이미지 업로드
+            String coverImageUrl;
+            try {
+                coverImageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(savedUuid), coverImage);
+            } catch (Exception e) {
+                throw new GeneralException(ErrorStatus.ALBUM_IMAGE_UPLOAD_FAILED);
+            }
 
-        //커버 이미지 엔티티 생성 및 저장
-        AlbumImage albumCoverImage = AlbumImage.builder()
-                .album(album)
-                .imageURL(coverImageUrl)
-                .build();
-        //레포지토리에 추가해주고
-        albumImageRepository.save(albumCoverImage);
-        //엔티티에 추가해주고
-        album.addCoverImageToAlbum(albumCoverImage);
-
+            // 커버 이미지 엔티티 생성 및 저장
+            AlbumImage albumCoverImage = AlbumImage.builder()
+                    .album(album)
+                    .imageURL(coverImageUrl)
+                    .build();
+            // 레포지토리에 추가
+            albumImageRepository.save(albumCoverImage);
+            // 엔티티에 커버 이미지 추가
+            album.addCoverImageToAlbum(albumCoverImage);
+        }
 
         //==== 앨범 표지 외 사진들!! ====//
-        for (MultipartFile image : albumImages) {
-            //uuid 생성 및 저장
-            String imageUuid = UUID.randomUUID().toString();
-            Uuid imageSavedUuid = uuidRepository.save(Uuid.builder().uuid(imageUuid).build());
-            // s3에 이미지 업로드
-            String imageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(imageSavedUuid), image);
-            //커버 이미지 엔티티 생성 및 저장
-            AlbumImage albumImage = AlbumImage.builder()
-                    .album(album)
-                    .imageURL(imageUrl)
-                    .build();
-            //레포지토리에 추가해주고
-            albumImageRepository.save(albumImage);
-            //엔티티에 추가해주고
-            album.addAlbumImageToAlbum(albumImage);
+        if (albumImages != null) {  // albumImages가 null이 아닌지 확인
+            for (MultipartFile image : albumImages) {
+                if (image != null && !image.isEmpty()) {  // 각각의 이미지 파일이 null이 아닌지 확인
+                    // UUID 생성 및 저장
+                    String imageUuid = UUID.randomUUID().toString();
+                    Uuid imageSavedUuid = uuidRepository.save(Uuid.builder().uuid(imageUuid).build());
+                    // S3에 이미지 업로드
+                    String imageUrl;
+                    try {
+                        imageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(imageSavedUuid), image);
+                    } catch (Exception e) {
+                        throw new GeneralException(ErrorStatus.ALBUM_IMAGE_UPLOAD_FAILED);
+                    }
+
+                    // 앨범 이미지 엔티티 생성 및 저장
+                    AlbumImage albumImage = AlbumImage.builder()
+                            .album(album)
+                            .imageURL(imageUrl)
+                            .build();
+                    // 레포지토리에 추가
+                    albumImageRepository.save(albumImage);
+                    // 엔티티에 앨범 이미지 추가
+                    album.addAlbumImageToAlbum(albumImage);
+                }
+            }
         }
 
         //드디어 세이브,,,,,
