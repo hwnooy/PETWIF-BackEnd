@@ -139,11 +139,11 @@ public class MemberController {
     }
 
     @GetMapping("/me")
-    public ApiResponse<Member> getMemberByToken(@RequestHeader("Authorization") String authorizationHeader) {
-        String token = authorizationHeader; // Bearer 제거하지 않음
+    public ApiResponse<MemberInfoResponseDto> getMemberByToken(@RequestHeader("Authorization") String authorizationHeader) {
         try {
-            Member member = memberService.getMemberByToken(token);
-            return ApiResponse.onSuccess(member);
+            Member member = memberService.getMemberByToken(authorizationHeader);
+            MemberInfoResponseDto dto = memberService.mapMemberInfoToResponse(member);
+            return ApiResponse.onSuccess(dto);
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         } catch (Exception e) {
