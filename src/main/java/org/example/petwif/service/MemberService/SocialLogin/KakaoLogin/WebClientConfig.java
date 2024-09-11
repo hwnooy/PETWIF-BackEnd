@@ -19,7 +19,8 @@ public class WebClientConfig {
     public WebClient webClient() {
         return WebClient.builder()
                 .baseUrl("https://kauth.kakao.com")
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                //.defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)  // 수정된 Content-Type
                 .clientConnector(new ReactorClientHttpConnector(
                         HttpClient.create()
                                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)

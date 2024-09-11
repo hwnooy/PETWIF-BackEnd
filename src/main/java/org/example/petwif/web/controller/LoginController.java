@@ -26,12 +26,13 @@ public class LoginController {
     private final TokenProvider tokenProvider;
 
     @PostMapping("/code/google")
+    @ResponseBody
     public ApiResponse<TokenDto> googleLogin(@RequestParam("code") String code) {
         try {
             TokenDto dto = googleLoginService.loginByGoogleAndSignUp(code);
             return ApiResponse.onSuccess(dto);
         } catch (Exception e) {
-            return null;
+            return ApiResponse.onFailure("400", e.getMessage(), null);
         }
     }
 
@@ -46,11 +47,28 @@ public class LoginController {
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
         TokenDto dto = tokenProvider.generateTokenDto(authentication);
-
+        System.out.println("accessToken 확인 : " + dto.getAccessToken());
         userService.createUser(userInfo.getKakao_account().getEmail());
 
         return ApiResponse.onSuccess(dto);
     }
+//    @PostMapping("/oauth")
+//    @ResponseBody
+//    public ApiResponse<TokenDto> kakaoOauth(@RequestParam("code") String code) {
+//        System.out.println("api test");
+//        KakaoTokenResponse kakaoTokenResponse = kakaoTokenJsonData.getToken(code);
+//        KakaoUserInfoResponse userInfo = kakaoUserInfo.getUserInfo(kakaoTokenResponse.getAccess_token());
+//        log.info("회원 정보 입니다.{}", userInfo);
+//        KakaoAccount account = userInfo.getKakao_account();
+//        String email = account.getEmail();
+//
+//        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
+//        TokenDto dto = tokenProvider.generateTokenDto(authentication);
+//
+//        userService.createUser(userInfo.getKakao_account().getEmail());
+//
+//        return ApiResponse.onSuccess(dto);
+//    }
 
 
 //    @GetMapping("/oauth")
