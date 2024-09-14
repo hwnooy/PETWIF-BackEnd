@@ -160,8 +160,8 @@ public class GoogleLoginService {
     // 구글로 회원가입했을 때 멤버 생성자
     public TokenDto loginByGoogleAndSignUp(String authorizationCode) throws Exception {
         // decode 추가
-        //String decode = URLDecoder.decode(authorizationCode, StandardCharsets.UTF_8);
-        GoogleTokenResponse googleToken = getGoogleToken(authorizationCode);
+        String decode = URLDecoder.decode(authorizationCode, StandardCharsets.UTF_8);
+        GoogleTokenResponse googleToken = getGoogleToken(decode);
         String token = googleToken.getAccessToken();
         GoogleUserInfo info = getGoogleUserInfo(token);
         String email = info.getEmail();
