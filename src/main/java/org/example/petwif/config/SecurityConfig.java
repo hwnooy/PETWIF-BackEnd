@@ -33,6 +33,8 @@ public class SecurityConfig {
                         config.addAllowedOrigin("https://petwif.netlify.app");
                         config.addAllowedOrigin("https://main--petwif.netlify.app");
                         config.addAllowedOrigin("https://dev--petwif.netlify.app");
+                        config.addAllowedOrigin("https://kauth.kakao.com");
+                        config.addAllowedOrigin("https://kapi.kakao.com");
                         config.addAllowedHeader("*");
                         config.addAllowedMethod("*");
                         return config;
