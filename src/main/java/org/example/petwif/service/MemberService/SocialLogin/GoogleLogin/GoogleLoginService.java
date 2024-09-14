@@ -125,6 +125,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Service
@@ -157,7 +159,9 @@ public class GoogleLoginService {
 
     // 구글로 회원가입했을 때 멤버 생성자
     public TokenDto loginByGoogleAndSignUp(String authorizationCode) throws Exception {
-        GoogleTokenResponse googleToken = getGoogleToken(authorizationCode);
+        // decode 추가
+        String decode = URLDecoder.decode(authorizationCode, StandardCharsets.UTF_8);
+        GoogleTokenResponse googleToken = getGoogleToken(decode);
         String token = googleToken.getAccessToken();
         GoogleUserInfo info = getGoogleUserInfo(token);
         String email = info.getEmail();
