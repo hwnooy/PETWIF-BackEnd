@@ -17,15 +17,3 @@ public class PetRequestDto {
     private Integer age;       // Integer 타입으로 null 허용
     private String petKind;
 }
-
-//@Getter
-//@Builder
-//public class PetRequestDto {
-//    private String petName;
-//
-//    @Enumerated(EnumType.STRING)
-//    private String gender;
-//
-//    private Integer age;
-//    private String petKind;
-//}

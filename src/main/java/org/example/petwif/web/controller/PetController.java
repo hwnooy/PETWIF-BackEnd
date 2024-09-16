@@ -26,18 +26,32 @@ public class PetController {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
 
-    @GetMapping("/view")
+    /* 리스트로 조회하는 상황일 때 사용한 api */
+    @GetMapping("/viewMyPets")
     public ApiResponse<List<PetResponseDto>> viewAllMyPets(@RequestHeader("Authorization")
                                           String authorizationHeader) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long id = member.getId();
         try {
-            return ApiResponse.onSuccess(petService.getAllPets(id));
+            return ApiResponse.onSuccess(petService.getAllPetList(id));
         } catch (Exception e) {
             throw new GeneralException(_BAD_REQUEST);
         }
     }
 
+    @GetMapping("/view")
+    public ApiResponse<PetResponseDto> viewMyPet(@RequestHeader("Authorization")
+                                                           String authorizationHeader) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
+        try {
+            return ApiResponse.onSuccess(petService.pet(id));
+        } catch (Exception e) {
+            throw new GeneralException(_BAD_REQUEST);
+        }
+    }
+
+    /* 기존에 작성한 여러개 등록 api
     @PostMapping("/add")
     public ApiResponse<List<PetResponseDto>> newPet(@RequestHeader("Authorization")
                                                     String authorizationHeader,
@@ -49,12 +63,25 @@ public class PetController {
         } catch (Exception e) {
             throw new GeneralException(_BAD_REQUEST);
         }
+    }*/
+    @PostMapping("/add")
+    public ApiResponse<PetResponseDto> newPet(@RequestHeader("Authorization")
+                                                    String authorizationHeader,
+                                                    @RequestBody PetRequestDto dto) {
+        Member member = memberService.getMemberByToken(authorizationHeader);
+        Long id = member.getId();
+        try {
+            return ApiResponse.onSuccess(petService.addPet(id, dto));
+        } catch (Exception e) {
+            throw new GeneralException(_BAD_REQUEST);
+        }
     }
 
     @PostMapping("/add/beforeLogin")
-    public ApiResponse<List<PetResponseDto>> newPetBeforeLogin(@RequestParam String email,
-                                                               @RequestBody List<PetRequestDto> dto) {
-        Member member = memberRepository.findMemberByEmail(email).orElseThrow(() ->new IllegalArgumentException("No member with "+email));
+    public ApiResponse<PetResponseDto> newPetBeforeLogin(@RequestParam String email,
+                                                               @RequestBody PetRequestDto dto) {
+        Member member = memberRepository.findMemberByEmail(email).orElseThrow(()
+                ->new IllegalArgumentException("No member with "+email));
         Long id = member.getId();
         try {
             return ApiResponse.onSuccess(petService.addPet(id, dto));
