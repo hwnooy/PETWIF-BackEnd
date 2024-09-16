@@ -24,6 +24,21 @@ public class PetService {
     private final PetRepository petRepository;
     private final MemberRepository memberRepository;
 
+    public PetResponseDto addPet(Long id, PetRequestDto dto){
+        Member member = memberRepository.findByMemberId(id);
+        Pet pet = new Pet();
+        pet.setPetAge(dto.getAge());
+        pet.setPetGender(dto.getGender());
+        pet.setPetName(dto.getPetName());
+        pet.setPetKind(dto.getPetKind());
+        pet.setMember(member);
+        petRepository.save(pet);
+        return mapPetToResponse(pet);
+
+    }
+    /* 아래는 pet을 여러개 등록할 때 쓰는 로직 */
+
+    /*
     public List<PetResponseDto> addPet(Long id, List<PetRequestDto> dto){
         Member member = memberRepository.findByMemberId(id);
         List<Pet> petList = new ArrayList<>();
@@ -39,7 +54,7 @@ public class PetService {
         }
         return Pets(petList);
 
-    }
+    } */
 
     public PetResponseDto editPet(Long mId, Long petId, PetRequestDto dto){
         Member member = memberRepository.findByMemberId(mId);
@@ -65,17 +80,24 @@ public class PetService {
                 .build();
     }
 
-    public List<PetResponseDto> getAllPets(Long id){
+    public List<PetResponseDto> getAllPetList(Long id){
         List<Pet> pets = petRepository.findPetsByMember(memberRepository.findByMemberId(id));
         return pets.stream()
                 .map(this::mapPetToResponse)
                 .collect(Collectors.toList());
     }
 
+    /* pet list를 list dto로 묶어서 리턴 */
     public List<PetResponseDto> Pets(List<Pet> pets){
         return pets.stream()
                 .map(this::mapPetToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public PetResponseDto pet(Long id){
+
+        Pet pet = petRepository.findPetByMemberId(id);
+        return mapPetToResponse(pet);
     }
 
     public void deletePet(Long id){
