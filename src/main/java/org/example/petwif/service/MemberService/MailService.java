@@ -25,10 +25,6 @@ public class MailService {
     public void sendVerificationEmail(String email) {
         // 인증번호 생성
         String code = generateVerificationCode();
-        Optional<Member> member = memberRepository.checkEmail(email, "PETWIF");
-        if (member.isPresent()) {
-            throw new IllegalStateException("Already assigned Member");
-        }
 
         // 이메일 메시지 생성
         SimpleMailMessage message = new SimpleMailMessage();
