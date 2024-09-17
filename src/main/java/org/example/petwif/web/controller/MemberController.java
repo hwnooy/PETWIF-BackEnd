@@ -36,7 +36,7 @@ public class MemberController {
                 return ApiResponse.onFailure("400", dto.getName() + ", 이미 회원입니다. 다른 이메일로 가입해주세요", null);
             }
         } catch (IllegalStateException e){
-            return ApiResponse.onFailure("400", "wrong password", null);
+            return ApiResponse.onFailure("400", e.getMessage(), null);
         }
     }
 
@@ -50,7 +50,7 @@ public class MemberController {
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "다시하세요",null);
+            return ApiResponse.onFailure("500", e.getMessage(),null);
         }
     }
 
@@ -67,7 +67,7 @@ public class MemberController {
                 return ApiResponse.onFailure("400", "이미 사용중인 닉네임니다.", "duplicated nickname");
             }
         } catch(Exception e){
-            return ApiResponse.onFailure("500", "error", "internal error");
+            return ApiResponse.onFailure("500", e.getMessage(), "internal error");
         }
     }
 
@@ -84,7 +84,7 @@ public class MemberController {
                 return ApiResponse.onFailure("400", "이미 사용중인 닉네임니다.", "duplicated nickname");
             }
         } catch(Exception e){
-            return ApiResponse.onFailure("500", "error", "internal error");
+            return ApiResponse.onFailure("500", e.getMessage() , "internal error");
         }
     }
 
@@ -102,7 +102,7 @@ public class MemberController {
                 return ApiResponse.onFailure("404", "회원을 찾을 수 없습니다.", "회원정보 추가 실패");
             }
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "서버 오류가 발생했습니다.", "회원정보 추가 실패");
+            return ApiResponse.onFailure("500", e.getMessage(), "회원정보 추가 실패");
         }
     }
 
@@ -119,7 +119,7 @@ public class MemberController {
                 return ApiResponse.onFailure("404", "회원을 찾을 수 없습니다.", "회원정보 추가 실패");
             }
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "서버 오류가 발생했습니다.", "회원정보 추가 실패");
+            return ApiResponse.onFailure("500", e.getMessage(), "회원정보 추가 실패");
         }
     }
 
@@ -135,7 +135,7 @@ public class MemberController {
         } catch (IllegalArgumentException e){
             return ApiResponse.onFailure("400", e.getMessage(), "비밀번호 수정 실패");
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "서버 오류", "비밀번호 수정 실패");
+            return ApiResponse.onFailure("500", e.getMessage(), "비밀번호 수정 실패");
         }
     }
 
@@ -172,7 +172,7 @@ public class MemberController {
             memberService.deleteMember(id);
             return ApiResponse.onSuccess("id : "+ id +" , "+ member.getEmail()+"님 삭제 완료");
         } catch (Exception e) {
-            return ApiResponse.onFailure("400", "존재하지 않는 회원입니다. ", null);
+            return ApiResponse.onFailure("400", e.getMessage(), null);
         }
     }
 
@@ -192,7 +192,7 @@ public class MemberController {
 
             return ApiResponse.onSuccess(fileUrl);
         } catch (Exception e) {
-            return ApiResponse.onFailure("400", "error", e.getMessage());
+            return ApiResponse.onFailure("400", e.getMessage(), e.getMessage());
         }
     }
 
