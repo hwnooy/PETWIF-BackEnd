@@ -4,10 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.apiPayload.exception.GeneralException;
+import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MailService;
 import org.example.petwif.web.dto.MemberDto.EmailRequestDto;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 import static org.example.petwif.apiPayload.code.status.ErrorStatus._BAD_REQUEST;
 
@@ -25,10 +28,9 @@ public class MailController {
             String email = mail.getEmail();
             emailVerificationService.sendVerificationEmail(email);
             return ApiResponse.onSuccess("Verification code sent to " + email);
-        } catch (Exception e){
-            throw new GeneralException(_BAD_REQUEST);
+        } catch (IllegalStateException e){
+            return ApiResponse.onFailure("400", e.getMessage(), "다른 이메일로 가입해주세요");
         }
-
     }
 
     @PostMapping("/verify")

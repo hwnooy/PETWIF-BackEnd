@@ -1,12 +1,17 @@
 package org.example.petwif.service.MemberService;
 
 import lombok.RequiredArgsConstructor;
+import org.example.petwif.apiPayload.ApiResponse;
+import org.example.petwif.apiPayload.exception.GeneralException;
+import org.example.petwif.domain.entity.Member;
+import org.example.petwif.repository.MemberRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -14,11 +19,16 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class MailService {
     private final JavaMailSender mailSender;
+    private final MemberRepository memberRepository;
     private final Map<String, String> verificationCodes = new HashMap<>();
 
     public void sendVerificationEmail(String email) {
         // 인증번호 생성
         String code = generateVerificationCode();
+        Optional<Member> member = memberRepository.checkEmail(email, "PETWIF");
+        if (member.isPresent()) {
+            throw new IllegalStateException("Already assigned Member");
+        }
 
         // 이메일 메시지 생성
         SimpleMailMessage message = new SimpleMailMessage();
