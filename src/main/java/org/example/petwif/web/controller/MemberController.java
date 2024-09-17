@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.S3.AmazonS3Manager;
 import org.example.petwif.apiPayload.ApiResponse;
+import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
@@ -138,10 +139,23 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/me")
+    @GetMapping("/me/with")
     public ApiResponse<MemberInfoResponseDto> getMemberByToken(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             Member member = memberService.getMemberByToken(authorizationHeader);
+            MemberInfoResponseDto dto = memberService.mapMemberInfoToResponse(member);
+            return ApiResponse.onSuccess(dto);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.onFailure("400", e.getMessage(), null);
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "회원 정보를 가져오는 중 오류가 발생했습니다.", null);
+        }
+    }
+
+    @GetMapping("/me/withoutAuth")
+    public ApiResponse<MemberInfoResponseDto> getMemberInfo(@RequestParam String email) {
+        try {
+            Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
             MemberInfoResponseDto dto = memberService.mapMemberInfoToResponse(member);
             return ApiResponse.onSuccess(dto);
         } catch (IllegalArgumentException e) {
