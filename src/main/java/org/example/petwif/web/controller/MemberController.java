@@ -148,7 +148,7 @@ public class MemberController {
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "회원 정보를 가져오는 중 오류가 발생했습니다.", null);
+            return ApiResponse.onFailure("500", e.getMessage(), null);
         }
     }
 
@@ -161,7 +161,7 @@ public class MemberController {
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "회원 정보를 가져오는 중 오류가 발생했습니다.", null);
+            return ApiResponse.onFailure("500", e.getMessage(), null);
         }
     }
 
