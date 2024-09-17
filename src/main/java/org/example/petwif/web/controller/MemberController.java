@@ -139,7 +139,7 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/me/with")
+    @GetMapping("/me/withAuth")
     public ApiResponse<MemberInfoResponseDto> getMemberByToken(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             Member member = memberService.getMemberByToken(authorizationHeader);
