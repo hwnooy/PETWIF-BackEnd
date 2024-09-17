@@ -178,6 +178,7 @@ public class GoogleLoginService {
             member.setEmail(email);
             member.setOauthProvider("GOOGLE");
             member.setProfile_url(info.getPicture());
+            member.setNickname(info.getName());
             // 여기에 스티커 이어서 로직 구현
             memberRepository.save(member);
         }
