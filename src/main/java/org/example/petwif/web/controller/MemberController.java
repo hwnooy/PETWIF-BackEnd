@@ -158,7 +158,7 @@ public class MemberController {
             memberService.deleteMember(id);
             return ApiResponse.onSuccess("id : "+ id +" , "+ member.getEmail()+"님 삭제 완료");
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "존재하지 않는 회원입니다. ", null);
+            return ApiResponse.onFailure("400", "존재하지 않는 회원입니다. ", null);
         }
     }
 
