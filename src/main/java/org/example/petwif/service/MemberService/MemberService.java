@@ -203,6 +203,7 @@ public class MemberService {
                 .email(email)
                 .oauthProvider("KAKAO")
                 .name(email+"님")
+                .nickname(email+"님")
                 .build();
         if (memberRepository.findMemberByEmail(email).isEmpty()){
             memberRepository.save(user);

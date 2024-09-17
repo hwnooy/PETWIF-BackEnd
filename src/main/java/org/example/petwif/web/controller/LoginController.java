@@ -39,17 +39,22 @@ public class LoginController {
     @GetMapping("/oauth")
     @ResponseBody
     public ApiResponse<TokenDto> kakaoOauth(@RequestParam("code") String code) {
-        KakaoTokenResponse kakaoTokenResponse = kakaoTokenJsonData.getToken(code);
-        KakaoUserInfoResponse userInfo = kakaoUserInfo.getUserInfo(kakaoTokenResponse.getAccess_token());
-        log.info("회원 정보 입니다.{}", userInfo);
-        KakaoAccount account = userInfo.getKakao_account();
-        String email = account.getEmail();
+        try{
+            KakaoTokenResponse kakaoTokenResponse = kakaoTokenJsonData.getToken(code);
+            KakaoUserInfoResponse userInfo = kakaoUserInfo.getUserInfo(kakaoTokenResponse.getAccess_token());
+            log.info("회원 정보 입니다.{}", userInfo);
+            KakaoAccount account = userInfo.getKakao_account();
+            String email = account.getEmail();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
-        TokenDto dto = tokenProvider.generateTokenDto(authentication);
-        System.out.println("accessToken 확인 : " + dto.getAccessToken());
-        userService.createUser(userInfo.getKakao_account().getEmail());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
+            TokenDto dto = tokenProvider.generateTokenDto(authentication);
+            System.out.println("accessToken 확인 : " + dto.getAccessToken());
+            userService.createUser(userInfo.getKakao_account().getEmail());
 
-        return ApiResponse.onSuccess(dto);
+            return ApiResponse.onSuccess(dto);
+        } catch (Exception e){
+            return ApiResponse.onFailure("code", e.getMessage(), null);
+        }
+
     }
 }
