@@ -164,18 +164,17 @@ public class MemberController {
 
     @PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> uploadImage(
-            @RequestHeader("Authorization") String authorizationHeader,
+            //@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam("id") Long id,
             @RequestParam("file") MultipartFile file) {
 
-        Member member = memberService.getMemberByToken(authorizationHeader);
-        Long memberId = member.getId();
 
         try {
             // S3에 파일 업로드 및 URL 반환
-            String keyName =  file.getOriginalFilename()+ "/"+ memberId;
+            String keyName =  file.getOriginalFilename()+ "/"+ id;
             String fileUrl = amazonS3Manager.uploadFile(keyName, file);
 
-            memberService.uploadProfile(memberId, fileUrl);
+            memberService.uploadProfile(id, fileUrl);
 
             return ApiResponse.onSuccess(fileUrl);
         } catch (Exception e) {
