@@ -79,6 +79,8 @@ public class MemberService {
                 .accessToken(dto.getAccessToken())
                 .refreshToken(dto.getRefreshToken())
                 .id(member.getId())
+                .name(member.getName())
+                .profile_url(member.getProfile_url())
                 .nickname(member.getNickname())
                 .build();
     }

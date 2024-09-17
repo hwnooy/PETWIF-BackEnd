@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.S3.AmazonS3Manager;
 import org.example.petwif.apiPayload.ApiResponse;
+import org.example.petwif.apiPayload.exception.GeneralException;
 import org.example.petwif.domain.entity.Member;
 import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
@@ -138,10 +139,23 @@ public class MemberController {
         }
     }
 
-    @GetMapping("/me")
+    @GetMapping("/me/withAuth")
     public ApiResponse<MemberInfoResponseDto> getMemberByToken(@RequestHeader("Authorization") String authorizationHeader) {
         try {
             Member member = memberService.getMemberByToken(authorizationHeader);
+            MemberInfoResponseDto dto = memberService.mapMemberInfoToResponse(member);
+            return ApiResponse.onSuccess(dto);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.onFailure("400", e.getMessage(), null);
+        } catch (Exception e) {
+            return ApiResponse.onFailure("500", "회원 정보를 가져오는 중 오류가 발생했습니다.", null);
+        }
+    }
+
+    @GetMapping("/me/withoutAuth")
+    public ApiResponse<MemberInfoResponseDto> getMemberInfo(@RequestParam String email) {
+        try {
+            Member member = memberRepository.findMemberByEmail(email).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원"));
             MemberInfoResponseDto dto = memberService.mapMemberInfoToResponse(member);
             return ApiResponse.onSuccess(dto);
         } catch (IllegalArgumentException e) {
@@ -158,24 +172,23 @@ public class MemberController {
             memberService.deleteMember(id);
             return ApiResponse.onSuccess("id : "+ id +" , "+ member.getEmail()+"님 삭제 완료");
         } catch (Exception e) {
-            return ApiResponse.onFailure("500", "존재하지 않는 회원입니다. ", null);
+            return ApiResponse.onFailure("400", "존재하지 않는 회원입니다. ", null);
         }
     }
 
     @PostMapping(value="/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<String> uploadImage(
-            @RequestHeader("Authorization") String authorizationHeader,
+            //@RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam("id") Long id,
             @RequestParam("file") MultipartFile file) {
 
-        Member member = memberService.getMemberByToken(authorizationHeader);
-        Long memberId = member.getId();
 
         try {
             // S3에 파일 업로드 및 URL 반환
-            String keyName =  file.getOriginalFilename()+ "/"+ memberId;
+            String keyName =  file.getOriginalFilename()+ "/"+ id;
             String fileUrl = amazonS3Manager.uploadFile(keyName, file);
 
-            memberService.uploadProfile(memberId, fileUrl);
+            memberService.uploadProfile(id, fileUrl);
 
             return ApiResponse.onSuccess(fileUrl);
         } catch (Exception e) {
