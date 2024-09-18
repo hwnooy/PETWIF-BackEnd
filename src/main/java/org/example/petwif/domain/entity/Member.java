@@ -101,6 +101,10 @@ public class Member extends BaseEntity {
     private List<Album> albumList = new ArrayList<>();
 
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder
     public Member(Long id, String email) {
         this.id = id;

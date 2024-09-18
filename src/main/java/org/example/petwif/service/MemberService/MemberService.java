@@ -24,7 +24,8 @@ public class MemberService {
     @Transactional   // 이메일로 회원가입할 때 멤버 생성자
     public EmailLoginResponse EmailSignup(EmailSignupRequestDTO dto) {
         // 동일한 이메일로 회원가입 안 됨, Optional<Member>와 isPresent()로 존재여부 찾아내기
-        if (memberRepository.checkEmail(dto.getEmail(), "PETWIF").isPresent()) {
+        if (memberRepository.findMemberByEmail(dto.getEmail()).isPresent()) {
+        //if (memberRepository.checkEmail(dto.getEmail(), "PETWIF").isPresent()) {
             // 중복된 이메일 존재
             return null;
         }
@@ -157,8 +158,14 @@ public class MemberService {
 
 
     public Boolean changePassword(String email, PasswordChangeRequestDto dto){
-        Member member = memberRepository.findMemberByEmail(email)
+        // 비밀번호 변경은 이메일로 로그인했을때만 가능하니까 checkEmail 서비스 사용함
+
+        Member member = memberRepository.checkEmail(email, "PETWIF")
                 .orElseThrow(() -> new IllegalArgumentException("No member found with email: " + email));
+
+        if (member.getOauthProvider().equals("KAKAO") || member.getOauthProvider().equals("GOOGLE")){
+            throw new IllegalStateException("소셜 로그인으로 이미 가입된 상태입니다. 소셜로그인으로 접속해주세요");
+        }
 
         String pw1 = dto.getChangePW();
         String pw2 = dto.getCheckChangePw();
@@ -167,9 +174,10 @@ public class MemberService {
             member.setPw(encoder.encode(pw1));
             memberRepository.save(member);
             return true;
-        }  else{
+        }  else {
             return false;
         }
+
     }
 
     public void uploadProfile(Long mId, String image) {
