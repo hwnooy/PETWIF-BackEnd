@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hibernate.query.sqm.tree.SqmNode.log;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -219,6 +221,7 @@ public class MemberService {
         if (memberRepository.findMemberByEmail(email).isEmpty()){
             memberRepository.save(user);
         }
+        log.info("nickname "+user.getName()+", profileUrl "+ user.getProfile_url());
 
         return user.getId();
     }
