@@ -58,21 +58,17 @@ public class LoginController {
             KakaoAccount account = userInfo.getKakao_account();
             String email = account.getEmail();
 
-            // 여기서 이메일 중복 확인하기
+            // 여기서 이메일 중복 확인하기, 있으면 예외처리, 없으면 db에 저장하기
             if (memberRepository.findMemberByEmail(email).isPresent()) throw new IllegalStateException("Already assigned Account");
+            else userService.createUser(userInfo.getKakao_account().getEmail(), userInfo.getKakao_account().getProfile_image(), userInfo.getKakao_account().getProfile_nickname());
 
-            else {
-                Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
-                TokenDto dto = tokenProvider.generateTokenDto(authentication);
-                String accessToken = dto.getAccessToken();
-                Member member = userService.getMemberByToken(accessToken);
-                EmailLoginAccessTokenResponse result = userService.mapMemberToEmailResponse(dto,member);
-                System.out.println("accessToken 확인 : " + dto.getAccessToken());
-                userService.createUser(userInfo.getKakao_account().getEmail(), userInfo.getKakao_account().getProfile_image(), userInfo.getKakao_account().getProfile_nickname());
-                return ApiResponse.onSuccess(result);
-            }
-
-
+            Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
+            TokenDto dto = tokenProvider.generateTokenDto(authentication);
+            String accessToken = dto.getAccessToken();
+            Member member = userService.getMemberByToken(accessToken);  // 여기서 member가 있는지 먼저 체크를 하기 때문에 해당 에러가 발생했음.
+            EmailLoginAccessTokenResponse result = userService.mapMemberToEmailResponse(dto,member);
+            System.out.println("accessToken 확인 : " + dto.getAccessToken());
+            return ApiResponse.onSuccess(result);
 
         } catch (IllegalStateException e){
             return ApiResponse.onFailure("code", e.getMessage(), null);
