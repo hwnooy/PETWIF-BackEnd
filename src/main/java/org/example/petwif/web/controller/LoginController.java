@@ -59,7 +59,7 @@ public class LoginController {
             String email = account.getEmail();
 
             // 여기서 이메일 중복 확인하기, 있으면 예외처리, 없으면 db에 저장하기
-            if (memberRepository.findMemberByEmail(email).isPresent()) throw new IllegalStateException("Already assigned Account");
+            if (memberRepository.checkEmail(email,"PETWIF").isPresent()) throw new IllegalStateException("Already assigned Account");
             else userService.createUser(userInfo.getKakao_account().getEmail(), userInfo.getKakao_account().getProfile_image(), userInfo.getKakao_account().getProfile_nickname());
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
