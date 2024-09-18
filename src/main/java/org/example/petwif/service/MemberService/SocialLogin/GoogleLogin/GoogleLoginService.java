@@ -165,7 +165,7 @@ public class GoogleLoginService {
         String token = googleToken.getAccessToken();
         GoogleUserInfo info = getGoogleUserInfo(token);
         String email = info.getEmail();
-        if (memberRepository.findMemberByEmail(email).isPresent()) {
+        if (memberRepository.checkEmail(email,"PETWIF").isPresent()) {
             throw new IllegalStateException("이미 가입된 이메일입니다.");
 
         }
