@@ -6,6 +6,7 @@ import org.example.petwif.JWT.TokenDto;
 import org.example.petwif.JWT.TokenProvider;
 import org.example.petwif.apiPayload.ApiResponse;
 import org.example.petwif.domain.entity.Member;
+import org.example.petwif.repository.MemberRepository;
 import org.example.petwif.service.MemberService.MemberService;
 import org.example.petwif.service.MemberService.SocialLogin.GoogleLogin.GoogleLoginService;
 import org.example.petwif.service.MemberService.SocialLogin.KakaoLogin.*;
@@ -26,6 +27,7 @@ public class LoginController {
     private final KakaoUserInfo kakaoUserInfo;
     private final MemberService userService;
     private final TokenProvider tokenProvider;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/code/google")
     @ResponseBody
@@ -34,8 +36,13 @@ public class LoginController {
             TokenDto dto = googleLoginService.loginByGoogleAndSignUp(code);
             String accessToken = dto.getAccessToken();
             Member member = userService.getMemberByToken(accessToken);
+
             EmailLoginAccessTokenResponse result = userService.mapMemberToEmailResponse(dto,member);
             return ApiResponse.onSuccess(result);
+
+
+        } catch (IllegalStateException e) {
+            return ApiResponse.onFailure("code", e.getMessage(), null);
         } catch (Exception e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
         }
@@ -51,6 +58,7 @@ public class LoginController {
             KakaoAccount account = userInfo.getKakao_account();
             String email = account.getEmail();
 
+            // 여기서 이메일 중복 확인하기
             Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
             TokenDto dto = tokenProvider.generateTokenDto(authentication);
             String accessToken = dto.getAccessToken();

@@ -165,12 +165,17 @@ public class GoogleLoginService {
         String token = googleToken.getAccessToken();
         GoogleUserInfo info = getGoogleUserInfo(token);
         String email = info.getEmail();
+        if (memberRepository.findMemberByEmail(email).isPresent()) {
+            throw new IllegalStateException("이미 가입된 이메일입니다.");
+
+        }
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null);
         TokenDto tokenFinal = tokenProvider.generateTokenDto(authentication);
 
         // MemberDB에 넣기 + 기존 구글로 로그인한 기록있으면 db에 넣지 않음
 
-        Optional<Member> member1 = memberRepository.checkEmail(email,"GOOGLE");
+        //Optional<Member> member1 = memberRepository.checkEmail(email,"GOOGLE");
+        Optional<Member> member1 = memberRepository.findMemberByEmail(email);
 
         if (member1.isEmpty()) {
             Member member = new Member();
@@ -179,7 +184,6 @@ public class GoogleLoginService {
             member.setOauthProvider("GOOGLE");
             member.setProfile_url(info.getPicture());
             member.setNickname(info.getName());
-            // 여기에 스티커 이어서 로직 구현
             memberRepository.save(member);
         }
         return tokenFinal;

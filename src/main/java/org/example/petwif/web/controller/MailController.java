@@ -26,7 +26,9 @@ public class MailController {
     public ApiResponse<String> sendVerificationEmail(@RequestBody @Valid EmailRequestDto mail) {
         try{
             String email = mail.getEmail();
-            Optional<Member> member = memberRepository.checkEmail(email, "PETWIF");
+            // 여기서는 소셜 로그인이 있으면 회원가입 안되게 설정해야함
+            //Optional<Member> member = memberRepository.checkEmail(email, "PETWIF");
+            Optional<Member> member = memberRepository.findMemberByEmail(email);
             if (member.isPresent()) {
                 throw new IllegalStateException("Already assigned Member");
             }
@@ -41,6 +43,7 @@ public class MailController {
     public ApiResponse<String> sendVerificationEmailForPW(@RequestBody @Valid EmailRequestDto mail) {
         try{
             String email = mail.getEmail();
+            // 비번 찾기는 이메일로 회원가입이므로 이렇게 하는 거 맞음
             Optional<Member> member = memberRepository.checkEmail(email, "PETWIF");
             if (member.isPresent()) {
                 emailVerificationService.sendVerificationEmail(email);

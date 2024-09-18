@@ -133,7 +133,9 @@ public class MemberController {
             else return ApiResponse.onFailure("400", "비밀번호 틀림", "비밀번호 수정 실패");
 
         } catch (IllegalArgumentException e){
-            return ApiResponse.onFailure("400", e.getMessage(), "비밀번호 수정 실패");
+            return ApiResponse.onFailure("400", e.getMessage(), "회원 존재하지 않음");
+        } catch (IllegalStateException e){
+            return ApiResponse.onFailure("code", e.getMessage(), "중복 회원가입");
         } catch (Exception e) {
             return ApiResponse.onFailure("500", e.getMessage(), "비밀번호 수정 실패");
         }
