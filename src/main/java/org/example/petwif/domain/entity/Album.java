@@ -51,7 +51,17 @@ public class Album extends BaseEntity {
     @Builder.Default
     private List<AlbumReport> albumReports = new ArrayList<>();
 
-   // @Column(nullable = false)
+    // comment 양방향 매핑 추가
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Notification> notificationList = new ArrayList<>();
+
+
+    // @Column(nullable = false)
     private String title;
 
    // @Column(nullable = false)
