@@ -14,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.hibernate.query.sqm.tree.SqmNode.log;
+
 @Service
 @RequiredArgsConstructor
 public class MemberService {
@@ -212,17 +214,26 @@ public class MemberService {
         Member user = Member.builder()
                 .email(email)
                 .oauthProvider("KAKAO")
-                .name(nickname)
-                .nickname(nickname)
+                .name(getUsernameFromEmail(email))
+                .nickname(getUsernameFromEmail(email))
                 .profile_url(profile)
                 .build();
         if (memberRepository.findMemberByEmail(email).isEmpty()){
             memberRepository.save(user);
         }
+        log.info("nickname "+user.getName()+", profileUrl "+ user.getProfile_url());
 
         return user.getId();
     }
 
+    public static String getUsernameFromEmail(String email) {
+        int atIndex = email.indexOf('@');
+        if (atIndex != -1) {
+            return email.substring(0, atIndex);
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 이메일 주소입니다.");
+        }
+    }
 
 
 
