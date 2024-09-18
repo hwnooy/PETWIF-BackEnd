@@ -12,4 +12,6 @@ public class EmailLoginAccessTokenResponse {
     private String refreshToken;
     private Long id;
     private String nickname;
+    private String name;
+    private String profile_url;
 }

@@ -79,6 +79,8 @@ public class MemberService {
                 .accessToken(dto.getAccessToken())
                 .refreshToken(dto.getRefreshToken())
                 .id(member.getId())
+                .name(member.getName())
+                .profile_url(member.getProfile_url())
                 .nickname(member.getNickname())
                 .build();
     }
@@ -198,11 +200,13 @@ public class MemberService {
     }
 
     @Transactional   // 카카오 회원가입 할 때의 멤버 생성자
-    public Long createUser(String email) {
+    public Long createUser(String email, String profile, String nickname) {
         Member user = Member.builder()
                 .email(email)
                 .oauthProvider("KAKAO")
-                .name(email+"님")
+                .name(nickname)
+                .nickname(nickname)
+                .profile_url(profile)
                 .build();
         if (memberRepository.findMemberByEmail(email).isEmpty()){
             memberRepository.save(user);
@@ -210,4 +214,8 @@ public class MemberService {
 
         return user.getId();
     }
+
+
+
+
 }
