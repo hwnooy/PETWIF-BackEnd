@@ -214,8 +214,8 @@ public class MemberService {
         Member user = Member.builder()
                 .email(email)
                 .oauthProvider("KAKAO")
-                .name(nickname)
-                .nickname(nickname)
+                .name(getUsernameFromEmail(email))
+                .nickname(getUsernameFromEmail(email))
                 .profile_url(profile)
                 .build();
         if (memberRepository.findMemberByEmail(email).isEmpty()){
@@ -226,6 +226,14 @@ public class MemberService {
         return user.getId();
     }
 
+    public static String getUsernameFromEmail(String email) {
+        int atIndex = email.indexOf('@');
+        if (atIndex != -1) {
+            return email.substring(0, atIndex);
+        } else {
+            throw new IllegalArgumentException("유효하지 않은 이메일 주소입니다.");
+        }
+    }
 
 
 
