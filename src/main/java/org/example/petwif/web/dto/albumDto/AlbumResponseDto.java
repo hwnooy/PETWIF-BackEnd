@@ -52,7 +52,7 @@ public class AlbumResponseDto {
         private Scope scope;
         private LocalDateTime updatedAt;
         private String coverImageUrl;
-        private List<String> albumImages;
+        private String albumImages;
         private int viewCount;
         private int likeCount;
         private int everyCommentCount;

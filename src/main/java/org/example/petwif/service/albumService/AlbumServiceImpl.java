@@ -48,7 +48,7 @@ public class AlbumServiceImpl implements AlbumService {
     //앨범 생성
     @Override
     @Transactional
-    public Album saveAlbum(AlbumRequestDto.SaveRequestDto requestDto, Long memberId, MultipartFile coverImage, MultipartFile[] albumImages){
+    public Album saveAlbum(AlbumRequestDto.SaveRequestDto requestDto, Long memberId, MultipartFile coverImage, MultipartFile albumImages){
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MEMBER_NOT_FOUND));
 
@@ -82,16 +82,14 @@ public class AlbumServiceImpl implements AlbumService {
         }
 
         //==== 앨범 표지 외 사진들!! ====//
-        if (albumImages != null) {  // albumImages가 null이 아닌지 확인
-            for (MultipartFile image : albumImages) {
-                if (image != null && !image.isEmpty()) {  // 각각의 이미지 파일이 null이 아닌지 확인
+        if (albumImages != null && !albumImages.isEmpty()) {  // albumImages가 null이 아닌지 확인
                     // UUID 생성 및 저장
                     String imageUuid = UUID.randomUUID().toString();
                     Uuid imageSavedUuid = uuidRepository.save(Uuid.builder().uuid(imageUuid).build());
                     // S3에 이미지 업로드
                     String imageUrl;
                     try {
-                        imageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(imageSavedUuid), image);
+                        imageUrl = s3Manager.uploadFile(s3Manager.generateAlbumKeyName(imageSavedUuid), albumImages);
                     } catch (Exception e) {
                         throw new GeneralException(ErrorStatus.ALBUM_IMAGE_UPLOAD_FAILED);
                     }
@@ -105,8 +103,8 @@ public class AlbumServiceImpl implements AlbumService {
                     albumImageRepository.save(albumImage);
                     // 엔티티에 앨범 이미지 추가
                     album.addAlbumImageToAlbum(albumImage);
-                }
-            }
+
+
         }
 
         //드디어 세이브,,,,,
