@@ -27,4 +27,5 @@ public class CommentReport extends BaseEntity {
     private Member member;
 
     private String content;
+
 }

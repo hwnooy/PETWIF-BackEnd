@@ -31,9 +31,13 @@ public class Album extends BaseEntity {
     @JoinColumn(name = "cover_image_id")
     private AlbumImage coverImage;
 
-    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL) //양방향 연관관계, 표지 제외 나머지 앨범 내 사진 리스트
-    @Builder.Default
-    private List<AlbumImage> albumImages = new ArrayList<>();
+//    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL) //양방향 연관관계, 표지 제외 나머지 앨범 내 사진 리스트
+//    @Builder.Default
+//    private List<AlbumImage> albumImages = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "album_images_id")
+    private AlbumImage albumImages;
 
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     @Builder.Default
@@ -88,6 +92,6 @@ public class Album extends BaseEntity {
     }
 
     public void addAlbumImageToAlbum(AlbumImage newAlbumImages) {
-        this.albumImages.add(newAlbumImages);
+        this.albumImages = newAlbumImages;
     }
 }
