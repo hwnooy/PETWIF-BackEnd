@@ -59,7 +59,7 @@ public class AlbumController {
                                                                      @RequestParam String content,
                                                                      @RequestParam Scope scope,
                                                                      @RequestPart(value = "coverImage", required = false) MultipartFile coverImage,
-                                                                     @RequestPart(value = "albumImages", required = false) MultipartFile[] albumImages,
+                                                                     @RequestPart(value = "albumImages", required = false) MultipartFile albumImages,
                                                                      @RequestHeader("Authorization") String authorizationHeader ) {
         AlbumRequestDto.SaveRequestDto requestDto = new AlbumRequestDto.SaveRequestDto();
         requestDto.setTitle(title);

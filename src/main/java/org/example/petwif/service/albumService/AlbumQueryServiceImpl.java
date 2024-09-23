@@ -50,9 +50,9 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
         //차단, 친구인지 확인
        albumCheckAccessService.checkAccess(album, memberId);
 
-       List<String> albumImageUrls = album.getAlbumImages().stream()
+       /*List<String> albumImageUrls = album.getAlbumImages().stream()
                .map(AlbumImage::getImageURL)
-               .collect(Collectors.toList());;
+               .collect(Collectors.toList());*/
        boolean isLiked = albumLikeRepository.existsByAlbumAndMemberId(album, memberId);
        boolean isBookmarked = albumBookmarkRepository.existsByAlbumAndMemberId(album, memberId);
 
@@ -65,7 +65,7 @@ public class AlbumQueryServiceImpl implements AlbumQueryService{
                .updatedAt(album.getUpdatedAt())
                .updatedAt(album.getUpdatedAt())
                .coverImageUrl(Optional.ofNullable(album.getCoverImage()).map(AlbumImage::getImageURL).orElse(null))
-               .albumImages(albumImageUrls)
+               .albumImages(Optional.ofNullable(album.getAlbumImages()).map(AlbumImage::getImageURL).orElse(null))
                .viewCount(album.getView())
                .likeCount(albumLikeRepository.countByAlbum(album))
                .everyCommentCount(comments.size())
