@@ -10,8 +10,8 @@ import java.util.List;
 public class ChatRequestDTO {
     @Getter
     public static class CreateChatRoomDTO { //채팅 생성
-        @NotNull
-        private Long otherId;
+        @NotBlank
+        private String nickname;
     }
     @Getter
     @Setter
