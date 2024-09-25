@@ -54,7 +54,8 @@ public class ChatController {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Long otherId = request.getOtherId();
+        Member other = memberService.getMemberByNickname(request.getNickname());
+        Long otherId = other.getId();
 
         ChatRoom chatRoom = chatCommandService.createChatRoom(memberId, otherId, request);
         return ApiResponse.onSuccess(ChatConverter.createChatRoomResultDTO(chatRoom));
