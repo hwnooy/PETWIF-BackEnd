@@ -26,7 +26,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Base64;
 import java.util.Optional;
 
 @RestController
@@ -64,13 +66,18 @@ public class ChatController {
     //채팅 보내기 - 완 (Rest API)
     @PostMapping(value = "/chatRoom/{chatRoomId}/send", consumes = "multipart/form-data")
     @Operation(summary = "채팅 메시지 전송 API - Rest API")
-    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendChat(@ModelAttribute ChatRequestDTO.SendChatDTO request,
+    public ApiResponse<ChatResponseDTO.SendChatResultDTO> sendChat(//@ModelAttribute ChatRequestDTO.SendChatDTO request,
                                                                    @RequestHeader("Authorization") String authorizationHeader,
+                                                                   @RequestParam String content,
+                                                                   @RequestPart(value = "chatImage", required = false) MultipartFile chatImage,
                                                                    @ExistChatRoom @PathVariable(name = "chatRoomId") Long chatRoomId) {
         Member member = memberService.getMemberByToken(authorizationHeader);
         Long memberId = member.getId();
 
-        Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request);
+        ChatRequestDTO.SendChatDTO request = new ChatRequestDTO.SendChatDTO();
+        request.setContent(content);
+
+        Chat chat = chatCommandService.sendChat(memberId, chatRoomId, request, chatImage);
         return ApiResponse.onSuccess(ChatConverter.sendChatResultDTO(chat));
     }
 

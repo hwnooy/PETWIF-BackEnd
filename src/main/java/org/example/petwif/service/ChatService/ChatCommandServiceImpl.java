@@ -12,6 +12,7 @@ import org.example.petwif.repository.*;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -77,7 +78,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
 
     @Override
     @Transactional
-    public Chat sendChat(Long memberId, Long chatRoomId, ChatRequestDTO.SendChatDTO request) { //채팅 보내기
+    public Chat sendChat(Long memberId, Long chatRoomId, ChatRequestDTO.SendChatDTO request, MultipartFile chatImages) { //채팅 보내기
         Chat chat = ChatConverter.toChat(request);
 
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)

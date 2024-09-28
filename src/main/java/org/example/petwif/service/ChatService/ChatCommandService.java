@@ -4,6 +4,7 @@ import org.example.petwif.domain.entity.Chat;
 import org.example.petwif.domain.entity.ChatReport;
 import org.example.petwif.domain.entity.ChatRoom;
 import org.example.petwif.web.dto.ChatDTO.ChatRequestDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface ChatCommandService {
 
@@ -11,7 +12,7 @@ public interface ChatCommandService {
     ChatRoom createChatRoom(Long memberId, Long otherId, ChatRequestDTO.CreateChatRoomDTO request);
 
     //채팅 보내기
-    Chat sendChat(Long memberId, Long chatRoomId, ChatRequestDTO.SendChatDTO request);
+    Chat sendChat(Long memberId, Long chatRoomId, ChatRequestDTO.SendChatDTO request, MultipartFile chatImage);
 
     //채팅방 나가기 = memberChatRoom
     void deleteChatRoom(Long memberId, Long chatRoomId);
